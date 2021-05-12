@@ -118,3 +118,29 @@ func TestDec_Ln(t *testing.T) {
 		})
 	}
 }
+
+func TestDec_RoundInflation(t *testing.T) {
+	tests := []struct {
+		name   string
+		d      Dec
+		a      Dec
+		b      Dec
+		c      Dec
+		want   Dec
+	}{
+		{"1", NewDec(0), NewDec(100), NewDec(150000000), NewDec(50000000), NewDec(1) },
+		{"2", NewDec(10000000), NewDec(100), NewDec(150000000), NewDec(50000000), NewDec(2) },
+		{"3", NewDec(20000000), NewDec(100), NewDec(150000000), NewDec(50000000), NewDec(3) },
+		{"4", NewDec(100000000), NewDec(100), NewDec(150000000), NewDec(50000000), NewDec(61) },
+		{"5", NewDec(150000000), NewDec(100), NewDec(150000000), NewDec(50000000), NewDec(100) },
+		{"6", NewDec(270000000), NewDec(100), NewDec(150000000), NewDec(50000000), NewDec(6) },
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.d.RoundInflation(tt.a, tt.b, tt.c); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Inflation() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+

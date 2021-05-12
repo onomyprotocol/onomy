@@ -489,6 +489,19 @@ func (d Dec) Ln() (Dec, error) {
 	return ln, nil
 }
 
+func (d Dec) Inflation(a Dec, b Dec, c Dec) Dec {
+	temp1 := d.Sub(b).Power(2)
+	temp2 := c.Power(2).MulInt64(2)
+	temp3 := temp1.Quo(temp2).Mul(NewDec(-1))
+	inflation := temp3.Exp().Mul(a)
+
+	return inflation
+}
+
+func (d Dec) RoundInflation(a Dec, b Dec, c Dec) Dec {
+	return NewDec(d.Inflation(a, b, c).RoundInt64())
+}
+
 // is integer, e.g. decimals are zero
 func (d Dec) IsInteger() bool {
 	return new(big.Int).Rem(d.i, precisionReuse).Sign() == 0
