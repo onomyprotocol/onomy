@@ -1,0 +1,29 @@
+name: Test-Deploy-Smart-Contract
+on: [ push ]
+
+jobs:
+  amd64:
+    name: Test-Deploy-Smart-Contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: deploy smart contract and save on GitGub
+        run: docker buildx build --tag leeway321/deploy-gravity-contract-1 --file deploy/master-cosmos-orchestrator-node/deployContract/Dockerfile --platform linux/amd64 --push --progress tty --build-arg GRAVITY_HOST=${{ secrets.MASTER_COSMOS_NODE_HOST }} --build-arg ETH_HOST=${{ secrets.MASTER_COSMOS_NODE_HOST }} --build-arg GIT_HUB_USER=sunnyk56 --build-arg GIT_HUB_PASS=Leeway321 --build-arg GIT_HUB_EMAIL=sunnyk@leewayhertz.com --build-arg GIT_HUB_BRANCH=config .
+

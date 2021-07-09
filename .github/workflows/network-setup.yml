@@ -1,0 +1,89 @@
+name: Network-Setup
+on: [ push ]
+
+jobs:
+  amd64:
+    name: Network-Setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push master-cosmos-validator-node
+        run: docker buildx build --tag leeway321/master-cosmos-validator-node --file deploy/master-cosmos-orchestrator-node/cosmos/Dockerfile --platform linux/amd64 --push --progress tty --build-arg PUBLIC_IP=${{ secrets.MASTER_COSMOS_NODE_HOST }} --build-arg GIT_HUB_USER=sunnyk56 --build-arg GIT_HUB_PASS=Leeway321 --build-arg GIT_HUB_EMAIL=sunnyk@leewayhertz.com --build-arg GIT_HUB_BRANCH=config .
+
+      - name: Build and push master-cosmos-orch-node
+        run: docker buildx build --tag leeway321/master-cosmos-orch-node --file deploy/master-cosmos-orchestrator-node/orchestrator/Dockerfile --platform linux/amd64 --push --progress tty --build-arg PUBLIC_IP=${{ secrets.MASTER_COSMOS_NODE_HOST }} --build-arg GIT_HUB_USER=sunnyk56 --build-arg GIT_HUB_PASS=Leeway321 --build-arg GIT_HUB_EMAIL=sunnyk@leewayhertz.com --build-arg GIT_HUB_BRANCH=config .
+
+      - name: Build and push peer-cosmos-validator-node
+        run: docker buildx build --tag leeway321/peer-cosmos-validator-node --file deploy/peer-cosmos-orchestrator-node/cosmos/Dockerfile --platform linux/amd64 --push --progress tty --build-arg PUBLIC_IP=${{ secrets.FULL_NODE_HOST }} --build-arg GIT_HUB_USER=sunnyk56 --build-arg GIT_HUB_PASS=Leeway321 --build-arg GIT_HUB_EMAIL=sunnyk@leewayhertz.com --build-arg GIT_HUB_BRANCH=config .
+
+      - name: Build and push peer-cosmos-orch-node
+        run: docker buildx build --tag leeway321/peer-cosmos-orch-node --file deploy/peer-cosmos-orchestrator-node/orchestrator/Dockerfile --platform linux/amd64 --push --progress tty --build-arg GRAVITY_HOST=${{ secrets.FULL_NODE_HOST }} --build-arg ETH_HOST=${{ secrets.MASTER_COSMOS_NODE_HOST }} --build-arg GIT_HUB_BRANCH=config .
+
+      - name: start master-cosmos-validator-node
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: docker run hello-world && docker rm -f $(docker ps -a -q) && docker rmi -f $(docker images -q) && docker run --name master_cosmos_validator_node -d -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 leeway321/master-cosmos-validator-node /bin/sh -c "sleep infinity | /root/scripts/update-master-node.sh sunnyk56 Leeway321 sunnyk@leewayhertz.com config"
+          host: ${{ secrets.MASTER_COSMOS_NODE_HOST }}
+          username: root
+          password: ""
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+
+      - name: start peer-cosmos-validator-node
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: docker run hello-world && docker rm -f $(docker ps -a -q) && docker rmi -f $(docker images -q) && docker run --name peer_cosmos_validator_node -d -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 leeway321/peer-cosmos-validator-node /bin/sh -c "sleep infinity | /root/scripts/update-peer-node.sh config"
+          host: ${{ secrets.FULL_NODE_HOST }}
+          username: root
+          password: ""
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+
+      - name: Build and push master-cosmos-eth-node
+        run: docker buildx build --tag leeway321/master-cosmos-eth-node --file deploy/master-cosmos-orchestrator-node/ethereum/Dockerfile --platform linux/amd64 --push --progress tty --build-arg GIT_HUB_BRANCH=config .
+
+      - name: start master-cosmos-eth-node
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: docker run --name master_cosmos_eth_node -d -p 30303:30303 -p 8545:8545 leeway321/master-cosmos-eth-node /bin/sh -c "sleep infinity | /root/scripts/ethereum-run.sh"
+          host: ${{ secrets.MASTER_COSMOS_NODE_HOST }}
+          username: root
+          password: ""
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+
+      - name: deploy smart contract and save on GitGub
+        run: docker buildx build --tag leeway321/deploy-gravity-contract-1 --file deploy/master-cosmos-orchestrator-node/deployContract/Dockerfile --platform linux/amd64 --push --progress tty --build-arg GRAVITY_HOST=${{ secrets.MASTER_COSMOS_NODE_HOST }} --build-arg ETH_HOST=${{ secrets.MASTER_COSMOS_NODE_HOST }} --build-arg GIT_HUB_USER=sunnyk56 --build-arg GIT_HUB_PASS=Leeway321 --build-arg GIT_HUB_EMAIL=sunnyk@leewayhertz.com --build-arg GIT_HUB_BRANCH=config .
+
+      - name: start master-cosmos-orch-node
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: docker run --name master_cosmos_orch_node -d -p 61278:61278 leeway321/master-cosmos-orch-node /bin/sh -c "sleep infinity | /root/scripts/orchestrator-run.sh ${{ secrets.MASTER_COSMOS_NODE_HOST }} ${{ secrets.MASTER_COSMOS_NODE_HOST }}"
+          host: ${{ secrets.MASTER_COSMOS_NODE_HOST }}
+          username: root
+          password: ""
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+
+      - name: start peer-cosmos-orch-node
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: docker run --name peer_cosmos_orch_node -d -p 61278:61278 leeway321/peer-cosmos-orch-node /bin/sh -c "sleep infinity | /root/scripts/orchestrator-run.sh ${{ secrets.FULL_NODE_HOST }} ${{ secrets.MASTER_COSMOS_NODE_HOST }}"
+          host: ${{ secrets.FULL_NODE_HOST }}
+          username: root
+          password: ""
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+

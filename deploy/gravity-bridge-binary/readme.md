@@ -1,0 +1,2 @@
+
+ Here idea is instead of making binary again and again, we can create a docker image that will contain all the binaries and whenever we need to launch either cosmos gravity node, ethereum node or orchestrator node we can use this docker image 
