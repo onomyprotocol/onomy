@@ -1,0 +1,77 @@
+name: One_Click_Cosmos_Node_Test_Network
+on: [push, pull_request]
+
+jobs:
+  amd64:
+    name: One_Click_Cosmos_Node_Test_Network
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push master-node
+        run: docker buildx build --tag leeway321/cosmos-master-node --file cosmosNode/master/Dockerfile --platform linux/amd64 --push --progress tty --build-arg PUBLIC_IP=${{ secrets.MASTER_NODE_HOST }} --build-arg GIT_HUB_USER=${{ secrets.GIT_HUB_USER }} --build-arg GIT_HUB_PASS=${{ secrets.GIT_HUB_PASS }} --build-arg GIT_HUB_EMAIL=${{ secrets.GIT_HUB_EMAIL }} --build-arg GIT_HUB_BRANCH=config .
+
+      - name: start master node
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: docker rm -f $(docker ps -a -q) && docker rmi -f $(docker images -q) && docker run --name cosmos-master-node -d -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 leeway321/cosmos-master-node /bin/sh -c "sleep infinite | gravity --home /root/.gravity/ --address tcp://0.0.0.0:26655 --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090 --log_level error --p2p.laddr tcp://0.0.0.0:26656 --rpc.pprof_laddr 0.0.0.0:6060 start"
+          host: ${{ secrets.MASTER_NODE_HOST }}
+          username: root
+          password: ""
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+
+      - name: Build and push peer-node
+        run: docker buildx build --tag leeway321/cosmos-peer-node --file cosmosNode/peerNode/Dockerfile --platform linux/amd64 --push --progress tty --build-arg PUBLIC_IP=${{ secrets.PEER_NODE_HOST }} --build-arg GIT_HUB_USER=${{ secrets.GIT_HUB_USER }} --build-arg GIT_HUB_PASS=${{ secrets.GIT_HUB_PASS }} --build-arg GIT_HUB_EMAIL=${{ secrets.GIT_HUB_EMAIL }} --build-arg GIT_HUB_BRANCH=config .
+
+      - name: start peer node
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: docker rm -f $(docker ps -a -q) && docker rmi -f $(docker images -q)  && docker run --name cosmos-peer-node -d -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 leeway321/cosmos-peer-node /bin/sh -c "sleep infinite | gravity --home /root/.gravity/ --address tcp://0.0.0.0:26655 --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090 --log_level error --p2p.laddr tcp://0.0.0.0:26656 --rpc.pprof_laddr 0.0.0.0:6060 start"
+          host: ${{ secrets.PEER_NODE_HOST }}
+          username: root
+          password: ""
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+
+      - name: Update master node
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: sleep 10 && docker exec -d cosmos-master-node sh /root/onomy/cosmosNode/master/update-master-node.sh ${{ secrets.GIT_HUB_USER }} ${{ secrets.GIT_HUB_PASS }} ${{ secrets.GIT_HUB_EMAIL }} config && docker exec -d cosmos-master-node gravity unsafe-reset-all && docker exec -d cosmos-master-node gravity --home /root/.gravity/ --address tcp://0.0.0.0:26655 --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090 --log_level error --p2p.laddr tcp://0.0.0.0:26656 --rpc.pprof_laddr 0.0.0.0:6060 start
+          host: ${{ secrets.MASTER_NODE_HOST }}
+          username: root
+          password: ""
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+
+      - name: Update peer node
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: sleep 10 && docker exec -d cosmos-peer-node sh /root/onomy/cosmosNode/peerNode/update-peer-node.sh ${{ secrets.GIT_HUB_USER }} ${{ secrets.GIT_HUB_PASS }} ${{ secrets.GIT_HUB_EMAIL }} config && docker exec -d cosmos-peer-node gravity unsafe-reset-all && docker exec -d cosmos-peer-node gravity --home /root/.gravity/ --address tcp://0.0.0.0:26655 --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090 --log_level error --p2p.laddr tcp://0.0.0.0:26656 --rpc.pprof_laddr 0.0.0.0:6060 start
+          host: ${{ secrets.PEER_NODE_HOST }}
+          username: root
+          password: ""
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+      # - name: Build and push full-node
+      #   run: docker buildx build --tag leeway321/cosmos-full-node --file cosmosNode/fullNode/Dockerfile --platform linux/amd64 --push --progress tty --build-arg PUBLIC_IP=${{ secrets.FULL_NODE_HOST }} --build-arg GIT_HUB_USER=${{ secrets.GIT_HUB_USER }} --build-arg GIT_HUB_PASS=${{ secrets.GIT_HUB_PASS }} --build-arg GIT_HUB_EMAIL=${{ secrets.GIT_HUB_EMAIL }} --build-arg GIT_HUB_BRANCH=config .
+      # - name: starting full node
+      #   uses: garygrossgarten/github-action-ssh@release
+      #   with:
+      #     command: docker rm -f $(docker ps -a -q) && docker rmi -f $(docker images -q) &&  docker run --name cosmos-full-node -d -p 26656:26656 -p 26657:26657 -p 1317:1317 -p 9090:9090 leeway321/cosmos-full-node /bin/sh -c "sleep infinite | gravity --home /root/.gravity/ --address tcp://0.0.0.0:26655 --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090 --log_level error --p2p.laddr tcp://0.0.0.0:26656 --rpc.pprof_laddr 0.0.0.0:6060 start | sh cosmosNode/fullNode/start.sh ${{ secrets.GIT_HUB_USER }} ${{ secrets.GIT_HUB_PASS }} ${{ secrets.GIT_HUB_EMAIL }} config"
+      #     host: ${{ secrets.FULL_NODE_HOST }}
+      #     username: root
+      #     password: ""
+      #     privateKey: ${{ secrets.PRIVATE_KEY}}
