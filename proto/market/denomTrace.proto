@@ -1,0 +1,13 @@
+syntax = "proto3";
+package onomyprotocol.onomy.market;
+
+option go_package = "github.com/onomyprotocol/onomy/x/market/types";
+
+import "gogoproto/gogo.proto";
+
+message DenomTrace {
+  string index = 2;
+  string port = 3; 
+  string channel = 4; 
+  string origin = 5; 
+}

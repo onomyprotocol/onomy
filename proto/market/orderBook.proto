@@ -1,0 +1,14 @@
+syntax = "proto3";
+package onomyprotocol.onomy.market;
+
+option go_package = "github.com/onomyprotocol/onomy/x/market/types";
+
+import "market/order.proto";
+
+message OrderBook {
+  string index = 2;
+  int32 orderIDTrack = 3; 
+  string amountDenom = 4; 
+  string exchRateDenom = 5;
+  repeated Order orders = 6;
+}

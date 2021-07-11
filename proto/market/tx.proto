@@ -1,0 +1,55 @@
+syntax = "proto3";
+package onomyprotocol.onomy.market;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/onomyprotocol/onomy/x/market/types";
+
+// Msg defines the Msg service.
+service Msg {
+    // this line is used by starport scaffolding # proto/tx/rpc
+  rpc CancelOrder(MsgCancelOrder) returns (MsgCancelOrderResponse);
+  rpc SendCreateOrder(MsgSendCreateOrder) returns (MsgSendCreateOrderResponse);
+  rpc SendCreatePair(MsgSendCreatePair) returns (MsgSendCreatePairResponse);
+}
+
+// this line is used by starport scaffolding # proto/tx/message
+message MsgCancelOrder {
+  string creator = 1;
+  string port = 2;
+  string channel = 3;
+  string amountDenom = 4;
+  string exchRateDenom = 5;
+  int32 orderID = 6;
+}
+
+message MsgCancelOrderResponse {
+}
+
+message MsgSendCreateOrder {
+  string sender = 1;
+  string port = 2;
+  string channelID = 3;
+  uint64 timeoutTimestamp = 4;
+  string amountDenom = 5;
+  int32 amount = 6;
+  string sourceCoin = 7;
+  string targetCoin = 8;
+  string exchRateDenom = 9;
+  string exchRate = 10;
+}
+
+message MsgSendCreateOrderResponse {
+}
+
+message MsgSendCreatePair {
+  string sender = 1;
+  string port = 2;
+  string channelID = 3;
+  uint64 timeoutTimestamp = 4;
+  string sourceDenom = 5;
+  string targetDenom = 6;
+}
+
+message MsgSendCreatePairResponse {
+}

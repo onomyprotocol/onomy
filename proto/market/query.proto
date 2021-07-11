@@ -1,0 +1,63 @@
+syntax = "proto3";
+package onomyprotocol.onomy.market;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+// this line is used by starport scaffolding # 1
+import "market/denomTrace.proto";
+import "market/orderBook.proto";
+
+option go_package = "github.com/onomyprotocol/onomy/x/market/types";
+
+// Query defines the gRPC querier service.
+service Query {
+    // this line is used by starport scaffolding # 2
+	rpc DenomTrace(QueryGetDenomTraceRequest) returns (QueryGetDenomTraceResponse) {
+		option (google.api.http).get = "/onomyprotocol/onomy/market/denomTrace/{index}";
+	}
+	rpc DenomTraceAll(QueryAllDenomTraceRequest) returns (QueryAllDenomTraceResponse) {
+		option (google.api.http).get = "/onomyprotocol/onomy/market/denomTrace";
+	}
+
+	rpc OrderBook(QueryGetOrderBookRequest) returns (QueryGetOrderBookResponse) {
+		option (google.api.http).get = "/onomyprotocol/onomy/market/orderBook/{index}";
+	}
+	rpc OrderBookAll(QueryAllOrderBookRequest) returns (QueryAllOrderBookResponse) {
+		option (google.api.http).get = "/onomyprotocol/onomy/market/orderBook";
+	}
+
+}
+
+// this line is used by starport scaffolding # 3
+message QueryGetDenomTraceRequest {
+	string index = 1;
+}
+
+message QueryGetDenomTraceResponse {
+	DenomTrace DenomTrace = 1;
+}
+
+message QueryAllDenomTraceRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllDenomTraceResponse {
+	repeated DenomTrace DenomTrace = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+message QueryGetOrderBookRequest {
+	string index = 1;
+}
+
+message QueryGetOrderBookResponse {
+	OrderBook OrderBook = 1;
+}
+
+message QueryAllOrderBookRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllOrderBookResponse {
+	repeated OrderBook OrderBook = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

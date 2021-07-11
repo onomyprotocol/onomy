@@ -1,0 +1,41 @@
+syntax = "proto3";
+package onomyprotocol.onomy.market;
+
+option go_package = "github.com/onomyprotocol/onomy/x/market/types";
+
+message MarketPacketData {
+    oneof packet {
+        NoData noData = 1;
+        // this line is used by starport scaffolding # ibc/packet/proto/field
+				CreateOrderPacketData createOrderPacket = 3; // this line is used by starport scaffolding # ibc/packet/proto/field/number
+				CreatePairPacketData createPairPacket = 2; // this line is used by starport scaffolding # ibc/packet/proto/field/number
+    }
+}
+
+message NoData {
+}
+
+// this line is used by starport scaffolding # ibc/packet/proto/message
+// CreateOrderPacketData defines a struct for the packet payload
+message CreateOrderPacketData {
+	  string amountDenom = 1;
+  int32 amount = 2;
+  string sourceCoin = 3;
+  string targetCoin = 4;
+  string exchRateDenom = 5;
+  string exchRate = 6;
+}
+
+// CreateOrderPacketAck defines a struct for the packet acknowledgment
+message CreateOrderPacketAck {
+	}
+
+// CreatePairPacketData defines a struct for the packet payload
+message CreatePairPacketData {
+	  string sourceDenom = 1;
+  string targetDenom = 2;
+}
+
+// CreatePairPacketAck defines a struct for the packet acknowledgment
+message CreatePairPacketAck {
+	}

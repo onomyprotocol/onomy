@@ -1,0 +1,15 @@
+syntax = "proto3";
+package onomyprotocol.onomy.market;
+
+option go_package = "github.com/onomyprotocol/onomy/x/market/types";
+
+import "gogoproto/gogo.proto";
+
+message Order {
+  int32 id = 1;
+  string creator = 2;
+  int32 amount = 3;
+  int32 sourceCoin = 4;
+  int32 targetCoin = 5;
+  string exchRate = 6;
+}
