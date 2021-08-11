@@ -1,17 +1,18 @@
+// Package keeper is onomy cosmos sdk keeper.
 package keeper
 
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/onomyprotocol/onomy/x/onomy/types"
-	// this line is used by starport scaffolding # ibc/keeper/import
 )
 
 type (
+	// Keeper is a struct that holds module store actions.
 	Keeper struct {
 		cdc      codec.Marshaler
 		storeKey sdk.StoreKey
@@ -21,6 +22,7 @@ type (
 	}
 )
 
+// NewKeeper creates an instance of Keeper.
 func NewKeeper(
 	cdc codec.Marshaler,
 	storeKey,
@@ -37,6 +39,7 @@ func NewKeeper(
 	}
 }
 
+// Logger logger wrapped with the keeper.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }

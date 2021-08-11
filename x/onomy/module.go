@@ -1,42 +1,41 @@
+// Package onomy is cosmso sdk onomy module.
 package onomy
 
 import (
 	"encoding/json"
 	"fmt"
-	// this line is used by starport scaffolding # 1
-
-	"github.com/gorilla/mux"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/spf13/cobra"
-
-	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/gorilla/mux"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/spf13/cobra"
+	abci "github.com/tendermint/tendermint/abci/types"
+
 	"github.com/onomyprotocol/onomy/x/onomy/client/cli"
 	"github.com/onomyprotocol/onomy/x/onomy/keeper"
 	"github.com/onomyprotocol/onomy/x/onomy/types"
-	// this line is used by starport scaffolding # ibc/module/import
 )
 
 var (
 	_ module.AppModule      = AppModule{}
 	_ module.AppModuleBasic = AppModuleBasic{}
-	// this line is used by starport scaffolding # ibc/module/interface
+	// this line is used by starport scaffolding # ibc/module/interface.
 )
 
 // ----------------------------------------------------------------------------
 // AppModuleBasic
-// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------.
 
 // AppModuleBasic implements the AppModuleBasic interface for the capability module.
 type AppModuleBasic struct {
 	cdc codec.Marshaler
 }
 
+// NewAppModuleBasic creates an instance of AppModuleBasic.
 func NewAppModuleBasic(cdc codec.Marshaler) AppModuleBasic {
 	return AppModuleBasic{cdc: cdc}
 }
@@ -46,15 +45,17 @@ func (AppModuleBasic) Name() string {
 	return types.ModuleName
 }
 
-func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
+// RegisterCodec registers type code.
+func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) { // nolint:staticcheck
 	types.RegisterCodec(cdc)
 }
 
-func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+// RegisterLegacyAminoCodec registers legacy type code.
+func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) { // nolint:staticcheck
 	types.RegisterCodec(cdc)
 }
 
-// RegisterInterfaces registers the module's interface types
+// RegisterInterfaces registers the module's interface types.
 func (a AppModuleBasic) RegisterInterfaces(reg cdctypes.InterfaceRegistry) {
 	types.RegisterInterfaces(reg)
 }
@@ -94,7 +95,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 
 // ----------------------------------------------------------------------------
 // AppModule
-// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------.
 
 // AppModule implements the AppModule interface for the capability module.
 type AppModule struct {
@@ -103,6 +104,7 @@ type AppModule struct {
 	keeper keeper.Keeper
 }
 
+// NewAppModule create a instance of AppModule.
 func NewAppModule(cdc codec.Marshaler, keeper keeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
@@ -124,7 +126,7 @@ func (am AppModule) Route() sdk.Route {
 func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
 // LegacyQuerierHandler returns the capability module's Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier { // nolint:staticcheck
 	return nil
 }
 

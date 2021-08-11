@@ -2,6 +2,7 @@ package onomy
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/onomyprotocol/onomy/x/onomy/keeper"
 	"github.com/onomyprotocol/onomy/x/onomy/types"
 )
@@ -15,7 +16,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 }
 
 // ExportGenesis returns the capability module's exported genesis.
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+func ExportGenesis(_ sdk.Context, _ keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 
 	// this line is used by starport scaffolding # genesis/module/export
