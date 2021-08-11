@@ -1,3 +1,4 @@
+// Package network contains network tools.
 package network
 
 import (
@@ -22,13 +23,24 @@ import (
 )
 
 type (
+	// Network defines a local in-process testing network using SimApp.
 	Network = network.Network
-	Config  = network.Config
+	// Config defines the necessary configuration used to bootstrapping.
+	Config = network.Config
+)
+
+const (
+	timeoutCommitSecconds = 2
+	numValidators         = 1
+
+	accountTokens = 1000
+	stakingTokens = 500
+	bondedTokens  = 100
 )
 
 // New creates instance with fully configured cosmos network.
 // Accepts optional config, that will be used in place of the DefaultConfig() if provided.
-func New(t *testing.T, configs ...network.Config) *network.Network {
+func New(t *testing.T, configs ...network.Config) *network.Network { // nolint:thelper
 	if len(configs) > 1 {
 		panic("at most one config should be provided")
 	}
@@ -44,7 +56,7 @@ func New(t *testing.T, configs ...network.Config) *network.Network {
 }
 
 // DefaultConfig will initialize config for the network with custom application,
-// genesis and single validator. All other parameters are inherited from cosmos-sdk/testutil/network.DefaultConfig
+// genesis and single validator. All other parameters are inherited from cosmos-sdk/testutil/network.DefaultConfig.
 func DefaultConfig() network.Config {
 	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
 	return network.Config{
@@ -63,14 +75,14 @@ func DefaultConfig() network.Config {
 			)
 		},
 		GenesisState:    app.ModuleBasics.DefaultGenesis(encoding.Marshaler),
-		TimeoutCommit:   2 * time.Second,
-		ChainID:         "chain-" + tmrand.NewRand().Str(6),
-		NumValidators:   1,
+		TimeoutCommit:   timeoutCommitSecconds * time.Second,
+		ChainID:         "chain-" + tmrand.NewRand().Str(6), // nolint:gomnd
+		NumValidators:   numValidators,
 		BondDenom:       sdk.DefaultBondDenom,
 		MinGasPrices:    fmt.Sprintf("0.000006%s", sdk.DefaultBondDenom),
-		AccountTokens:   sdk.TokensFromConsensusPower(1000),
-		StakingTokens:   sdk.TokensFromConsensusPower(500),
-		BondedTokens:    sdk.TokensFromConsensusPower(100),
+		AccountTokens:   sdk.TokensFromConsensusPower(accountTokens),
+		StakingTokens:   sdk.TokensFromConsensusPower(stakingTokens),
+		BondedTokens:    sdk.TokensFromConsensusPower(bondedTokens),
 		PruningStrategy: storetypes.PruningOptionNothing,
 		CleanupDir:      true,
 		SigningAlgo:     string(hd.Secp256k1Type),
