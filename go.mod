@@ -3,6 +3,7 @@ module github.com/onomyprotocol/onomy
 go 1.16
 
 require (
+	github.com/althea-net/cosmos-gravity-bridge/module v0.0.0-20210623144132-d71cc5bf08f4
 	github.com/cosmos/cosmos-sdk v0.42.6
 	github.com/gogo/protobuf v1.3.3
 	github.com/google/go-cmp v0.5.6 // indirect
@@ -21,3 +22,5 @@ require (
 replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+replace github.com/althea-net/cosmos-gravity-bridge/module => github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20210716023927-0fb1bd34390a

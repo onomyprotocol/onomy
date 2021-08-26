@@ -7,6 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/althea-net/cosmos-gravity-bridge/module/x/gravity"
+	gravitykeeper "github.com/althea-net/cosmos-gravity-bridge/module/x/gravity/keeper"
+	gravitytypes "github.com/althea-net/cosmos-gravity-bridge/module/x/gravity/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -138,7 +141,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		gravity.AppModuleBasic{},
 		onomymodule.AppModuleBasic{},
 	)
 
@@ -151,7 +154,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		// this line is used by starport scaffolding # stargate/app/maccPerms
+		gravitytypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -201,14 +204,12 @@ type App struct {
 	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
+	GravityKeeper    gravitykeeper.Keeper
+	OnomyKeeper      onomymodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
-
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
-
-	OnomyKeeper onomymodulekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -230,7 +231,6 @@ func New( // nolint: funlen
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
-
 	bApp := baseapp.NewBaseApp(Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetAppVersion(version.Version)
@@ -241,8 +241,7 @@ func New( // nolint: funlen
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		// this line is used by starport scaffolding # stargate/app/storeKey
-		onomymoduletypes.StoreKey,
+		gravitytypes.StoreKey, onomymoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -338,6 +337,10 @@ func New( // nolint: funlen
 		&stakingKeeper, govRouter,
 	)
 
+	app.GravityKeeper = gravitykeeper.NewKeeper(
+		appCodec, keys[gravitytypes.StoreKey], app.GetSubspace(gravitytypes.ModuleName), stakingKeeper, app.BankKeeper, app.SlashingKeeper,
+	)
+
 	app.OnomyKeeper = *onomymodulekeeper.NewKeeper(
 		appCodec,
 		keys[onomymoduletypes.StoreKey],
@@ -382,7 +385,7 @@ func New( // nolint: funlen
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		// this line is used by starport scaffolding # stargate/app/appModule
+		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
 		onomyModule,
 	)
 
@@ -395,7 +398,7 @@ func New( // nolint: funlen
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, gravitytypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -416,7 +419,7 @@ func New( // nolint: funlen
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/initGenesis
+		gravitytypes.ModuleName,
 		onomymoduletypes.ModuleName,
 	)
 
@@ -603,8 +606,8 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
+	paramsKeeper.Subspace(gravitytypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	// this line is used by starport scaffolding # stargate/app/paramSubspace
 	paramsKeeper.Subspace(onomymoduletypes.ModuleName)
 
 	return paramsKeeper
