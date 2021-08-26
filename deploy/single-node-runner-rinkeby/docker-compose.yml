@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  onomy:
+    image: onomy/onomy-single-node-runner-rinkeby:local
+    restart: on-failure
+    container_name: onomy-single-node-runner-rinkeby
+    # volumes:
+      # uncomment to pin onomy dir
+      # - ./data:/home/onomy/onomy/data
+      # uncomment to update onomy config in runtime
+      # - ./scripts:/root/home/scripts
+      # uncomment to update onomy config in runtime
+      # - ./onomy_home:/root/home/onomy/onomy/.
+    ports:
+      # onomy
+      - 26656:26656
+      - 26657:26657
+      - 1317:1317 # swagger
+      - 61278:61278
+      - 9090:9090
+      - 8000:8000 # fauset
+      # ethereum
+      - 8545:8545
