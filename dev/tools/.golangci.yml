@@ -340,6 +340,7 @@ linters:
   disable:
     - exhaustivestruct
     - prealloc
+    - paralleltest
     - gas
     - goerr113
     - goheader
