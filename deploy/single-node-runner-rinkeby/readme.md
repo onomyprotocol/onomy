@@ -46,7 +46,7 @@ This home contains testnet chain settings and genesys file of the chain.
 ***The contract used for the runner***.
 
 ```
-Gravity deployed at Address - 0xb0F9E3f7891B284615F49d84BB48b8E97DF6e0f9
+Gravity deployed at Address - 0x3292d20ADa8d5FEC9719613d6624380A594e7B23
 ```
 
 ## Run
@@ -107,7 +107,7 @@ private key: c40f62e75a11789dbaf6ba82233ce8a52c20efb434281ae6977bb0b3a69bf709
 ```
 "name": "val",
 "type": "local",
-"address": "onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j",
+"address": "onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw",
 "pubkey": "onomypub1addwnpepq28frhwps0tz8xkhus0kep2d8smfndx830hy2p2zr2e4f7q3sj94shxlvpx",
 "mnemonic": "staff pool flush bundle radar craft sister local fiction clown anger friend torch toss trial drift choice fine exist weapon hamster energy marine hub"
 ```
@@ -132,28 +132,28 @@ The ETC20 coins used in that part are FAU. You can substitute "erc20-address" to
 
   - Get cosmos user's balance:
     ```
-    onomyd query bank balances onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j --chain-id onomy
+    onomyd query bank balances onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw --chain-id onomy
     ```
   
-  - Send from eth to cosmos (from 0x97D5F5D4fDf83b9D2Cb342A09b8DF297167a73d0 to onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j)
+  - Send from eth to cosmos (from 0x97D5F5D4fDf83b9D2Cb342A09b8DF297167a73d0 to onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw)
     ```
-    ./gbt client eth-to-cosmos \
+    gbt -a onomy client eth-to-cosmos \
             --ethereum-key="e0b21b1d80e53f38734a3ed395796956b50c637916ddbb6cedb096b848053d2d" \
             --ethereum-rpc="http://0.0.0.0:8545" \
-            --gravity-contract-address=0xb0F9E3f7891B284615F49d84BB48b8E97DF6e0f9 \
+            --gravity-contract-address=0x3292d20ADa8d5FEC9719613d6624380A594e7B23 \
             --token-contract-address=0xFab46E002BbF0b4509813474841E0716E6730136 \
             --amount=10 \
-            --destination=onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j
+            --destination=onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw
     ```
   
   - Now check users balances on both sides
   
-  - Send from cosmos to eth (from onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j to 0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d /different eth address)
+  - Send from cosmos to eth (from onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw to 0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d /different eth address)
   
     ```
-    ./gbt client cosmos-to-eth --cosmos-phrase="staff pool flush bundle radar craft sister local fiction clown anger friend torch toss trial drift choice fine exist weapon hamster energy marine hub" \
+    gbt -a onomy client cosmos-to-eth --cosmos-phrase="ten stereo fortune girl mean stadium boost maze immune margin rural dragon stage gadget comfort creek cupboard expect satoshi maple machine hunt abstract entry" \
                     --cosmos-grpc="http://0.0.0.0:9090" \
-                    --fees=1samoleans \
+                    --fees=1nom \
                     --amount=1000gravity0xFab46E002BbF0b4509813474841E0716E6730136 \
                     --eth-destination=0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d
     
@@ -180,32 +180,32 @@ The ETC20 coins used in that part are FAU. You can substitute "erc20-address" to
   ```
   - Mint some FAU tokens for the 0x97D5F5D4fDf83b9D2Cb342A09b8DF297167a73d0 on the [page](https://erc20faucet.com/)
 
-  - Check balance of the cosmos user onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j on the onomy side
+  - Check balance of the cosmos user onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw on the onomy side
   ```
-  curl -X GET "http://$ONOMY_HOST:1317/cosmos/bank/v1beta1/balances/onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j" -H "accept: application/json"
+  curl -X GET "http://$ONOMY_HOST:1317/cosmos/bank/v1beta1/balances/onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw" -H "accept: application/json"
   ```
 
-  - Send from eth to cosmos (from 0x97D5F5D4fDf83b9D2Cb342A09b8DF297167a73d0 to onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j)
+  - Send from eth to cosmos (from 0x97D5F5D4fDf83b9D2Cb342A09b8DF297167a73d0 to onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw)
   ```
-  ./gbt client eth-to-cosmos \
+  ./gbt -a onomy client eth-to-cosmos \
         --ethereum-key="e0b21b1d80e53f38734a3ed395796956b50c637916ddbb6cedb096b848053d2d" \
         --ethereum-rpc="http://$ETH_HOST:8545" \
-        --gravity-contract-address=0xb0F9E3f7891B284615F49d84BB48b8E97DF6e0f9 \
+        --gravity-contract-address=0x3292d20ADa8d5FEC9719613d6624380A594e7B23 \
         --token-contract-address=0xFab46E002BbF0b4509813474841E0716E6730136 \
         --amount=10 \
-        --destination=onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j
+        --destination=onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw
   ```
   
-  - Check balance of the user onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j on the gravity side (should be +10 gravity0xFab46E002BbF0b4509813474841E0716E6730136)
+  - Check balance of the user onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw on the gravity side (should be +10 gravity0xFab46E002BbF0b4509813474841E0716E6730136)
   ```
-  curl -X GET "http://$ONOMY_HOST:1317/cosmos/bank/v1beta1/balances/onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j" -H "accept: application/json"
+  curl -X GET "http://$ONOMY_HOST:1317/cosmos/bank/v1beta1/balances/onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw" -H "accept: application/json"
   ```
 
-  - Send from cosmos to eth (from onomy10l7l34gz2udsufqdwnndez07ydl5l0mukv5p5j to 0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d /different eth address)
+  - Send from cosmos to eth (from onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw to 0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d /different eth address)
   ```
-  ./gbt client cosmos-to-eth --cosmos-phrase="staff pool flush bundle radar craft sister local fiction clown anger friend torch toss trial drift choice fine exist weapon hamster energy marine hub" \
+  ./gbt -a onomy client cosmos-to-eth --cosmos-phrase="ten stereo fortune girl mean stadium boost maze immune margin rural dragon stage gadget comfort creek cupboard expect satoshi maple machine hunt abstract entry" \
                     --cosmos-grpc="http://$ONOMY_HOST:9090" \
-                    --fees=1samoleans \
+                    --fees=1nom \
                     --amount=1000gravity0xFab46E002BbF0b4509813474841E0716E6730136 \
                     --eth-destination=0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d
   ```

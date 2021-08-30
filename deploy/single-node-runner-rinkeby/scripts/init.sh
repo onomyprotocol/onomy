@@ -65,13 +65,9 @@ $ONOMY $ONOMY_HOME_FLAG keys add $ONOMY_VALIDATOR_NAME $ONOMY_KEYRING_FLAG --out
 echo "Adding validator addresses to genesis files"
 $ONOMY $ONOMY_HOME_FLAG add-genesis-account "$($ONOMY $ONOMY_HOME_FLAG keys show $ONOMY_VALIDATOR_NAME -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
 echo "Generating orchestrator keys"
-$ONOMY $ONOMY_HOME_FLAG keys add --dry-run=true --output=json $ONOMY_ORCHESTRATOR_NAME | jq . >> $ONOMY_HOME/orchestrator_key.json
-
-echo "Adding orchestrator keys to genesis"
-ONOMY_ORCHESTRATOR_KEY="$(jq .address $ONOMY_HOME/orchestrator_key.json)"
-
-jq ".app_state.auth.accounts += [{\"@type\": \"/cosmos.auth.v1beta1.BaseAccount\",\"address\": $ONOMY_ORCHESTRATOR_KEY,\"pub_key\": null,\"account_number\": \"0\",\"sequence\": \"0\"}]" $ONOMY_NODE_GENESIS | sponge $ONOMY_NODE_GENESIS
-jq ".app_state.bank.balances += [{\"address\": $ONOMY_ORCHESTRATOR_KEY,\"coins\": [{\"denom\": \"$STAKE_DENOM\",\"amount\": \"1000000000000\"}]}]" $ONOMY_NODE_GENESIS | sponge $ONOMY_NODE_GENESIS
+$ONOMY $ONOMY_HOME_FLAG keys add $ONOMY_ORCHESTRATOR_NAME $ONOMY_KEYRING_FLAG --output json | jq . >> $ONOMY_HOME/orchestrator_key.json
+echo "Adding orchestrator addresses to genesis files"
+$ONOMY $ONOMY_HOME_FLAG add-genesis-account "$($ONOMY $ONOMY_HOME_FLAG keys show $ONOMY_ORCHESTRATOR_NAME -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
 
 echo "Creating gentxs"
 $ONOMY $ONOMY_HOME_FLAG gentx --ip $ONOMY_HOST $ONOMY_VALIDATOR_NAME 100000000000$STAKE_DENOM "$ETH_ORCHESTRATOR_VALIDATOR_ADDRESS" "$(jq -r .address $ONOMY_HOME/orchestrator_key.json)" $ONOMY_KEYRING_FLAG $ONOMY_CHAINID_FLAG
