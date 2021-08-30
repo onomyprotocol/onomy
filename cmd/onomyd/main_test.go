@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"flag"
 	"io"
@@ -39,7 +38,7 @@ func TestInitToCollectGentxsFlow(t *testing.T) {
 	defer os.RemoveAll(dir) // nolint: errcheck
 
 	// generate genesys
-	executeCmd(t, "init:", []string{"init", chainName, homeFlag})
+	executeCmd(t, "init:", []string{"init", chainName, chainFlag, homeFlag})
 
 	// add new user
 	val1KeyString := executeCmd(t, "add key:", []string{"keys", "add", validator1Name, keyRingFlag, jsonOutFlag, homeFlag})
@@ -58,6 +57,10 @@ func TestInitToCollectGentxsFlow(t *testing.T) {
 	// collect gentx
 	collectGentxsOut := executeCmd(t, "collect-gentxs:", []string{"collect-gentxs", homeFlag})
 	t.Log(collectGentxsOut)
+
+	// eth keys
+	ethKey := executeCmd(t, "gentx:", []string{"eth_keys", "add", homeFlag, "--output=json"})
+	t.Log(ethKey)
 }
 
 func executeCmd(t *testing.T, name string, args []string) string {
@@ -66,22 +69,19 @@ func executeCmd(t *testing.T, name string, args []string) string {
 	// this call is required because otherwise flags panics, if args are set between flag.Parse calls
 	flag.CommandLine = flag.NewFlagSet(name, flag.ExitOnError)
 	// we need a value to set Args[0] to, cause flag begins parsing at Args[1]
-	os.Args = append([]string{name}, args...)
+	os.Args = append([]string{"onomyd"}, args...)
 	t.Log(strings.Join(os.Args, " "))
+
+	// rests config seal protection
+	config := sdk.GetConfig()
+	setField(config, "sealed", false)
+	setField(config, "sealedch", make(chan struct{}))
 
 	out := captureOutput(func() {
 		main()
 	})
 
 	os.Args = oldArgs
-
-	// rests config seal protection
-	config, err := sdk.GetSealedConfig(context.Background())
-	if err != nil {
-		panic(err)
-	}
-	setField(config, "sealed", false)
-	setField(config, "sealedch", make(chan struct{}))
 
 	return out
 }
