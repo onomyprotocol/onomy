@@ -302,13 +302,6 @@ discovery_time = "15s"
 # Will create a new, randomly named directory within, and remove it when done.
 temp_dir = ""
 
-# The timeout duration before re-requesting a chunk, possibly from a different
-# peer (default: 1 minute).
-chunk_request_timeout = "10s"
-
-# The number of concurrent chunk fetchers to run (default: 1).
-chunk_fetchers = "4"
-
 #######################################################
 ###       Fast Sync Configuration Connections       ###
 #######################################################
