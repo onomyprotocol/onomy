@@ -20,7 +20,7 @@ const flagPassphrase = "passphrase"
 
 // Commands registers a sub-tree of commands to interact with
 // local private key storage.
-func Commands(defaultNodeHome string) *cobra.Command {
+func AddEthKeysCommands(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "eth_keys",
 		Short: "Manage your application's ethereum keys",
