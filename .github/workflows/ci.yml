@@ -20,4 +20,4 @@ jobs:
         uses: docker-practice/actions-setup-docker@master
       - name: CI
         run: |
-          make format-in-docker && make all-in-docker
+          make all-in-docker
