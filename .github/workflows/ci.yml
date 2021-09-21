@@ -21,5 +21,4 @@ jobs:
       - name: CI
         run: |
           make format-in-docker
-          |
           make all-in-docker
