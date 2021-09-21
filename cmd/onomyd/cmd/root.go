@@ -107,7 +107,8 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(onomy.DefaultNodeHome)
+		keys.Commands(onomy.DefaultNodeHome),
+		//              Commands(onomy.DefaultNodeHome),
 	)
 }
 
