@@ -18,7 +18,7 @@ import (
 
 const flagPassphrase = "passphrase"
 
-// Commands registers a sub-tree of commands to interact with
+// AddEthKeysCommands registers a sub-tree of commands to interact with
 // local private key storage.
 func AddEthKeysCommands(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
