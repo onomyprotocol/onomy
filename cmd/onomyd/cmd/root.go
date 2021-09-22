@@ -95,6 +95,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		GenTxCmd(onomy.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, onomy.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(onomy.ModuleBasics),
 		AddGenesisAccountCmd(onomy.DefaultNodeHome),
+		AddEthKeysCommands(onomy.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
 	)
@@ -107,7 +108,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		queryCommand(),
 		txCommand(),
 		keys.Commands(onomy.DefaultNodeHome),
-		Commands(onomy.DefaultNodeHome),
+		// 		Commands(onomy.DefaultNodeHome),
 	)
 }
 
