@@ -24,9 +24,7 @@ ENV PATH=$PATH:$GOPATH/bin
 
 # build onomyd artifact
 WORKDIR $ONOMY_DIR
-RUN make build
-# copy binary to bin
-RUN cp onomyd /usr/bin/onomyd
+RUN make install
 
 # ------------------ orchestrator ------------------
 
@@ -47,6 +45,7 @@ RUN curl https://get.starport.network/faucet! | bash
 
 # ------------------ run node ------------------
 
+WORKDIR /root/home
 RUN cp -r $ONOMY_DIR/deploy/single-node-runner-rinkeby/scripts scripts
 RUN mkdir onomy
 RUN cp -r $ONOMY_DIR/deploy/single-node-runner-rinkeby/onomy_home onomy/onomy
