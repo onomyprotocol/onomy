@@ -4,3 +4,4 @@ release/
 /vendor/
 /.idea/
 *.iml
+/tests/dockerfile/onomy.tar.gz

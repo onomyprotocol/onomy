@@ -9,13 +9,11 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install --no-install-recommends -yq
                                                 tar \
                                                 git
 
-# ------------------ clone repository ------------------
+# ------------------ onomy chain ------------------
 
 ARG ONOMY_DIR=/go/src/github.com/onomyprotocol/onomy/
 # clone the repo
 COPY . $ONOMY_DIR
-
-# ------------------ onomy chain ------------------
 
 # install golang
 RUN curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output go.tar.gz
@@ -30,48 +28,10 @@ RUN make build
 # copy binary to bin
 RUN cp onomyd /usr/bin/onomyd
 
-# ------------------ gravity repo ------------------
-
-ARG GRAVITY_DIR=/go/src/github.com/onomyprotocol/cosmos-gravity-bridge/
-# clone the repo
-RUN mkdir $GRAVITY_DIR
-RUN git clone https://github.com/onomyprotocol/cosmos-gravity-bridge.git $GRAVITY_DIR
-
 # ------------------ orchestrator ------------------
 
-# install rust
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
-# check cargo works
-RUN cargo version
-
-# build orchestrator artifact
-WORKDIR $GRAVITY_DIR/orchestrator
-RUN rustup target add x86_64-unknown-linux-musl
-RUN apt-get install --no-install-recommends -yq musl-tools
-RUN cargo build --target=x86_64-unknown-linux-musl --release  --all
-# copy binary to bin
-RUN ls target/x86_64-unknown-linux-musl
-RUN ls target/x86_64-unknown-linux-musl/release
-RUN cp target/x86_64-unknown-linux-musl/release/gbt /usr/bin/gbt
-
-# ------------------ contract-deployer ------------------
-
-RUN apt-get install --no-install-recommends -yq python3 \
-                                                make \
-                                                g++
-
-RUN curl -sL https://deb.nodesource.com/setup_15.x  | bash -
-RUN apt-get -y install nodejs
-
-# build contract-deployer
-WORKDIR $GRAVITY_DIR/solidity
-RUN npm ci
-RUN chmod -R +x scripts
-RUN npm run typechain
-
-# go to root home
-WORKDIR /root/home
+ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.0-20210915184851/gbt /usr/bin/gbt
+RUN chmod 777 /usr/bin/gbt
 
 # ------------------ ethereum go (geth) ------------------
 RUN add-apt-repository -y ppa:ethereum/ethereum
