@@ -46,7 +46,7 @@ This home contains testnet chain settings and genesys file of the chain.
 ***The contract used for the runner***.
 
 ```
-Gravity deployed at Address - 0x3292d20ADa8d5FEC9719613d6624380A594e7B23
+Gravity deployed at Address - 0x8778174A44b74CD75daEeCbC9830D675Cc5C892C
 ```
 
 ## Run
@@ -140,7 +140,7 @@ The ETC20 coins used in that part are FAU. You can substitute "erc20-address" to
     gbt -a onomy client eth-to-cosmos \
             --ethereum-key="e0b21b1d80e53f38734a3ed395796956b50c637916ddbb6cedb096b848053d2d" \
             --ethereum-rpc="http://0.0.0.0:8545" \
-            --gravity-contract-address=0x3292d20ADa8d5FEC9719613d6624380A594e7B23 \
+            --gravity-contract-address=0x8778174A44b74CD75daEeCbC9830D675Cc5C892C \
             --token-contract-address=0xFab46E002BbF0b4509813474841E0716E6730136 \
             --amount=10 \
             --destination=onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw
@@ -190,7 +190,7 @@ The ETC20 coins used in that part are FAU. You can substitute "erc20-address" to
   ./gbt -a onomy client eth-to-cosmos \
         --ethereum-key="e0b21b1d80e53f38734a3ed395796956b50c637916ddbb6cedb096b848053d2d" \
         --ethereum-rpc="http://$ETH_HOST:8545" \
-        --gravity-contract-address=0x3292d20ADa8d5FEC9719613d6624380A594e7B23 \
+        --gravity-contract-address=0x8778174A44b74CD75daEeCbC9830D675Cc5C892C \
         --token-contract-address=0xFab46E002BbF0b4509813474841E0716E6730136 \
         --amount=10 \
         --destination=onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw

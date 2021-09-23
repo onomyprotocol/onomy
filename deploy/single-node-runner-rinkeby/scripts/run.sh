@@ -37,7 +37,7 @@ ETH_HOST="0.0.0.0"
 # Eth node rpc port
 ETH_RPC_PORT="8545"
 
-ETH_CONTRACT_ADDRESS=0x3292d20ADa8d5FEC9719613d6624380A594e7B23
+ETH_CONTRACT_ADDRESS=0x8778174A44b74CD75daEeCbC9830D675Cc5C892C
 
 # ------------------ Run onomy ------------------
 
@@ -78,7 +78,7 @@ for i in {1..600}; do
   echo "attempt $i to start the eth node"
 
   netPeerCount=$($GETH_CONSOLE "net.peerCount")
-  if [ "$netPeerCount" -lt 3  ]; then
+  if [ "$netPeerCount" -lt 2  ]; then
      echo "net.peerCount : $netPeerCount"
      continue
   fi
