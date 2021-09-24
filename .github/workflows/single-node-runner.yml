@@ -3,7 +3,7 @@ name: Single node runners build & publish
 on:
   push:
     branches:
-      - 'eth-keys-command-fix'
+      - 'dev'
 
 jobs:
   docker:
