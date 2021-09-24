@@ -37,7 +37,7 @@ ETH_HOST="0.0.0.0"
 # Eth node rpc port
 ETH_RPC_PORT="8545"
 
-ETH_CONTRACT_ADDRESS=0x3292d20ADa8d5FEC9719613d6624380A594e7B23
+ETH_CONTRACT_ADDRESS=0x8778174A44b74CD75daEeCbC9830D675Cc5C892C
 
 # ------------------ Run onomy ------------------
 
@@ -72,8 +72,8 @@ geth --rinkeby --syncmode "light" \
 GETH_IPC_PATH="/root/.ethereum/rinkeby/geth.ipc"
 GETH_CONSOLE="geth --rinkeby attach ipc:$GETH_IPC_PATH console --exec"
 
-# 600 sec to run light node
-for i in {1..600}; do
+# 600000 sec to run light node
+for i in {1..600000}; do
   sleep 1
   echo "attempt $i to start the eth node"
 
@@ -89,7 +89,7 @@ for i in {1..600}; do
      continue
   fi
 
-  if [ $i -eq 600 ]; then
+  if [ $i -eq 600000 ]; then
      echo "timeout for ethereum light node exceed"
      exit
   fi
