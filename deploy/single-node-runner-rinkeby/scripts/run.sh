@@ -78,7 +78,7 @@ for i in {1..600}; do
   echo "attempt $i to start the eth node"
 
   netPeerCount=$($GETH_CONSOLE "net.peerCount")
-  if [ "$netPeerCount" -lt 2  ]; then
+  if [ "$netPeerCount" -lt 3  ]; then
      echo "net.peerCount : $netPeerCount"
      continue
   fi
