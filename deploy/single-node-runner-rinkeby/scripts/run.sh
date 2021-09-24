@@ -68,7 +68,7 @@ geth --rinkeby --syncmode "light" \
                                --http.corsdomain "*" \
                                --http.vhosts "*" \
                                &
-sleep 10
+
 GETH_IPC_PATH="/root/.ethereum/rinkeby/geth.ipc"
 GETH_CONSOLE="geth --rinkeby attach ipc:$GETH_IPC_PATH console --exec"
 
