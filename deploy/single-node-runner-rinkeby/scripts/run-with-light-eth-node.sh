@@ -33,7 +33,9 @@ STAKE_DENOM="nom"
 ETH_ORCHESTRATOR_PRIVATE_KEY=c40f62e75a11789dbaf6ba82233ce8a52c20efb434281ae6977bb0b3a69bf709
 
 # The host of ethereum node
-ETH_HOST="https://eth-rinkeby.alchemyapi.io/v2/0iGN3oZ9y_CKTaelqOV1XfLnCCiKNRoR"
+ETH_HOST="0.0.0.0"
+# Eth node rpc port
+ETH_RPC_PORT="8545"
 
 ETH_CONTRACT_ADDRESS=0x8778174A44b74CD75daEeCbC9830D675Cc5C892C
 
@@ -55,6 +57,49 @@ echo "$ONOMY_NODE_NAME launched"
 echo "Starting fauset based on validator account"
 faucet -cli-name=$ONOMY -mnemonic="$ONOMY_VALIDATOR_MNEMONIC" &
 
+#-------------------- Run ethereum (geth) --------------------
+
+echo "Starting rinkeby eth node"
+
+geth --rinkeby --syncmode "light" \
+                               --http \
+                               --http.port "$ETH_RPC_PORT" \
+                               --http.addr "$ETH_HOST" \
+                               --http.corsdomain "*" \
+                               --http.vhosts "*" \
+                               &
+
+GETH_IPC_PATH="/root/.ethereum/rinkeby/geth.ipc"
+GETH_CONSOLE="geth --rinkeby attach ipc:$GETH_IPC_PATH console --exec"
+
+# 600000 sec to run light node
+for i in {1..600000}; do
+  sleep 1
+  echo "attempt $i to start the eth node"
+
+  netPeerCount=$($GETH_CONSOLE "net.peerCount")
+  if [ "$netPeerCount" -lt 3  ]; then
+     echo "net.peerCount : $netPeerCount"
+     continue
+  fi
+
+  ethSyncing=$($GETH_CONSOLE "eth.syncing")
+  if [ "$ethSyncing" != "false"  ]; then
+     echo "eth.syncing : $ethSyncing"
+     continue
+  fi
+
+  if [ $i -eq 600000 ]; then
+     echo "timeout for ethereum light node exceed"
+     exit
+  fi
+
+  break
+done
+set -e
+
+echo "ethereum light node is ready, peers: $($GETH_CONSOLE "net.peerCount")"
+
 #-------------------- Run orchestrator --------------------
 
 echo "Starting orchestrator"
@@ -63,6 +108,6 @@ gbt --address-prefix="$ONOMY_ADDRESS_PREFIX" orchestrator \
              --cosmos-phrase="$ONOMY_ORCHESTRATOR_MNEMONIC" \
              --ethereum-key="$ETH_ORCHESTRATOR_PRIVATE_KEY" \
              --cosmos-grpc="http://$ONOMY_HOST:$ONOMY_GRPC_PORT/" \
-             --ethereum-rpc="$ETH_HOST" \
+             --ethereum-rpc="http://$ETH_HOST:$ETH_RPC_PORT/" \
              --fees="1$STAKE_DENOM" \
              --gravity-contract-address="$ETH_CONTRACT_ADDRESS"

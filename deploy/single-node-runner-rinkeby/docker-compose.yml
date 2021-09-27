@@ -5,11 +5,11 @@ services:
     image: onomy/onomy-single-node-runner-rinkeby:local
     restart: on-failure
     container_name: onomy-single-node-runner-rinkeby
-    # volumes:
+    volumes:
       # uncomment to pin onomy dir
       # - ./data:/home/onomy/onomy/data
       # uncomment to update onomy config in runtime
-      # - ./scripts:/root/home/scripts
+      - ./scripts:/root/home/scripts
       # uncomment to update onomy config in runtime
       # - ./onomy_home:/root/home/onomy/onomy/.
     ports:

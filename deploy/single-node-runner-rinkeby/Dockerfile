@@ -26,10 +26,18 @@ ENV PATH=$PATH:$GOPATH/bin
 WORKDIR $ONOMY_DIR
 RUN make install
 
+
+# ------------------ contract-deployer ------------------
+
+ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.0-20210915184851/Gravity.json /root/home/solidity/Gravity.json
+ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.0-20210915184851/TestERC20A.json /root/home/solidity/TestERC20A.json
+ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.0-20210915184851/contract-deployer /usr/bin/gbt
+RUN chmod +x /usr/bin/contract-deployer
+
 # ------------------ orchestrator ------------------
 
 ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.0-20210915184851/gbt /usr/bin/gbt
-RUN chmod 777 /usr/bin/gbt
+RUN chmod +x /usr/bin/gbt
 
 # ------------------ ethereum go (geth) ------------------
 RUN add-apt-repository -y ppa:ethereum/ethereum

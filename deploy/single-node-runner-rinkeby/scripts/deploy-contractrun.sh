@@ -21,21 +21,14 @@ ONOMY_GRPC_PORT="9090"
 ONOMY_HOME="$CURRENT_WORKING_DIR/$CHAINID/$ONOMY_NODE_NAME"
 # Home flag for home folder
 ONOMY_HOME_FLAG="--home $ONOMY_HOME"
-# Onomy mnemonic used for orchestrator signing of the transactions (orchestrator_key.json file)
-ONOMY_ORCHESTRATOR_MNEMONIC=$(jq -r .mnemonic $ONOMY_HOME/orchestrator_key.json)
 # Onomy mnemonic used for fauset from (validator_key.json file)
 ONOMY_VALIDATOR_MNEMONIC=$(jq -r .mnemonic $ONOMY_HOME/validator_key.json)
-
-# Onomy chain demons
-STAKE_DENOM="nom"
 
 # The ETH key used for orchestrator signing of the transactions
 ETH_ORCHESTRATOR_PRIVATE_KEY=c40f62e75a11789dbaf6ba82233ce8a52c20efb434281ae6977bb0b3a69bf709
 
 # The host of ethereum node
 ETH_HOST="https://eth-rinkeby.alchemyapi.io/v2/0iGN3oZ9y_CKTaelqOV1XfLnCCiKNRoR"
-
-ETH_CONTRACT_ADDRESS=0x8778174A44b74CD75daEeCbC9830D675Cc5C892C
 
 # ------------------ Run onomy ------------------
 
@@ -57,12 +50,15 @@ faucet -cli-name=$ONOMY -mnemonic="$ONOMY_VALIDATOR_MNEMONIC" &
 
 #-------------------- Run orchestrator --------------------
 
-echo "Starting orchestrator"
+cd /root/home/solidity
 
-gbt --address-prefix="$ONOMY_ADDRESS_PREFIX" orchestrator \
-             --cosmos-phrase="$ONOMY_ORCHESTRATOR_MNEMONIC" \
-             --ethereum-key="$ETH_ORCHESTRATOR_PRIVATE_KEY" \
-             --cosmos-grpc="http://$ONOMY_HOST:$ONOMY_GRPC_PORT/" \
-             --ethereum-rpc="$ETH_HOST" \
-             --fees="1$STAKE_DENOM" \
-             --gravity-contract-address="$ETH_CONTRACT_ADDRESS"
+contract-deployer \
+--cosmos-node="http://$GRAVITY_HOST:26657" \
+--eth-node="$ETH_HOST" \
+--eth-privkey="$ETH_ORCHESTRATOR_PRIVATE_KEY" \
+--contract=Gravity.json \
+--test-mode=false | grep "Gravity deployed at Address" | grep -Eow '0x[0-9a-fA-F]{40}' >> $GRAVITY_HOME/eth_contract_address
+
+CONTRACT_ADDRESS=$(cat $GRAVITY_HOME/eth_contract_address)
+
+echo "Contract address: $CONTRACT_ADDRESS"
