@@ -27,9 +27,6 @@ ONOMY_VALIDATOR_MNEMONIC=$(jq -r .mnemonic $ONOMY_HOME/validator_key.json)
 # The ETH key used for orchestrator signing of the transactions
 ETH_ORCHESTRATOR_PRIVATE_KEY=c40f62e75a11789dbaf6ba82233ce8a52c20efb434281ae6977bb0b3a69bf709
 
-# The host of ethereum node
-ETH_HOST="https://eth-rinkeby.alchemyapi.io/v2/0iGN3oZ9y_CKTaelqOV1XfLnCCiKNRoR"
-
 # ------------------ Run onomy ------------------
 
 echo "Starting $ONOMY_NODE_NAME"
@@ -50,7 +47,7 @@ cd /root/home/solidity
 
 contract-deployer \
 --cosmos-node="http://$ONOMY_HOST:26657" \
---eth-node="$ETH_HOST" \
+--eth-node="$ETH_ADDRESS" \
 --eth-privkey="$ETH_ORCHESTRATOR_PRIVATE_KEY" \
 --contract=Gravity.json \
 --test-mode=false | grep "Gravity deployed at Address" | grep -Eow '0x[0-9a-fA-F]{40}' >> $GRAVITY_HOME/eth_contract_address
