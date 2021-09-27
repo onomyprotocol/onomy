@@ -43,17 +43,13 @@ done
 
 echo "$ONOMY_NODE_NAME launched"
 
-# ------------------ Run fauset ------------------
+#-------------------- Deploy the contract --------------------
 
-echo "Starting fauset based on validator account"
-faucet -cli-name=$ONOMY -mnemonic="$ONOMY_VALIDATOR_MNEMONIC" &
-
-#-------------------- Run orchestrator --------------------
-
+echo "Deploying Gravity contract"
 cd /root/home/solidity
 
 contract-deployer \
---cosmos-node="http://$GRAVITY_HOST:26657" \
+--cosmos-node="http://$ONOMY_HOST:26657" \
 --eth-node="$ETH_HOST" \
 --eth-privkey="$ETH_ORCHESTRATOR_PRIVATE_KEY" \
 --contract=Gravity.json \
@@ -62,3 +58,5 @@ contract-deployer \
 CONTRACT_ADDRESS=$(cat $GRAVITY_HOME/eth_contract_address)
 
 echo "Contract address: $CONTRACT_ADDRESS"
+
+
