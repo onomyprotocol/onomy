@@ -31,7 +31,7 @@ and one bridge orchestrator. This is a minimum that makes the bridge works.
 ### Build locally
   
   ```
-  docker build -t onomy/onomy-single-node-runner-rinkeby:local  -f Dockerfile ../../
+  docker build -t onomy/onomy-single-node-runner-rinkeby:local  -f Dockerfile ../../ --no-cache
   ```
 
 ### Steps to rebuild image from scratch
@@ -46,7 +46,7 @@ This home contains testnet chain settings and genesys file of the chain.
 ***The contract used for the runner***.
 
 ```
-Gravity deployed at Address - 0x8778174A44b74CD75daEeCbC9830D675Cc5C892C
+Gravity deployed at Address - 0x8A0814b7251138Dea19054425D0dfF0C497305d3
 ```
 
 ## Run
@@ -139,8 +139,8 @@ The ETC20 coins used in that part are FAU. You can substitute "erc20-address" to
     ```
     gbt -a onomy client eth-to-cosmos \
             --ethereum-key="e0b21b1d80e53f38734a3ed395796956b50c637916ddbb6cedb096b848053d2d" \
-            --ethereum-rpc="http://0.0.0.0:8545" \
-            --gravity-contract-address=0x8778174A44b74CD75daEeCbC9830D675Cc5C892C \
+            --ethereum-rpc="http://$ETH_HOST:8545" \
+            --gravity-contract-address=0x8A0814b7251138Dea19054425D0dfF0C497305d3 \
             --token-contract-address=0xFab46E002BbF0b4509813474841E0716E6730136 \
             --amount=10 \
             --destination=onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw
@@ -153,8 +153,8 @@ The ETC20 coins used in that part are FAU. You can substitute "erc20-address" to
     ```
     gbt -a onomy client cosmos-to-eth --cosmos-phrase="ten stereo fortune girl mean stadium boost maze immune margin rural dragon stage gadget comfort creek cupboard expect satoshi maple machine hunt abstract entry" \
                     --cosmos-grpc="http://0.0.0.0:9090" \
-                    --fees=1nom \
-                    --amount=1000gravity0xFab46E002BbF0b4509813474841E0716E6730136 \
+                    --fees=1gravity0xFab46E002BbF0b4509813474841E0716E6730136 \
+                    --amount=555555gravity0xFab46E002BbF0b4509813474841E0716E6730136 \
                     --eth-destination=0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d
     
   - Now check users balances on both sides one more time
@@ -190,7 +190,7 @@ The ETC20 coins used in that part are FAU. You can substitute "erc20-address" to
   ./gbt -a onomy client eth-to-cosmos \
         --ethereum-key="e0b21b1d80e53f38734a3ed395796956b50c637916ddbb6cedb096b848053d2d" \
         --ethereum-rpc="http://$ETH_HOST:8545" \
-        --gravity-contract-address=0x8778174A44b74CD75daEeCbC9830D675Cc5C892C \
+        --gravity-contract-address=0x8A0814b7251138Dea19054425D0dfF0C497305d3 \
         --token-contract-address=0xFab46E002BbF0b4509813474841E0716E6730136 \
         --amount=10 \
         --destination=onomy1e6xtwjw9mgmljyrqw6mlw3nrpuz3p79gct73nw
