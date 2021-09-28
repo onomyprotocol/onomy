@@ -23,8 +23,8 @@ or If you have Fedora (Fedora 34) or Redhat (Red Hat Enterprise Linux 8.4 (Ootpa
  and you want to make binaries yourself, then follow these steps
 
 sudo yum install -y git
-git clone -b ONET-65 https://github.com/sunnyk56/market.git
-cd market/deploy/onomy-chain
+git clone -b dev https://github.com/onomyprotocol/onomy.git
+cd onomy/deploy/testnet
 bash bin.sh
 ```
 ### Init the config files
@@ -85,7 +85,7 @@ onomyd --home $HOME/onomy/onomy keys list --keyring-backend test
 You'll see an output like this
 
 ```
-- name: jkilpatr
+- name: keyname
   type: local
   address: cosmos1youraddresswillgohere
   pubkey: cosmospub1yourpublickleywillgohere
