@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eux
-# your gaiad binary name
+# your onomyd binary name
 BIN=onomyd
 
 NODES=$1
@@ -10,7 +10,7 @@ do
 # add this ip for loopback dialing
 ip addr add 7.7.7.$i/32 dev eth0 || true # allowed to fail
 
-GAIA_HOME="--home /validator$i"
+ONOMY_HOME="--home /validator$i"
 # this implicitly caps us at ~6000 nodes for this sim
 # note that we start on 26656 the idea here is that the first
 # node (node 1) is at the expected contact address from the gentx
@@ -31,7 +31,7 @@ fi
 LISTEN_ADDRESS="--address tcp://7.7.7.$i:26655"
 P2P_ADDRESS="--p2p.laddr tcp://7.7.7.$i:26656"
 LOG_LEVEL="--log_level error"
-ARGS="$GAIA_HOME $LISTEN_ADDRESS $RPC_ADDRESS $GRPC_ADDRESS $LOG_LEVEL $P2P_ADDRESS"
+ARGS="$ONOMY_HOME $LISTEN_ADDRESS $RPC_ADDRESS $GRPC_ADDRESS $LOG_LEVEL $P2P_ADDRESS"
 $BIN $ARGS start > /validator$i/logs &
 done
 
