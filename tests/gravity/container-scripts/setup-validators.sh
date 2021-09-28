@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eux
-# your gaiad binary name
+# your onomyd binary name
 BIN=onomyd
 
 CHAIN_ID="gravity-test"
@@ -30,12 +30,12 @@ mv /edited-genesis.json /genesis.json
 
 
 # Sets up an arbitrary number of validators on a single machine by manipulating
-# the --home parameter on gaiad
+# the --home parameter on onomyd
 for i in $(seq 1 $NODES);
 do
-GAIA_HOME="--home /validator$i"
+ONOMY_HOME="--home /validator$i"
 GENTX_HOME="--home-client /validator$i"
-ARGS="$GAIA_HOME --keyring-backend test"
+ARGS="$ONOMY_HOME --keyring-backend test"
 
 # Generate a validator key, orchestrator key, and eth key for each validator
 $BIN keys add $ARGS validator$i 2>> /validator-phrases
@@ -57,14 +57,14 @@ done
 for i in $(seq 1 $NODES);
 do
 cp /genesis.json /validator$i/config/genesis.json
-GAIA_HOME="--home /validator$i"
-ARGS="$GAIA_HOME --keyring-backend test"
+ONOMY_HOME="--home /validator$i"
+ARGS="$ONOMY_HOME --keyring-backend test"
 ORCHESTRATOR_KEY=$($BIN keys show orchestrator$i -a $ARGS)
 ETHEREUM_KEY=$(grep address /validator-eth-keys | sed -n "$i"p | sed 's/.*://')
 # the /8 containing 7.7.7.7 is assigned to the DOD and never routable on the public internet
-# we're using it in private to prevent gaia from blacklisting it as unroutable
+# we're using it in private to prevent onomy from blacklisting it as unroutable
 # and allow local pex
-$BIN gentx $ARGS $GAIA_HOME --moniker validator$i --chain-id=$CHAIN_ID --ip 7.7.7.$i validator$i 500000000ualtg $ETHEREUM_KEY $ORCHESTRATOR_KEY
+$BIN gentx $ARGS $ONOMY_HOME --moniker validator$i --chain-id=$CHAIN_ID --ip 7.7.7.$i validator$i 500000000ualtg $ETHEREUM_KEY $ORCHESTRATOR_KEY
 # obviously we don't need to copy validator1's gentx to itself
 if [ $i -gt 1 ]; then
 cp /validator$i/config/gentx/* /validator1/config/gentx/

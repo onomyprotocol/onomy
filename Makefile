@@ -28,7 +28,7 @@ ifeq ($(LEDGER_ENABLED),true)
   endif
 endif
 
-ifeq (cleveldb,$(findstring cleveldb,$(GAIA_BUILD_OPTIONS)))
+ifeq (cleveldb,$(findstring cleveldb,$(ONOMY_BUILD_OPTIONS)))
   build_tags += gcc
 endif
 build_tags += $(BUILD_TAGS)
@@ -47,25 +47,32 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=onomy \
 
 BUILD_FLAGS := -ldflags '$(ldflags)' -gcflags="all=-N -l"
 
+.PHONY: all
 all: lint test install
 
+.PHONY: build
 build: go.sum
 		go build $(BUILD_FLAGS) ./cmd/onomyd
 
+.PHONY: install
 install: go.sum
 		go install $(BUILD_FLAGS) ./cmd/onomyd
 
+.PHONY: go.sum
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
 		GO111MODULE=on go mod verify
 
+.PHONY: test
 test:
 	@go test -mod=readonly $(PACKAGES)
 
+.PHONY: lint
 lint:
 	golangci-lint -c dev/tools/.golangci.yml run
 	gofmt -d -s $(SCAN_FILES)
 
+.PHONY: format
 format:
 	gofumpt -lang=1.6 -extra -s -w $(SCAN_FILES)
 	gogroup -order std,other,prefix=$(IMPORT_PREFIX) -rewrite $(SCAN_FILES)
@@ -75,6 +82,7 @@ format:
 ###                      Docker wrapped commands                            ###
 ###############################################################################
 
+.PHONY: in-docker
 in-docker:
 	docker build -t onomy-dev-utils ./dev/tools -f dev/tools/Dockerfile.devtools
 	docker run -i --rm \
@@ -82,11 +90,14 @@ in-docker:
 		--mount source=dev-tools-cache,destination=/cache/,consistency=delegated onomy-dev-utils bash -x -c "\
 		$(ARGS)"
 
+.PHONY: lint-in-docker
 lint-in-docker:
 	make in-docker ARGS="make lint"
 
+.PHONY: format-in-docker
 format-in-docker:
 	make in-docker ARGS="make format"
 
+.PHONY: all-in-docker
 all-in-docker:
 	make in-docker ARGS="make all"
