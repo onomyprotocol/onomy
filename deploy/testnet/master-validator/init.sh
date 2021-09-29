@@ -8,7 +8,7 @@ CURRENT_WORKING_DIR=$HOME
 # Name of the network to bootstrap
 #echo "Enter chain-id"
 #read chainid
-CHAINID="onomy"
+CHAINID="onomy-testnet1"
 # Name of the gravity artifact
 GRAVITY=onomyd
 # The name of the gravity node
@@ -91,6 +91,17 @@ $GRAVITY $GRAVITY_HOME_FLAG add-genesis-account "$($GRAVITY $GRAVITY_HOME_FLAG k
 echo "Adding orchestrator addresses to genesis files"
 $GRAVITY $GRAVITY_HOME_FLAG add-genesis-account "$($GRAVITY $GRAVITY_HOME_FLAG keys show $GRAVITY_ORCHESTRATOR_NAME -a $GRAVITY_KEYRING_FLAG)" $GRAVITY_GENESIS_COINS
 
+echo "Adding faucet account addresses to genesis files"
+$GRAVITY $GRAVITY_HOME_FLAG keys add --output=json faucet_account1 $GRAVITY_KEYRING_FLAG | jq . >> $GRAVITY_HOME/faucet_account1.json
+$GRAVITY $GRAVITY_HOME_FLAG keys add --output=json faucet_account2 $GRAVITY_KEYRING_FLAG | jq . >> $GRAVITY_HOME/faucet_account2.json
+$GRAVITY $GRAVITY_HOME_FLAG keys add --output=json faucet_account3 $GRAVITY_KEYRING_FLAG | jq . >> $GRAVITY_HOME/faucet_account3.json
+$GRAVITY $GRAVITY_HOME_FLAG keys add --output=json faucet_account4 $GRAVITY_KEYRING_FLAG | jq . >> $GRAVITY_HOME/faucet_account4.json
+$GRAVITY $GRAVITY_HOME_FLAG keys add --output=json faucet_account5 $GRAVITY_KEYRING_FLAG | jq . >> $GRAVITY_HOME/faucet_account5.json
+$GRAVITY $GRAVITY_HOME_FLAG add-genesis-account "$($GRAVITY $GRAVITY_HOME_FLAG keys show faucet_account1 -a $GRAVITY_KEYRING_FLAG)" $GRAVITY_GENESIS_COINS
+$GRAVITY $GRAVITY_HOME_FLAG add-genesis-account "$($GRAVITY $GRAVITY_HOME_FLAG keys show faucet_account2 -a $GRAVITY_KEYRING_FLAG)" $GRAVITY_GENESIS_COINS
+$GRAVITY $GRAVITY_HOME_FLAG add-genesis-account "$($GRAVITY $GRAVITY_HOME_FLAG keys show faucet_account3 -a $GRAVITY_KEYRING_FLAG)" $GRAVITY_GENESIS_COINS
+$GRAVITY $GRAVITY_HOME_FLAG add-genesis-account "$($GRAVITY $GRAVITY_HOME_FLAG keys show faucet_account4 -a $GRAVITY_KEYRING_FLAG)" $GRAVITY_GENESIS_COINS
+$GRAVITY $GRAVITY_HOME_FLAG add-genesis-account "$($GRAVITY $GRAVITY_HOME_FLAG keys show faucet_account5 -a $GRAVITY_KEYRING_FLAG)" $GRAVITY_GENESIS_COINS
 #echo "Adding orchestrator keys to genesis"
 #GRAVITY_ORCHESTRATOR_KEY="$(jq .address $GRAVITY_HOME/orchestrator_key.json)"
 
@@ -143,4 +154,4 @@ echo "delete faucet account if we have previously"
 $GRAVITY keys delete faucet --keyring-backend test -y &
 
 echo "Starting faucet based on validator account"
-faucet -cli-name=$GRAVITY -keyring-backend=test -mnemonic="$ONOMY_ORCHESTRATOR_MNEMONIC" &
+faucet -cli-name=$GRAVITY -keyring-backend=test -mnemonic="$ONOMY_ORCHESTRATOR_MNEMONIC" credit-amount=100000000  -max-credit=200000000 &

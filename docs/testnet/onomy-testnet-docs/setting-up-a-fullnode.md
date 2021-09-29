@@ -14,8 +14,10 @@ I also suggest an open notepad or other document to keep track of the keys you w
 Start by logging into your Linux server using ssh. The following commands are intended to be run on that machine
 
 ### Download/install Onomy chain binaries
-```
 To download binary follow these commands
+
+```
+cd $HOME
 mkdir binaries
 cd binaries
 wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/onomyd
@@ -24,16 +26,16 @@ wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/geth
 cd ..
 chmod -R +x binaries
 export PATH=$PATH:$HOME/binaries/
-
-
+```
 or If you have Fedora (Fedora 34) or Redhat (Red Hat Enterprise Linux 8.4 (Ootpa))
- and you want to make binaries yourself, then follow these steps
-
+and you want to make binaries yourself, then follow these steps
+```
 sudo yum install -y git
 git clone -b dev https://github.com/onomyprotocol/onomy.git
 cd onomy/deploy/testnet
 bash bin.sh
 ```
+The second way may be unsafe because it used the latest version of the artifacts.
 
 ### Initiate chain
 
@@ -50,8 +52,8 @@ This script will run commands to generate keys and also store in files. You will
 bash peer-validator/init.sh
 
 Note: 1. Script will ask for enter validator name(Type any name for example validator1)
-      2. Script will ask for enter node-id of any validator that is running in chain to add seed(Please enter 1302d0ed290d74d6f061fb8506e0e34f3f67f7ff)
-      3. Script will ask for enter ip of validator for which you have added node-id(Please enter 147.182.128.38)
+      2. Script will ask for enter node-id of any validator that is running in chain to add seed(Please enter 5e0f5b9d54d3e038623ddb77c0b91b559ff13495)
+      3. Script will ask for enter ip of validator for which you have added node-id(Please enter 147.182.190.16)
 ```
 
 Now it's finally up and start the sycing block
