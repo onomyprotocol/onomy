@@ -167,7 +167,7 @@ Be sure to replace 'my validator key name' with your actual key name. If you wan
 
 ```
 
-onomyd --home $HOME/onomy-testnet1/onomy query staking validator $(onomyd --home $HOME/onomy-testnet1/onomy keys show myvalidatorkeyname --bech val --address --keyring-backend test)
+onomyd --home $HOME/onomy-testnet1/onomy query staking validator $(onomyd --home $HOME/onomy-testnet1/onomy keys show <myvalidatorkeyname> --bech val --address --keyring-backend test)
 
 ```
 
@@ -177,15 +177,18 @@ You are now validating on the Onomy blockchain. But as a validator you also need
 
 ### Register your delegate keys
 
-Delegate keys allow the for the validator private keys to be kept in secure storage while the Orchestrator can use it's own delegated keys for Gravity functions. The delegate keys registration tool will generate Ethereum and Cosmos keys for you if you don't provide any. These will be saved in your local config for later use.
+Delegate keys allow the for the validator private keys to be kept in secure storage while the Orchestrator can use it's own delegated keys for Gravity functions. `The delegate keys registration tool will generate Ethereum and Cosmos keys for you if you don't provide any. These will be saved in your local config for later use`.
 
 \*\*If you have set a minimum fee value in your `$HOME/onomy-testnet1/onomy/config/app.toml` modify the `--fees` parameter to match that value!
 
+Here we need validator phrase which we have saved while created validator key
 ```
-
+cat $HOME/onomy-testnet1/onomy/validator_key.json
+```
+```
 gbt -a onomy init
 
-gbt -a onomy keys register-orchestrator-address --validator-phrase "the phrase you saved earlier" --fees=1nom
+gbt -a onomy keys register-orchestrator-address --validator-phrase "the phrase you saved earlier" --fees=0nom
 
 ```
 
@@ -227,7 +230,7 @@ list of Geth full nodes from our community that will serve light clients.
 
 If you have more than 40gb of free storage, an SSD and extra memory/CPU power, please run a full node and share the node url. If you do not, please use the light client instructions
 
-_Please only run one or the other of the below instructions, both will not work_
+_Please only run one or the other of the below instructions in new terminal, both will not work_
 
 #### Light client instructions
 
@@ -285,7 +288,7 @@ gbt --address-prefix="onomy" orchestrator \
         --fees="1nom" \
         --gravity-contract-address="0xB4BAd4Cef22a4EAeF67434644ebaB4cEC54Db37A"
 ```
-
+Please run below command in new terminal.
 ```
 bash start-orchestrator.sh
 ```
