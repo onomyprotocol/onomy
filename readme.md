@@ -16,7 +16,7 @@ make format-in-docker
 ## Run CI 
 
 ```
-make all-in-dokcer
+make all-in-docker
 ```
 
 ## Build the project
