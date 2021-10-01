@@ -60,4 +60,8 @@ Verify installation:
 onomyd version
 ```
 
-Your output should be `<version-tag>`. If you were successful, you can now install a full node.
+Your output should be `<version-tag>`. 
+
+## Next Steps
+
+If you were successful, you can now [install a full node](onomy-testnet-docs/setting-up-a-fullnode-manual.md).

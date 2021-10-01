@@ -12,19 +12,14 @@ If you are looking to integrate against the Onomy testnet you can use the public
 
 ## Documents
 
-In order to join the testnet, you'll need to first install `onomyd`, set up the `node`, get tokens from the `faucet`, then create the `validator`.
+In order to join the testnet, you'll need to first install `onomyd`, set up the `node`, get tokens from the `faucet`, then create the `validator`. Finally, you will setup the gravity relay.
 
 - [Install onomyd](onomy-testnet-docs/install-onomyd.md)
-- [Set up full node](onomy-testnet-docs/setting-up-a-full-node.md)
+- [Set up full node (manual) (recommended)](onomy-testnet-docs/setting-up-a-fullnode-manual.md)
+- [How to run a fullnode using automated script](onomy-testnet-docs/setting-up-a-fullnode.md)
 - [Get tokens from faucet](onomy-testnet-docs/utilize-faucet.md)
-- [Become a validator](onomy-testnet-docs/setting-up-Svalidator.md)
+- [Become a validator (manual) (recommended)](onomy-testnet-docs/setting-up-a-validator-manual.md)
+- [How to become a validator using automated script](onomy-testnet-docs/setting-up-a-validator.md)
+- [Set up Gravity bridge](onomy-testnet-docs/settings-up-gravity-relay.md)
 
---- 
-# old
-
-- [How to run a fullnode (manual setup) (recommended)](onomy-testnet-docs/setting-up-a-fullnode-manual.md)
-- [How to run a fullnode](onomy-testnet-docs/setting-up-a-fullnode.md)
-- [How to become a validator (manual setup) (recommended)](onomy-testnet-docs/setting-up-a-validator-manual.md)
-- [How to become a validator](onomy-testnet-docs/setting-up-a-validator.md)
-- [Testnet Faucet](onomy-testnet-docs/faucet.md)
 - [Test Onomy Chain](onomy-testnet-docs/testing-gravity.md)

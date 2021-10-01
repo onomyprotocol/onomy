@@ -121,3 +121,16 @@ Your node is now fully set up!
 From here you can:
 - request tokens from the faucet
 - become a validator
+
+### Check the status of the Onomy chain
+
+You should be good to go! You can check the status of the three
+Onomy chain by running.
+```
+curl http://localhost:26657/status
+```
+if catching_up is false means your node is fully synced.
+
+## Next Steps
+
+Now that the node is set up, you must now [request tokens from the faucet](onomy-testnet-docs/utilize-faucet.md) and [become a validator](onomy-testnet-docs/setting-up-a-validator-manual.md).
