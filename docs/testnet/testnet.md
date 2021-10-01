@@ -12,6 +12,16 @@ If you are looking to integrate against the Onomy testnet you can use the public
 
 ## Documents
 
+In order to join the testnet, you'll need to first install `onomyd`, set up the `node`, get tokens from the `faucet`, then create the `validator`.
+
+- [Install onomyd](onomy-testnet-docs/install-onomyd.md)
+- [Set up full node](onomy-testnet-docs/setting-up-a-full-node.md)
+- [Get tokens from faucet](onomy-testnet-docs/utilize-faucet.md)
+- [Become a validator](onomy-testnet-docs/setting-up-Svalidator.md)
+
+--- 
+# old
+
 - [How to run a fullnode (manual setup) (recommended)](onomy-testnet-docs/setting-up-a-fullnode-manual.md)
 - [How to run a fullnode](onomy-testnet-docs/setting-up-a-fullnode.md)
 - [How to become a validator (manual setup) (recommended)](onomy-testnet-docs/setting-up-a-validator-manual.md)
