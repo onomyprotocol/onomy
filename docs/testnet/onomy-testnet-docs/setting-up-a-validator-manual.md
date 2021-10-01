@@ -8,34 +8,7 @@ Onomy chain can be run on Windows and Mac. Binaries are provided on the releases
 
 I also suggest an open notepad or other document to keep track of the keys you will be generating.
 
-## Bootstrapping steps and commands
-
-### Download/install Onomy chain binaries
-To download binary follow these commands
-```
-cd $HOME
-mkdir binaries
-cd binaries
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/onomyd
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/gbt
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/geth
-cd ..
-chmod -R +x binaries
-export PATH=$PATH:$HOME/binaries/
-```
-or If you have Fedora (Fedora 34) or Redhat (Red Hat Enterprise Linux 8.4 (Ootpa))
-and you want to make binaries yourself, then follow these steps
-```
-sudo yum install -y git
-git clone -b dev https://github.com/onomyprotocol/onomy.git
-cd onomy/deploy/testnet
-bash bin.sh
-```
-The second way may be unsafe because it used the latest version of the artifacts.
-
-At specific points during the testnet you may be told to 'update your orchestrator' or 'update your onomyd binary'. In order to do that you can simply repeat the above instructions and then restart the affected software.
-
-to check what version of the tools you have run `gbt --version`
+The following will outline how to turn your node into a validator. You must first have a [full node running](onomy-testnet-docs/setting-up-a-fullnode-manual.md) in order to become a validator.
 
 ### Generate your key
 
@@ -47,87 +20,15 @@ You'll be prompted to create a password, I suggest you pick something short sinc
 
 ```
 cd $HOME
-onomyd --home $HOME/onomy-testnet1/onomy init {validator moniker} --chain-id onomy-testnet1
-onomyd --home $HOME/onomy-testnet1/onomy keys add {myvalidatorkeyname} --keyring-backend test --output json | jq . >> $HOME/onomy-testnet1/onomy/validator_key.json
+onomyd --home $HOME/.onomy keys add {myvalidatorkeyname} --keyring-backend test --output json | jq . >> $HOME/.onomy/validator_key.json
 ```
 
-### Copy the genesis file
-
-```
-
-rm $HOME/onomy-testnet1/onomy/config/genesis.json
-wget http://147.182.190.16:26657/genesis? -O $HOME/raw.json
-jq .result.genesis $HOME/raw.json >> $HOME/onomy-testnet1/onomy/config/genesis.json
-rm -rf $HOME/raw.json
-```
-
-### Update toml configuration files
-
-Change in $HOME/onomy-testnet1/onomy/config/config.toml to contain the following:
-
-```
-
-replace seeds = "" to seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@147.182.190.16:26656"
-replace "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
-replace "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
-replace addr_book_strict = true to addr_book_strict = false
-replace external_address = "" to external_address = "tcp://0.0.0.0:26656"
-```
-
-Change in $HOME/onomy-testnet1/onomy/config/app.toml to contain the following:
-
-```
-replace enable = false to enable = true
-replace swagger = false to swagger = true
-```
-## Increasing the default open files limit
-If we don't raise this value nodes will crash once the network grows large enough
-```
-sudo su -c "echo 'fs.file-max = 65536' >> /etc/sysctl.conf"
-sysctl -p
-
-sudo su -c "echo '* hard nofile 94000' >> /etc/security/limits.conf"
-sudo su -c "echo '* soft nofile 94000' >> /etc/security/limits.conf"
-
-sudo su -c "echo 'session required pam_limits.so' >> /etc/pam.d/common-session"
-```
-For this to take effect you'll need to (A) reboot (B) close and re-open all ssh sessions.
-To check if this has worked run
-```
-ulimit -n
-```
-If you see 1024 then you need to reboot
-
-### Start your full node in another terminal and wait for it to sync
-```
-onomyd --home $HOME/onomy-testnet1/onomy start
-```
-To check if the node is synced or not, do:
-```
-onomyd status
-```
-When the value of catching_up is false, your node is fully sync'd with the network.
-```
- "sync_info": {
-    "latest_block_hash": "7BF95EED4EB50073F28CF833119FDB8C7DFE0562F611DF194CF4123A9C1F4640",
-    "latest_app_hash": "7C0C89EC4E903BAC730D9B3BB369D870371C6B7EAD0CCB5080B5F9D3782E3559",
-    "latest_block_height": "668538",
-    "latest_block_time": "2020-10-31T17:50:56.800119764Z",
-    "earliest_block_hash": "E7CAD87A4FDC47DFDE3D4E7C24D80D4C95517E8A6526E2D4BB4D6BC095404113",
-    "earliest_app_hash": "",
-    "earliest_block_height": "1",
-    "earliest_block_time": "2020-09-15T14:02:31Z",
-    "catching_up": false
-  },
-```
 ### Request some funds be sent to your address
 
 First find your address
 
 ```
-
-onomyd --home $HOME/onomy-testnet1/onomy keys list --keyring-backend test
-
+onomyd --home $HOME/.onomy keys list --keyring-backend test
 ```
 
 Copy your address from the 'address' field and paste it into the command below in place of $ONOMY_VALIDATOR_ADDRESS
@@ -142,9 +43,9 @@ This will provide you 100000000nom from the faucet storage.
 
 ```
 
-onomyd --home $HOME/onomy-testnet1/onomy tx staking create-validator \
+onomyd --home $HOME/.onomy tx staking create-validator \
  --amount=100000000nom \
- --pubkey=$(onomyd --home $HOME/onomy-testnet1/onomy tendermint show-validator) \
+ --pubkey=$(onomyd --home $HOME/.onomy tendermint show-validator) \
  --moniker="put your validator name here" \
  --chain-id=onomy-testnet1 \
  --commission-rate="0.10" \
@@ -163,11 +64,11 @@ onomyd --home $HOME/onomy-testnet1/onomy tx staking create-validator \
 
 If you see one line in the response you are validating. If you don't see any output from this command you are not validating. Check that the last command ran successfully.
 
-Be sure to replace 'my validator key name' with your actual key name. If you want to double check you can see all your keys with 'onomyd --home $HOME/onomy-testnet1/onomy keys list --keyring-backend test'
+Be sure to replace 'my validator key name' with your actual key name. If you want to double check you can see all your keys with 'onomyd --home $HOME/.onomy keys list --keyring-backend test'
 
 ```
 
-onomyd --home $HOME/onomy-testnet1/onomy query staking validator $(onomyd --home $HOME/onomy-testnet1/onomy keys show <myvalidatorkeyname> --bech val --address --keyring-backend test)
+onomyd --home $HOME/.onomy query staking validator $(onomyd --home $HOME/.onomy keys show <myvalidatorkeyname> --bech val --address --keyring-backend test)
 
 ```
 
@@ -179,11 +80,11 @@ You are now validating on the Onomy blockchain. But as a validator you also need
 
 Delegate keys allow the for the validator private keys to be kept in secure storage while the Orchestrator can use it's own delegated keys for Gravity functions. `The delegate keys registration tool will generate Ethereum and Cosmos keys for you if you don't provide any. These will be saved in your local config for later use`.
 
-\*\*If you have set a minimum fee value in your `$HOME/onomy-testnet1/onomy/config/app.toml` modify the `--fees` parameter to match that value!
+\*\*If you have set a minimum fee value in your `$HOME/.onomy/config/app.toml` modify the `--fees` parameter to match that value!
 
 Here we need validator phrase which we have saved while created validator key
 ```
-cat $HOME/onomy-testnet1/onomy/validator_key.json
+cat $HOME/.onomy/validator_key.json
 ```
 ```
 gbt -a onomy init
@@ -203,12 +104,12 @@ You should have received 100000000 Onomy Governance Token in nom.
 To get the address for your validator key you can run the below, where 'myvalidatorkeyname' is whatever you named your key in the 'generate your key' step.
 
 ```
-onomyd --home $HOME/onomy-testnet1/onomy keys show {myvalidatorkeyname} --keyring-backend test
+onomyd --home $HOME/.onomy keys show {myvalidatorkeyname} --keyring-backend test
 ```
-Basically there is two way to fund your delegate cosmos address
+Basically there is two-way to fund your delegate cosmos address
 1. to transfer from a account
 ```
-onomyd --home $HOME/onomy-testnet1/onomy tx bank send <your validator address> <your delegate cosmos address> 1000000nom --chain-id=onomy-testnet1 --keyring-backend test
+onomyd --home $HOME/.onomy tx bank send <your validator address> <your delegate cosmos address> 1000000nom --chain-id=onomy-testnet1 --keyring-backend test
 ```
 2. using faucet command, from Onomy side faucet funded
 ```
@@ -272,7 +173,7 @@ If your Orchestrator goes down for more than 16 hours during the testnet you wil
 
 Since you'll be running this a lot I suggest putting the command into a script, like so. The next version of the orchestrator will use a config file for these values and have encrypted key storage.
 
-\*\*If you have set a minimum fee value in your `$HOME/onomy-testnet1/onomy/config/app.toml` modify the `--fees` parameter to match that value!
+\*\*If you have set a minimum fee value in your `$HOME/.onomy/config/app.toml` modify the `--fees` parameter to match that value!
 
 ```
 nano start-orchestrator.sh
@@ -293,3 +194,6 @@ Please run below command in new terminal.
 bash start-orchestrator.sh
 ```
 
+## Next Step
+
+Now that the validator node and gravity bridge setup is successfully done, you must [test gravity bridge](onomy-testnet-docs/testing-gravity.md).

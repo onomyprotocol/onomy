@@ -6,48 +6,28 @@ A Onomy chain full node is just like any other Cosmos chain full node and unlike
 
 A Linux server with any modern Linux distribution, 2gb of ram and at least 20gb storage. Requirements are very minimal.
 
-### Download/install Onomy chain binaries
-To download binary follow these commands
-```
-cd $HOME
-mkdir binaries
-cd binaries
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/onomyd
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/gbt
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/geth
-cd ..
-chmod -R +x binaries
-export PATH=$PATH:$HOME/binaries/
-```
-or If you have Fedora (Fedora 34) or Redhat (Red Hat Enterprise Linux 8.4 (Ootpa))
-and you want to make binaries yourself, then follow these steps
-```
-sudo yum install -y git
-git clone -b dev https://github.com/onomyprotocol/onomy.git
-cd onomy/deploy/testnet
-bash bin.sh
-```
-The second way may be unsafe because it used the latest version of the artifacts.
+Setting up a node requires first [pre installation](onomy-testnet-docs/pre-installation.md)
 
 ### Init the config files
 
 ```
 cd $HOME
-onomyd --home $HOME/onomy-testnet1/onomy init {validator moniker} --chain-id onomy-testnet1
+onomyd --home $HOME/.onomy init {validator moniker} --chain-id onomy-testnet1
 ```
+Note:- Here the default home directory path is `~/.onomy` or `$HOME/.onomy`, if you want to change it then you can provide in `onomyd` command with flag `--home` as shown in above command. If you are using the default home directory path then its optional to provide in the `onomyd` commands.
 
 ### Copy the genesis file
 
 ```
-rm $HOME/onomy-testnet1/onomy/config/genesis.json
+rm $HOME/.onomy/config/genesis.json
 wget http://147.182.190.16:26657/genesis? -O $HOME/raw.json
-jq .result.genesis $HOME/raw.json >> $HOME/onomy-testnet1/onomy/config/genesis.json
+jq .result.genesis $HOME/raw.json >> $HOME/.onomy/config/genesis.json
 rm -rf $HOME/raw.json
 ```
 
 ### Update toml configuration files
 
-Change in $HOME/onomy-testnet1/onomy/config/config.toml to contain the following:
+Change in $HOME/.onomy/config/config.toml to contain the following:
 
 ```
 
@@ -58,7 +38,7 @@ replace addr_book_strict = true to addr_book_strict = false
 replace external_address = "" to external_address = "tcp://0.0.0.0:26656"
 ```
 
-Change in $HOME/onomy-testnet1/onomy/config/app.toml to contain the following:
+Change in $HOME/.onomy/config/app.toml to contain the following:
 
 ```
 replace enable = false to enable = true
@@ -84,7 +64,7 @@ If you see 1024 then you need to reboot
 ### Start your full node in another terminal and wait for it to sync
 
 ```
-onomyd --home $HOME/onomy-testnet1/onomy start
+onomyd --home $HOME/.onomy start
 ```
 ### Check the status of the Onomy chain
 
