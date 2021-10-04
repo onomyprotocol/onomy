@@ -34,7 +34,7 @@ onomyd --home $HOME/.onomy keys list --keyring-backend test
 Copy your address from the 'address' field and paste it into the command below in place of $ONOMY_VALIDATOR_ADDRESS
 
 ```
-curl -X POST http://147.182.190.16:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"100000000nom\"  ]}"
+curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"100000000nom\"  ]}"
 ```
 
 This will provide you 100000000nom from the faucet storage.
@@ -113,7 +113,7 @@ onomyd --home $HOME/.onomy tx bank send <your validator address> <your delegate 
 ```
 2. using faucet command, from Onomy side faucet funded
 ```
-curl -X POST http://147.182.190.16:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"100000000nom\"  ]}"
+curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"100000000nom\"  ]}"
 ```
 
  Now we need some Rinkeby Eth in the Ethereum delegate key

@@ -45,7 +45,7 @@ You'll see an output like this
 Copy your address from the 'address' field and paste it into the command below in place of $ONOMY_VALIDATOR_ADDRESS
 
 ```
-curl -X POST http://147.182.190.16:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"10nom\"  ]}"
+curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"10nom\"  ]}"
 ```
 
 This will provide you 10nom from the faucet storage.

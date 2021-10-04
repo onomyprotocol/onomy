@@ -13,7 +13,7 @@ Important Note: Here in the script file we have set up implementation with the h
 ```
 bash peer-validator/makeValidator.sh
 
-Note: 1. Script will ask for enter faucet url get faucet token(Please enter http://147.182.190.16:8000/)
+Note: 1. Script will ask for enter faucet url get faucet token(Please enter http://testnet1.onomy.io:8000/)
 ```
 You can check the validators of the Onomy chain by running.
 ```
@@ -66,7 +66,7 @@ onomyd --home $HOME/onomy-testnet1/onomy tx bank send <your validator address> <
 ```
 2. using faucet command, from Onomy side faucet funded
 ```
-curl -X POST http://147.182.190.16:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"100000000nom\"  ]}"
+curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"100000000nom\"  ]}"
 ```
 
 Now we need some Rinkeby Eth in the Ethereum delegate key

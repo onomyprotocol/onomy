@@ -28,7 +28,7 @@ bash peer-validator/init.sh
 
 Note: 1. Script will ask for enter validator name(Type any name for example validator1)
       2. Script will ask for enter node-id of any validator that is running in chain to add seed(Please enter 5e0f5b9d54d3e038623ddb77c0b91b559ff13495)
-      3. Script will ask for enter ip of validator for which you have added node-id(Please enter 147.182.190.16)
+      3. Script will ask for enter ip of validator for which you have added node-id(Please enter testnet1.onomy.io)
 ```
 
 Now it's finally up and start the sycing block

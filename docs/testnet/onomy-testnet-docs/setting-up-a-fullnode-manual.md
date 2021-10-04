@@ -20,7 +20,7 @@ Note:- Here the default home directory path is `~/.onomy` or `$HOME/.onomy`, if 
 
 ```
 rm $HOME/.onomy/config/genesis.json
-wget http://147.182.190.16:26657/genesis? -O $HOME/raw.json
+wget http://testnet1.onomy.io:26657/genesis? -O $HOME/raw.json
 jq .result.genesis $HOME/raw.json >> $HOME/.onomy/config/genesis.json
 rm -rf $HOME/raw.json
 ```
@@ -31,7 +31,7 @@ Change in $HOME/.onomy/config/config.toml to contain the following:
 
 ```
 
-replace seeds = "" to seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@147.182.190.16:26656"
+replace seeds = "" to seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656"
 replace "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
 replace "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
 replace addr_book_strict = true to addr_book_strict = false
