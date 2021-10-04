@@ -1,5 +1,8 @@
 # Onomy
 
+# Testnet
+
+Join the Testnet #1! You can find the testnet documentation [here](docs/testnet/testnet.md) 
 
 # Development
 
