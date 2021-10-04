@@ -4,7 +4,7 @@
 
 A Linux server with any modern Linux distribution, 4cores, 8gb of ram and at least 20gb of SSD storage.
 
-The following will outline how to turn your node into a validator. You must first have a [full node running](onomy-testnet-docs/setting-up-a-fullnode.md) in order to become a validator.
+The following will outline how to turn your node into a validator. You must first have a [full node running](setting-up-a-fullnode.md) in order to become a validator.
 
 ### Run script to make it as validator node but before that node should fully sync
 
@@ -142,4 +142,4 @@ bash start-orchestrator.sh
 
 ## Next Step
 
-Now that the validator node and gravity bridge setup is successfully done, you must [test gravity bridge](onomy-testnet-docs/testing-gravity.md).
+Now that the validator node and gravity bridge setup is successfully done, you must [test gravity bridge](testing-gravity.md).

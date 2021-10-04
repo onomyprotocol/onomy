@@ -6,7 +6,7 @@ A Onomy chain full node is just like any other Cosmos chain full node and unlike
 
 A Linux server with any modern Linux distribution, 4cores, 8gb of ram and at least 20gb of SSD storage.
 
-Setting up a node requires first [pre installation](onomy-testnet-docs/pre-installation.md)
+Setting up a node requires first [pre installation](pre-installation.md)
 
 
 ### Initiate chain

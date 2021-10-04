@@ -6,7 +6,7 @@ In order to test the Onomy faucet and receive Onomy faucet tokens you'll first n
 
 A Linux server with any modern Linux distribution, 2gb of ram and at least 20gb storage. Requirements are very minimal.
 
-The following will outline how to setup wallet/account and test the Onomy faucet. You must first have a [full node running](onomy-testnet-docs/setting-up-a-fullnode-manual.md).
+The following will outline how to setup wallet/account and test the Onomy faucet. You must first have a [full node running](setting-up-a-fullnode-manual.md).
 
 
 ### Generate your key

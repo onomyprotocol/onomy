@@ -8,7 +8,7 @@ Onomy chain can be run on Windows and Mac. Binaries are provided on the releases
 
 I also suggest an open notepad or other document to keep track of the keys you will be generating.
 
-The following will outline how to turn your node into a validator. You must first have a [full node running](onomy-testnet-docs/setting-up-a-fullnode-manual.md) in order to become a validator.
+The following will outline how to turn your node into a validator. You must first have a [full node running](setting-up-a-fullnode-manual.md) in order to become a validator.
 
 ### Generate your key
 
@@ -196,4 +196,4 @@ bash start-orchestrator.sh
 
 ## Next Step
 
-Now that the validator node and gravity bridge setup is successfully done, you must [test gravity bridge](onomy-testnet-docs/testing-gravity.md).
+Now that the validator node and gravity bridge setup is successfully done, you must [test gravity bridge](testing-gravity.md).
