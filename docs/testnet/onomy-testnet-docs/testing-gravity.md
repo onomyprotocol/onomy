@@ -32,7 +32,7 @@ You should see a message like this on your Orchestrator. The details of course w
 Once the event has been observed we can check our balance on the Cosmos side. We will see some peggy<ERC20 address> tokens in our balance. We have a good bit of code in flight right now so the module renaming from 'Peggy' to 'Gravity' has been put on hold until we're feature complete.
 
 ```
-onomyd --home $HOME/onomy/onomy query bank balances <any cosmos address>
+onomyd --home $HOME/.onomy query bank balances <any cosmos address>
 ```
 
 Now that we have some tokens on the Onomy chain we can try sending them back to Ethereum. Remember to use the Cosmos phrase for the address you actually sent the tokens to. Alternately you can send Cosmos native tokens with this command.

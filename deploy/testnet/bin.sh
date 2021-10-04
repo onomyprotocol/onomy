@@ -31,7 +31,7 @@ echo "----------------cloning_repository-------------------"
 
 GRAVITY_DIR=$HOME_DIRECTORY/gravity
 ONOMY_DIR=$HOME_DIRECTORY/go/onomy
-git clone https://github.com/onomyprotocol/cosmos-gravity-bridge.git $GRAVITY_DIR
+git clone -b v0.0.0-20210915184851-orch-nomarket https://github.com/onomyprotocol/cosmos-gravity-bridge.git $GRAVITY_DIR
 git clone -b dev https://github.com/onomyprotocol/onomy.git $ONOMY_DIR
 
 echo "--------------install_golang---------------------------"

@@ -7,7 +7,7 @@ If you would like to join this testnet connect with us on the [Onomy Discord](te
 If you are looking to integrate against the Onomy testnet you can use the public rpc
 
 ```
-147.182.128.38:26657
+testnet1.onomy.io:26657
 ```
 
 ## Documents

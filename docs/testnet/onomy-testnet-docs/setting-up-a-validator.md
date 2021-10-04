@@ -4,75 +4,18 @@
 
 A Linux server with any modern Linux distribution, 4cores, 8gb of ram and at least 20gb of SSD storage.
 
-In theory Onomy chain can be run on Windows and Mac. Binaries are provided on the releases page. But instructions are not provided.
-
-I also suggest an open notepad or other document to keep track of the keys you will be generating.
-
-## Bootstrapping steps and commands
-
-Start by logging into your Linux server using ssh. The following commands are intended to be run on that machine
-
-### Download/install Onomy chain binaries
-```
-To download binary follow these commands
-mkdir binaries
-cd binaries
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/onomyd
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/gbt
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/geth
-cd ..
-chmod -R +x binaries
-export PATH=$PATH:$HOME/binaries/
-
-
-or If you have Fedora (Fedora 34) or Redhat (Red Hat Enterprise Linux 8.4 (Ootpa))
- and you want to make binaries yourself, then follow these steps
-
-sudo yum install -y git
-git clone -b dev https://github.com/onomyprotocol/onomy.git
-cd onomy/deploy/testnet
-bash bin.sh
-```
-
-### Initiate chain
-
-```
-git clone -b dev https://github.com/onomyprotocol/onomy.git
-cd onomy/deploy/testnet
-```
-
-### Run the first time bootstrapping playbook and script
-
-This script will print a lot of instructions, follow them carefully and be sure to copy
-down the keys you generate. You will need them later.
-
-```
-bash peer-validator/init.sh
-
-Note: 1. Script will ask for enter validator name(Type any name for example validator1)
-      2. Script will ask for enter node-id of any validator that is running in chain to add seed(Please enter 1302d0ed290d74d6f061fb8506e0e34f3f67f7ff)
-      3. Script will ask for enter ip of validator for which you have added node-id(Please enter 147.182.128.38)
-```
-Now it's finally up and start the sycing block
-
-### Check the status of the Onomy chain
-
-You should be good to go! You can check the status of the
-Onomy chain by running.
-```
-curl http://localhost:26657/status
-```
-if catching_up is false means your node is fully synced
+The following will outline how to turn your node into a validator. You must first have a [full node running](onomy-testnet-docs/setting-up-a-fullnode.md) in order to become a validator.
 
 ### Run script to make it as validator node but before that node should fully sync
+
+Important Note: Here in the script file we have set up implementation with the home directory `$HOME/onomy-testnet1/onomy`. So if you have changed this path then provide the home directory path accordingly in the `onomyd` command.
 
 ```
 bash peer-validator/makeValidator.sh
 
-Note: 1. Script will ask for enter faucet url get faucet token(Please enter http://147.182.128.38:8000/)
+Note: 1. Script will ask for enter faucet url get faucet token(Please enter http://testnet1.onomy.io:8000/)
 ```
-You can check the validators of the
-Onomy chain by running.
+You can check the validators of the Onomy chain by running.
 ```
 curl http//localhost:26657/validators
 ```
@@ -84,15 +27,20 @@ You are now validating on the Onomy blockchain. But as a validator you also need
 
 ### Register your delegate keys
 
-Delegate keys allow the for the validator private keys to be kept in secure storage while the Orchestrator can use it's own delegated keys for Gravity functions. The delegate keys registration tool will generate Ethereum and Cosmos keys for you if you don't provide any. These will be saved in your local config for later use.
+Delegate keys allow the for the validator private keys to be kept in secure storage while the Orchestrator can use it's own delegated keys for Gravity functions. `The delegate keys registration tool will generate Ethereum and Cosmos keys for you if you don't provide any. These will be saved in your local config for later use`.
 
-\*\*If you have set a minimum fee value in your `~/onomy/onomy/config/app.toml` modify the `--fees` parameter to match that value!
+\*\*If you have set a minimum fee value in your `$HOME/onomy-testnet1/onomy/config/app.toml` modify the `--fees` parameter to match that value!
+
+Here we need validator phrase which we have saved while created validator key
+```
+cat $HOME/onomy-testnet1/onomy/validator_key.json
+```
 
 ```
 
 gbt -a onomy init
 
-gbt -a onomy keys register-orchestrator-address --validator-phrase "the phrase you saved earlier" --fees=1nom
+gbt -a onomy keys register-orchestrator-address --validator-phrase "the phrase you saved earlier" --fees=0nom
 
 ```
 
@@ -102,42 +50,44 @@ Both your Ethereum delegate key and your Cosmos delegate key will need some toke
 
 In a production network only relayers would need Ethereum to fund relaying, but for this testnet all validators run relayers by default, allowing us to more easily simulate a lively economy of many relayers.
 
-You should have received 1000000000 Onomy Governance Token in nom and the same amount of footoken. We're going to send half of the footoken to the delegate address
+You should have received 200000000 Onomy Governance Token in nom. We're going to send half of the nom to the delegate address
 
 To get the address for your validator key you can run the below, where 'myvalidatorkeyname' is whatever you named your key in the 'generate your key' step.
 
 ```
 
-onomyd --home $HOME/onomy/onomy keys show myvalidatorkeyname --keyring-backend test
+onomyd --home $HOME/onomy-testnet1/onomy keys show {myvalidatorkeyname} --keyring-backend test
 
 ```
-
+Basically there is two way to fund your delegate cosmos address
+1. to transfer from a account
+```
+onomyd --home $HOME/onomy-testnet1/onomy tx bank send <your validator address> <your delegate cosmos address> 1000000nom --chain-id=onomy-testnet1 --keyring-backend test
+```
+2. using faucet command, from Onomy side faucet funded
+```
+curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"100000000nom\"  ]}"
 ```
 
-onomyd --home $HOME/onomy/onomy tx bank send <your validator address> <your delegate cosmos address> 1000000nom --chain-id=onomy --keyring-backend test
-or using facuet
-curl -X POST http://147.182.128.38:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"100000000nom\"  ]}"
-
-```
-
-With the Onomy side faucet funded, now we need some Rinkeby Eth in the Ethereum delegate key
+Now we need some Rinkeby Eth in the Ethereum delegate key
 
 ```
 https://www.rinkeby.io/#faucet
 ```
 
 ### Setup Geth on the Rinkeby testnet
+_Please only run one or the other of the below instructions in new terminal, both will not work_
 
 #### Light client instructions
 
 ```
-geth --rinkeby --syncmode "light"  --rpc --rpcport "8545"
+geth --rinkeby --syncmode "light"  --http --http.port "8545"
 ```
 
 #### Fullnode instructions
 
 ```
-geth --rinkeby --syncmode "full"  --rpc --rpcport "8545"
+geth --rinkeby --syncmode "full"  --http --http.port "8545"
 ```
 
 You'll see this url, please note your ip and share both this node url and your ip in chat to add to the light client nodes list
@@ -150,13 +100,13 @@ Finally you'll need to wait for several hours until your node is synced, you can
 
 ### Deployment of the Gravity contract
 
-Once 66% of the validator set has registered their delegate Ethereum key it is possible to deploy the Gravity Ethereum contract. Once deployed the Gravity contract address on Görli will be posted here
+Once 66% of the validator set has registered their delegate Ethereum key it is possible to deploy the Gravity Ethereum contract. Once deployed the Gravity contract address on rinkeby will be posted here
 
 Here is the contract address! Move forward!
 
 ```
 
-0xD6F7ab117DF5172264221FA33299Dd6C290cE26f
+0xB4BAd4Cef22a4EAeF67434644ebaB4cEC54Db37A
 
 ```
 
@@ -168,7 +118,7 @@ If your Orchestrator goes down for more than 16 hours during the testnet you wil
 
 Since you'll be running this a lot I suggest putting the command into a script, like so. The next version of the orchestrator will use a config file for these values and have encrypted key storage.
 
-\*\*If you have set a minimum fee value in your `$HOME/onomy/onomy/config/app.toml` modify the `--fees` parameter to match that value!
+\*\*If you have set a minimum fee value in your `$HOME/onomy-testnet1/onomy/config/app.toml` modify the `--fees` parameter to match that value!
 
 ```
 nano start-orchestrator.sh
@@ -182,9 +132,14 @@ gbt --address-prefix="onomy" orchestrator \
         --ethereum-key="<registered delegate ethereum private key>" \
         --ethereum-rpc="http://0.0.0.0:8545" \
         --fees="1nom" \
-        --gravity-contract-address="0xD6F7ab117DF5172264221FA33299Dd6C290cE26f"
+        --gravity-contract-address="0xB4BAd4Cef22a4EAeF67434644ebaB4cEC54Db37A"
 ```
+Please run below command in new terminal.
 
 ```
 bash start-orchestrator.sh
 ```
+
+## Next Step
+
+Now that the validator node and gravity bridge setup is successfully done, you must [test gravity bridge](onomy-testnet-docs/testing-gravity.md).

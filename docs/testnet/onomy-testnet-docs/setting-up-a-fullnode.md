@@ -6,34 +6,8 @@ A Onomy chain full node is just like any other Cosmos chain full node and unlike
 
 A Linux server with any modern Linux distribution, 4cores, 8gb of ram and at least 20gb of SSD storage.
 
-In theory, Onomy chain can be run on Windows and Mac. Binaries will be provided on the releases page and currently, scripts files are provided to make binaries.
-I also suggest an open notepad or other document to keep track of the keys you will be generating.
+Setting up a node requires first [pre installation](onomy-testnet-docs/pre-installation.md)
 
-## Bootstrapping steps and commands
-
-Start by logging into your Linux server using ssh. The following commands are intended to be run on that machine
-
-### Download/install Onomy chain binaries
-```
-To download binary follow these commands
-mkdir binaries
-cd binaries
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/onomyd
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/gbt
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/geth
-cd ..
-chmod -R +x binaries
-export PATH=$PATH:$HOME/binaries/
-
-
-or If you have Fedora (Fedora 34) or Redhat (Red Hat Enterprise Linux 8.4 (Ootpa))
- and you want to make binaries yourself, then follow these steps
-
-sudo yum install -y git
-git clone -b dev https://github.com/onomyprotocol/onomy.git
-cd onomy/deploy/testnet
-bash bin.sh
-```
 
 ### Initiate chain
 
@@ -46,12 +20,15 @@ cd onomy/deploy/testnet
 
 This script will run commands to generate keys and also store in files. You will need them later.
 
+Important Note: Here in the script file we have set up implementation with the home directory `$HOME/onomy-testnet1/onomy`. So if you have changed this path then provide the home directory path accordingly in the `onomyd` command.
+
+
 ```
 bash peer-validator/init.sh
 
 Note: 1. Script will ask for enter validator name(Type any name for example validator1)
-      2. Script will ask for enter node-id of any validator that is running in chain to add seed(Please enter 1302d0ed290d74d6f061fb8506e0e34f3f67f7ff)
-      3. Script will ask for enter ip of validator for which you have added node-id(Please enter 147.182.128.38)
+      2. Script will ask for enter node-id of any validator that is running in chain to add seed(Please enter 5e0f5b9d54d3e038623ddb77c0b91b559ff13495)
+      3. Script will ask for enter ip of validator for which you have added node-id(Please enter testnet1.onomy.io)
 ```
 
 Now it's finally up and start the sycing block

@@ -8,7 +8,7 @@ CURRENT_WORKING_DIR=$HOME
 # Name of the network to bootstrap
 #echo "Enter chain-id"
 #read chainid
-CHAINID="onomy"
+CHAINID="onomy-testnet1"
 # Name of the gravity artifact
 GRAVITY=onomyd
 # The name of the gravity node
