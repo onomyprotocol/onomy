@@ -7,7 +7,7 @@ dnf -y update
 dnf -y copr enable ngompa/musl-libc
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-dnf -y install curl nano ca-certficates tar git jq gcc-c++ musl-devel musl-gcc golang gmp-devel perl python3 moreutils wget nodejs
+dnf -y install curl nano ca-certificates tar git jq gcc-c++ musl-devel musl-gcc golang gmp-devel perl python3 moreutils wget nodejs make
 
 echo "--------------installing_rust---------------------------"
 curl https://sh.rustup.rs -sSf | bash -s -- -y
@@ -55,5 +55,5 @@ echo "------------------ install fauset ------------------"
 curl https://get.starport.network/faucet! | bash
 cd $HOME
 
-echo "export PATH=$PATH:$HOME/.cargo/bin:$HOME/go/bin" >> $HOME/.bashrc_
+echo "export PATH=$PATH:$HOME/.cargo/bin:$HOME/go/bin" >> $HOME/.bashrc
 

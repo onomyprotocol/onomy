@@ -11,11 +11,8 @@ The following will outline how to setup wallet/account and test the Onomy faucet
 
 ### Generate your key
 
-Be sure to back up the phrase you get! You’ll need it in a bit. If you don't back up the phrase here just follow the steps again to generate a new key.
 
 Note 'account_name' is just the name of your key here, you can pick anything you like, just remember it later.
-
-You'll be prompted to create a password, I suggest you pick something short since you'll be typing it a lot
 
 ```
 onomyd --home $HOME/.onomy keys add {account_name} --keyring-backend test --output json | jq . >> $HOME/.onomy/validator_key.json
@@ -34,8 +31,8 @@ You'll see an output like this
 ```
 - name: keyname
   type: local
-  address: cosmos1youraddresswillgohere
-  pubkey: cosmospub1yourpublickleywillgohere
+  address: onomy1youraddresswillgohere
+  pubkey: onomypub1yourpublickleywillgohere
   mnemonic: ""
   threshold: 0
   pubkeys: []
@@ -54,4 +51,3 @@ You can check balances of account using this command as given below
 onomyd --home $HOME/.onomy query bank balances $ACCOUNT_ADDRESS 
 
 ```
-
