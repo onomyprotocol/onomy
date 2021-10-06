@@ -7,19 +7,22 @@ I also suggest an open notepad or other document to keep track of the keys you w
 Start by logging into your Linux server using ssh. The following commands are intended to be run on that machine
 
 ### Download/install Onomy chain binaries
-To download binary follow these commands
+To download and install binaries follow these steps
 
+1. create a new directory to download binaries in and open that directory `mkdir binaries && cd binaries` 
+2. Download binaries using wget and add executable permission
 ```
-cd $HOME
-mkdir binaries
-cd binaries
 wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/onomyd
 wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/gbt
 wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/geth
-cd ..
-chmod -R +x binaries
-export PATH=$PATH:$HOME/binaries/
+chmod +x *
+
 ```
+3. You can now use these binaries, but in order to use them from anywhere in your terminal, you will need add them to $PATH variable
+`
+export PATH=$PATH:$HOME/binaries/
+`
+
 or If you have Fedora (Fedora 34) or Redhat (Red Hat Enterprise Linux 8.4 (Ootpa))
 and you want to make binaries yourself, then follow these steps
 ```
