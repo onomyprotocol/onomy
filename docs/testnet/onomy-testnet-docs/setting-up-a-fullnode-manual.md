@@ -1,12 +1,14 @@
-# How to run a Onomy testnet full node
+# How to Run a Full Node (Manual Setup - Recommended)
 
-A Onomy chain full node is just like any other Cosmos chain full node and unlike the validator flow requires no external software
+As a Cosmos-based chain, the ONET full nodes are similar to any Cosmos full nodes. Unlike the validator flow, running a full node requires no external software. 
 
-## What do I need?
+## What do I Need?
 
-A Linux server with any modern Linux distribution, 2gb of ram and at least 20gb storage. Requirements are very minimal.
+A Linux server with any modern Linux distribution, 2gb of RAM and at least 20gb storage. Requirements are minimal.
 
-Setting up a node requires first [pre installation](pre-installation.md)
+## Full Node Tutorial
+
+[Pre installation](pre-installation.md) is required prior to setting up a full node.
 
 ### Init the config files
 
