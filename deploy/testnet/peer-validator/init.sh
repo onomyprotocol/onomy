@@ -3,7 +3,7 @@ set -eu
 
 echo "building environment"
 # Initial dir
-CURRENT_WORKING_DIR=$HOME
+ONOMY_HOME=$HOME/.onomy
 
 # Name of the network to bootstrap
 #echo "Enter chain-id"
@@ -16,7 +16,7 @@ GRAVITY_NODE_NAME="onomy"
 # The address to run gravity node
 GRAVITY_HOST="0.0.0.0"
 # Home folder for gravity config
-GRAVITY_HOME="$CURRENT_WORKING_DIR/$CHAINID/$GRAVITY_NODE_NAME"
+GRAVITY_HOME="$ONOMY_HOME/$CHAINID/$GRAVITY_NODE_NAME"
 # Home flag for home folder
 GRAVITY_HOME_FLAG="--home $GRAVITY_HOME"
 # Config directories for gravity node
