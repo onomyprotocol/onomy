@@ -15,12 +15,11 @@ Be sure to back up the phrase you will get! You’ll need it in a bit. If you do
 
 Note 'account_name' is just the name of your key here. You can pick anything you like, just make sure to remember it later.
 
-You'll be prompted to create a password. We suggest you pick something short since you'll be typing it a lot.
 
 ```
 onomyd --home $HOME/.onomy keys add {account_name} --keyring-backend test --output json | jq . >> $HOME/.onomy/validator_key.json
 ```
-
+Now you will be able to access your wallet details in `$HOME/.onomy/validator_key.json`. Here, $HOME is path to your home directory. You will be able to see wallet name, wallet type, wallet address, wallet public key and your wallet mnemonic
 ### Request tokens from the faucet
 
 First, list all of your keys:
@@ -34,8 +33,8 @@ You'll see an output like this:
 ```
 - name: keyname
   type: local
-  address: cosmos1youraddresswillgohere
-  pubkey: cosmospub1yourpublickleywillgohere
+  address: onomy1somerandomtext
+  pubkey: onomypub1somemorerandomtext
   mnemonic: ""
   threshold: 0
   pubkeys: []
@@ -48,9 +47,9 @@ Copy your address from the 'address' field and paste it into the command below i
 curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"10nom\"  ]}"
 ```
 
-This will provide you 10 NOM from the faucet storage.
+This will provide you 10 NOM from the faucet.
 
-You can check your account balances by using this command line:
+You can check your account balances by using this command:
 ```
 onomyd --home $HOME/.onomy query bank balances $ACCOUNT_ADDRESS 
 
