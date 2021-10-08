@@ -16,7 +16,7 @@ cargo version
 
 echo "----------------cloning_repository-------------------"
 git clone -b v0.0.0-20210915184851-orch-nomarket https://github.com/onomyprotocol/cosmos-gravity-bridge.git $GRAVITY_DIR
-git clone -b dev https://github.com/onomyprotocol/onomy.git $ONOMY_DIR
+git clone -b v0.0.1 https://github.com/onomyprotocol/onomy.git $ONOMY_DIR
 
 echo "--------------install_golang---------------------------"
 curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output $HOME/go.tar.gz
