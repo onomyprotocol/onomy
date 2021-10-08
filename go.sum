@@ -525,6 +525,8 @@ github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
 github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20210915184851-84388292706a h1:PhzMBXrAMmtMswggCrSnMCOssrCljMc1FnsWeMHaMY0=
 github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20210915184851-84388292706a/go.mod h1:kf96o2kMPivom+2SGkkExANrG7uA8cOFxb1+Ns4/hc0=
+github.com/onomyprotocol/mint v0.42.44 h1:gx6PAAnVywkNmUMzgeifkFuLGjF8MY5fsxZ7/bgi6Xg=
+github.com/onomyprotocol/mint v0.42.44/go.mod h1:zzSsLTaHAYMq3rl0/EFFIpCvto3OTIqOYixofKaADZc=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.12.1/go.mod h1:zj2OWP4+oCPe1qIXoGWkgMRwljMUYCdkwsT2108oapk=
