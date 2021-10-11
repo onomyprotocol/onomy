@@ -4,10 +4,10 @@ As a Cosmos-based chain, the ONET full nodes are similar to any Cosmos full node
 
 ## Getting Started?
 Minimum system requirements:
--A Linux server with any modern Linux distribution, 
--A quad-core CPU
--8 GiB of RAM
--20gb of storage.
+	-A Linux server with any modern Linux distribution, 
+	-A quad-core CPU
+	-8 GiB of RAM
+	-20gb of storage.
 
 Make sure you have gone through [Pre installation Steps](pre-installation.md) prior to setting up a node.
 
@@ -82,20 +82,20 @@ rm -rf $HOME/raw.json
 
 1. Make following changes in $ONOMY_HOME/config/config.toml:
 
-- add *5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656* to seeds field. It should look somthing like this
-`seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656"`
+	- add *5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656* to seeds field. It should look somthing like this
+	`seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656"`
 
-- add *tcp://0.0.0.0:26656* to external_address field
-`external_address = "" to external_address = "tcp://0.0.0.0:26656"`
+	- add *tcp://0.0.0.0:26656* to external_address field
+	`external_address = "" to external_address = "tcp://0.0.0.0:26656"`
 
-- change "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
-- change "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
-- change addr_book_strict = true to addr_book_strict = false
+	- change "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
+	- change "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
+	- change addr_book_strict = true to addr_book_strict = false
 
 2. Make following changes in $ONOMY_HOME/config/app.toml:
 
-- Change enable = false to enable = true
-- Change swagger = false to swagger = true
+	- Change enable = false to enable = true
+	- Change swagger = false to swagger = true
 
 ## Increasing the default open files limit
 If we don't raise this value nodes will crash once the network grows large enough
