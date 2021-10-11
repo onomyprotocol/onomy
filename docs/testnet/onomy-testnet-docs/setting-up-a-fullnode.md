@@ -2,13 +2,16 @@
 
 As a Cosmos-based chain, the ONET full nodes are similar to any Cosmos full nodes. Unlike the validator flow, running a full node requires no external software. 
 
-## What do I need?
+## Getting Started?
+Prerequisites:
+A Linux server with any modern Linux distribution, 
+at least a 4 core CPU
+8 GiB of RAM
+20gb of SSD storage.
 
-A Linux server with any modern Linux distribution, 4cores, 8gb of RAM and at least 20gb of SSD storage.
+Make sure you have gone through [Pre installation Steps](pre-installation.md) prior to setting up a node.
 
-[Pre installation](pre-installation.md) is required prior to setting up a node.
-
-There are two ways for setting up the node, one is the standard method where everything is done by creating a script while second one is for more advanced users who might want to customize their installation
+There are two ways for setting up the node, one is the standard method where everything is done by running a pre-configured script while second one is for more advanced users who might want to customize their installation:
 1. [Standard Method](#standardMethod)
 2. [Advanced Method](#advancedMethod)
 
@@ -25,45 +28,46 @@ cd onomy/deploy/testnet
 
 This script will run the needed commands to generate keys and store these in files. Be mindful of the generated keys, as you’ll need them later.
 
-Important Note: Here in the script file, we have set up implementation with the home directory `$HOME/.onomy/onomy-testnet1/onomy`. So, if you have changed this path, then provide the home directory path accordingly in the `onomyd` command.
-
 
 ```
 bash peer-validator/init.sh
 ```
-Note: 1. Script will ask for validator name (Type any name for example validator1)
-      2. Script will ask for node-id of any validator that is running in chain to add seed (Please enter 5e0f5b9d54d3e038623ddb77c0b91b559ff13495)
-      3. Script will ask for ip of validator for which you have added node-id (Please enter testnet1.onomy.io)
+Script will ask you a few questions for parameters:
+1. Validator name (Type any name for example validator1)
+2. Node id of any validator that is running in chain to add seed (Please enter 5e0f5b9d54d3e038623ddb77c0b91b559ff13495)
+3. IP address or Host Name of validator for which you have added node-id (Please enter testnet1.onomy.io)
 
+Note:- Here the default home directory path is `~/.onomy` or `$HOME/.onomy`, if you have to changed it then you need add `--home` flag to `onomyd` command as shown below. If you are using the default path then its optional.
 
-Now, it's finally up and has started the sycing block
+```
+onomyd --home /path/to/your/onomy/home ......
+```
+
+Now, it's finally up and has started the syncing with blockchain
 
 ### Check the status of the Onomy Network Testnet
 
-You should be good to go! You can check the status of the three Onomy chain by running:
+You should be good to go! You can check the status of the Onomy chain by running:
 ```
 curl http://localhost:26657/status
 ```
 If catching_up is false, this means that your node is fully synced. Congratulations!
 
 
-
-
-
-
-# How to Run a Full Node (Manual Setup - Recommended)
-
-## <a name="advancedMethod"> 1. Advanced Method
+## <a name="advancedMethod"> 2. Advanced Method
 ### Init the config files
 
 ```
 cd $HOME
 onomyd --home $HOME/.onomy init {validator moniker} --chain-id onomy-testnet1
 ```
+
 Note:- Here the default home directory path is `~/.onomy` or `$HOME/.onomy`, if you have to changed it then you need add `--home` flag to `onomyd` command as shown above. If you are using the default path then its optional.
 
-### Copy the genesis file
+We will refer to onomy home directory as $ONOMY_HOME for here on.
 
+### Copy the genesis file
+You need to get the latest genesis file from testnet and replace it with the one in your $ONOMY_HOME directory
 ```
 rm $HOME/.onomy/config/genesis.json
 wget http://testnet1.onomy.io:26657/genesis? -O $HOME/raw.json
@@ -73,23 +77,25 @@ rm -rf $HOME/raw.json
 
 ### Update toml configuration files
 
-Change in $HOME/.onomy/config/config.toml to contain the following:
+1. Make following changes in $ONOMY_HOME/config/config.toml:
+
+- add *5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656* to seeds field. It should look somthing like this
+`seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656"`
+
+-add *tcp://0.0.0.0:26656* to external_address field
+`external_address = "" to external_address = "tcp://0.0.0.0:26656"`
+
+-change "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
+-change "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
+-change addr_book_strict = true to addr_book_strict = false
+
+2. Make following changes in $ONOMY_HOME/config/app.toml:
 
 ```
-
-replace seeds = "" to seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656"
-replace "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
-replace "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
-replace addr_book_strict = true to addr_book_strict = false
-replace external_address = "" to external_address = "tcp://0.0.0.0:26656"
+-Change enable = false to enable = true
+-Change swagger = false to swagger = true
 ```
 
-Change in $HOME/.onomy/config/app.toml to contain the following:
-
-```
-replace enable = false to enable = true
-replace swagger = false to swagger = true
-```
 ## Increasing the default open files limit
 If we don't raise this value nodes will crash once the network grows large enough
 ```
@@ -101,21 +107,23 @@ sudo su -c "echo '* soft nofile 94000' >> /etc/security/limits.conf"
 
 sudo su -c "echo 'session required pam_limits.so' >> /etc/pam.d/common-session"
 ```
-For this to take effect you'll need to (A) reboot (B) close and re-open all ssh sessions.
-To check if this has worked run
+After making these changes, you will either need to reboot your system or close all the ssh sessions and connect again
+
+To check if these changes are in effect, run 
 ```
 ulimit -n
 ```
-If you see 1024 then you need to reboot
+If limit is still 1024, changes are not in effect yet.
+
 ### Start your full node in another terminal and wait for it to sync
 
 ```
-onomyd --home $HOME/.onomy start
+onomyd --home $ONOMY_HOME start
 ```
+
 ### Check the status of the Onomy chain
 
-You should be good to go! You can check the status of the three
-Onomy chain by running.
+You should be good to go! You can check the status of the Onomy chain by running.
 ```
 curl http://localhost:26657/status
 ```
