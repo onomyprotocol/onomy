@@ -2,6 +2,20 @@
 
 # Onomy
 
+Onomy is an application-specific blockchain built to power a decentralized exchange that converges Forex and Decentralized Finance.
+
+As a multi-chain ecosystem based on the Cosmos software development kit, it leverages the inter-blockchain communication protocol and implements bridges between blockchains like Ethereum, Avalanche, EVM chains, and others TBA.
+
+Users can easily manage assets from connected networks via Onomy Access (multi-chain wallet), efficiently trade digital assets on the decentralized Onomy Exchange supporting both AMM and orderbook trading (limit orders, stop loss, market), and mint decentralized stablecoins through the Onomy Reserve using NOM, the protocol token, as collateral.
+
+✨[Official Website](https://onomy.io/)
+✨[Telegram Discussion](https://t.me/onomyprotocol)
+✨[Telegram Ann](https://t.me/onomyannouncements)
+✨[Discord](https://discord.gg/u5qcykwJqV)
+✨[Twitter](https://twitter.com/OnomyProtocol)
+✨[Medium](https://medium.com/onomy-protocol) 
+
+
 # Testnet
 
 Join the Testnet #1! You can find the testnet documentation [here](docs/testnet/testnet.md) 
@@ -42,4 +56,4 @@ make install
 - [Starport Docs](https://docs.starport.network)
 - [Cosmos SDK documentation](https://docs.cosmos.network)
 - [Cosmos SDK Tutorials](https://tutorials.cosmos.network)
-- [Discord](https://discord.gg/W8trcGV)
+- [Onomy Discord](https://discord.gg/u5qcykwJqV)
