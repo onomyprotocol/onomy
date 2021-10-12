@@ -3,7 +3,7 @@ set -eu
 
 echo "building environment"
 # Initial dir
-CURRENT_WORKING_DIR=$HOME
+ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
 CHAINID=$(jq .chain_id $HOME/val_info.json | sed 's#\"##g')
 # Name of the gravity artifact
@@ -13,7 +13,7 @@ GRAVITY_NODE_NAME="onomy"
 # The address to run gravity node
 GRAVITY_HOST="0.0.0.0"
 # Home folder for gravity config
-GRAVITY_HOME="$CURRENT_WORKING_DIR/$CHAINID/$GRAVITY_NODE_NAME"
+GRAVITY_HOME="$ONOMY_HOME/$CHAINID/$GRAVITY_NODE_NAME"
 # Home flag for home folder
 GRAVITY_HOME_FLAG="--home $GRAVITY_HOME"
 # Config directories for gravity node
@@ -32,7 +32,7 @@ GRAVITY_VALIDATOR_NAME=$(jq .validator_name $HOME/val_info.json | sed 's#\"##g')
 STAKE_DENOM="nom"
 #NORMAL_DENOM="samoleans"
 NORMAL_DENOM="footoken"
-echo "Please enter faucet url get faucet token for example http://domain_name:8000/"
+echo "Please enter faucet url get faucet address for example http://domain_name:8000/"
 read url
 FAUCET_TOKEN_BASE_URL="$url"
 
