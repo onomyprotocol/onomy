@@ -14,25 +14,26 @@ You also need to have [full node running](setting-up-a-fullnode.md) before tryin
 In order to become validator, you need to follow steps below
 1. [Set up Validator](#validator)
 2. [Set up Gravity Bridge](#gravityBridge)
-3. [Set up Go Ethereum (GEth)](GEth)
-4. [Start Orchastrator](orchastrator)
+3. [Set up Go Ethereum (GEth)](#GEth)
+4. [Start Orchestrator](#orchestrator)
 
 
 ## <a name="validator"></a> 1. Set up Validator
-In order to set up your node as a validator, you first need to have a [full-node running](setting-up-a-fullnode.md). ONce you have set up a full node and has it synced with the block chain, you have two options to setup a validator:
+In order to set up your node as a validator, you first need to have a [full-node running](setting-up-a-fullnode.md). Once you have set up a full node and it has synced with the blockchain, you have two options to setup a validator:
+
 a. [Standard Method](standardMethod)
 b. [Advanced Method](advancedMethod)
 
-### <a name="standardMethod"></a> 1. Standard Method
-Run the makeValidator script to convert your full node into a validator.
+### <a name="standardMethod"></a> a. Standard Method
+Run the makeValidator.sh script to convert your full node into a validator.
 
-Important Note: In the script file here, we have set up the implementation with the home directory `$HOME/.onomy/onomy-testnet1/onomy`. If you have changed this path, then provide the home directory path accordingly in the `onomyd` command.
+Important Note: In the script, default file path is `$HOME/.onomy/onomy-testnet1/onomy`. If you have changed this path, than provide the home directory path accordingly in the `onomyd` command.
 
 ```
 bash peer-validator/makeValidator.sh
 ```
 
-Note: 1. Script will ask for enter faucet url get faucet token (Please enter http://testnet1.onomy.io:8000/)
+Script will ask for faucet url to get faucet token (Please enter http://testnet1.onomy.io:8000/)
 
 You can check the validators of the Onomy chain by running:
 ```
@@ -43,15 +44,12 @@ curl http//localhost:26657/validators
 ### <a name=advancedMethod></a> b. Advanced Method
 #### Generate your key
 
-Be sure to back up the phrase you will get! You’ll need it in a bit. If you don't back up the phrase here, just follow the steps again to generate a new key.
-
-Note 'account_name' is just the name of your key here. You can pick anything you like, just make sure to remember it later.
-
-
+Use the following command to generate your keys. Your keys will be stored in `$HOME/.onomy/validator_key.json`.
 ```
 onomyd --home $HOME/.onomy keys add {account_name} --keyring-backend test --output json | jq . >> $HOME/.onomy/validator_key.json
 ```
-Now you will be able to access your wallet details in `$HOME/.onomy/validator_key.json`. Here, $HOME is path to your home directory. You will be able to see wallet name, wallet type, wallet address, wallet public key and your wallet mnemonic
+
+You will be able to see wallet name, wallet type, wallet address, wallet public key and your wallet mnemonic
 
 #### Request tokens from the faucet
 
@@ -75,7 +73,7 @@ Copy your address from the 'address' field and paste it into the command below i
 ```
 curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"100000000nom\"  ]}"
 ```
-This will provide you 100000000nom from the faucet storage.
+This will provide you 100000000nom from the faucet.
 
 #### Send your validator setup transaction, but make sure your node is fully synced before:
 
@@ -97,17 +95,16 @@ onomyd --home $HOME/.onomy tx staking create-validator \
 ```
 
 #### Confirm that you are validating
-
-If you see one line in the response, that means you are validating. If you don't see any output from this command, you are not validating. Check to see if the last command has run successfully.
-
-Be sure to replace 'my validator key name' with your actual key name. If you want to double check, you can see all your keys with 'onomyd --home $HOME/.onomy keys list --keyring-backend test'
+Run the following command and check for the output, if you don't see any output from this command, you are not validating.
 
 ```
 onomyd --home $HOME/.onomy query staking validator $(onomyd --home $HOME/.onomy keys show <myvalidatorkeyname> --bech val --address --keyring-backend test)
-
 ```
 
-##<a name="gravityBridge"> 2.  Setup Gravity bridge
+Be sure to replace 'my validator key name' with your actual key name. If you want to double check, you can see all your keys with 'onomyd --home $HOME/.onomy keys list --keyring-backend test'
+
+
+## <a name="gravityBridge"> 2. Setup Gravity bridge
 
 You are now validating on the Onomy Network. However, as a validator, you also need to run the Gravity bridge components or you will be slashed and removed from the validator set after about 16 hours.
 
@@ -150,7 +147,7 @@ onomyd --home $HOME/.onomy tx bank send <your validator address> <your delegate 
 ```
 curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"100000000nom\"  ]}"
 ```
- Now, we need some Rinkeby ETH in the Ethereum delegate key:
+ Now, we need some Rinkeby ETH in the Ethereum delegate key. You can get some RInkeby ETH from official Rinkeby faucet:
 ```
 https://www.rinkeby.io/#faucet
 ```
@@ -185,13 +182,13 @@ INFO [06-10|14:11:03.104] Started P2P networking self=enode://71b8bb569dad23b168
 
 Finally, you'll need to wait for several hours until your node is synced. You cannot continue with the instructions before your node is fully synced.
 
-## <a name="oechestrator"></a> 3. Start your Orchestrator
+## <a name="orchestrator"></a> 3. Start your Orchestrator
 
-Now that the setup is complete, you can start your Orchestrator. Use the Cosmos mnemonic generated in the 'register delegate keys' step and the Ethereum private key also generated in that step. You should setup your Orchestrator in systemd or elsewhere to keep it running and restart it when it crashes.
+Now that the setup is complete, you can start your Orchestrator. Use the Cosmos mnemonic and Ethereum private key generated in the 'register delegate keys' step. You should setup your Orchestrator in systemd or elsewhere to keep it running and restart it when it crashes.
 
 If your Orchestrator goes down for more than 16 hours during the testnet, you will be slashed and booted from the active validator set.
 
-Since you'll be running this a lot, we suggest putting the command into a script, like so. The next version of the orchestrator will use a config file for these values and have encrypted key storage.
+Since you'll be running this a lot, we suggest putting the command into a script. The next version of the orchestrator will use a config file for these values and have encrypted key storage.
 
 \*\*If you have set a minimum fee value in your `$HOME/.onomy/config/app.toml` modify the `--fees` parameter to match that value!
 
@@ -205,10 +202,6 @@ gbt --address-prefix="onomy" orchestrator \
         --ethereum-rpc="http://0.0.0.0:8545" \
         --fees="1nom" \
         --gravity-contract-address="0xB4BAd4Cef22a4EAeF67434644ebaB4cEC54Db37A"
-```
-Please run the command below in new terminal:
-```
-bash start-orchestrator.sh
 ```
 
 ## Next Step
