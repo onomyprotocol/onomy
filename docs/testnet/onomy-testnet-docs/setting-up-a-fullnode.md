@@ -4,10 +4,10 @@ As a Cosmos-based chain, the ONET full nodes are similar to any Cosmos full node
 
 ## Getting Started?
 Minimum system requirements:
-	-A Linux server with any modern Linux distribution, 
-	-A quad-core CPU
-	-8 GiB of RAM
-	-20gb of storage.
+- A Linux server with any modern Linux distribution, 
+- A quad-core CPU
+- 8 GiB of RAM
+- 20gb of storage.
 
 Make sure you have gone through [Pre installation Steps](pre-installation.md) prior to setting up a node.
 

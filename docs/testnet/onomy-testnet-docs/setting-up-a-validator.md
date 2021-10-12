@@ -1,25 +1,29 @@
 # How to Become a Validator on the Onomy Network
 
 ## What Do I Need?
+Minimum Requirements:
+- Any modern Linux distribution 
+- A quad-core CPU
+- 16 GiB RAM
+- 320gb of storage space
 
-You'll need a Linux server with any modern Linux distribution, 4cores, 8gb of RAM and at least 20gb of SSD storage.
+You also need to have [full node running](setting-up-a-fullnode.md) before trying to set up a validator.
 
-This guide will outline how to turn your node into a validator. Do mind that you must first have a [full node running](setting-up-a-fullnode.md) in order to become a validator.
+## <a name="standardMethod"></a> 1. Standard Method
+### Run the following script to convert your full node to validator node, but note that before, the full node should be fully synced with blockchain
 
-### Run the script to make it as validator node, but note that before, the full node should be fully synced
-
-Important Note: In the script file here, we have set up the implementation with the home directory `$HOME/onomy-testnet1/onomy`. If you have changed this path, then provide the home directory path accordingly in the `onomyd` command.
+Important Note: In the script file here, we have set up the implementation with the home directory `$HOME/.onomy/onomy-testnet1/onomy`. If you have changed this path, then provide the home directory path accordingly in the `onomyd` command.
 
 ```
 bash peer-validator/makeValidator.sh
+```
 
 Note: 1. Script will ask for enter faucet url get faucet token(Please enter http://testnet1.onomy.io:8000/)
-```
+
 You can check the validators of the Onomy chain by running:
 ```
 curl http//localhost:26657/validators
 ```
-The validator count will now be increased by 1 number.
 
 ### Setup Gravity bridge
 
@@ -31,13 +35,13 @@ Delegate keys allow the for the validator private keys to be kept in secure stor
 
 If you have set a minimum fee value in your `$HOME/onomy-testnet1/onomy/config/app.toml`, then modify the `--fees` parameter to match that value!
 
-Here, we need validator phrase which we have saved while creating the validator key:
+Here, we will need validator phrase which we have saved while creating the validator key:
 ```
 cat $HOME/onomy-testnet1/onomy/validator_key.json
 ```
 
+Now we can use that mnemonic phrase to delegate keys to orchastrator
 ```
-
 gbt -a onomy init
 
 gbt -a onomy keys register-orchestrator-address --validator-phrase "the phrase you saved earlier" --fees=0nom
@@ -77,19 +81,19 @@ https://www.rinkeby.io/#faucet
 ```
 
 ### Setup Geth on the Rinkeby testnet
-_Please only run one or the other of the below instructions in new terminal; both will not work._
+You can either setup a light client node or a full client node.
+*Note that, you cannot set-up both light and full node at the same time.*
+	#### Light client instructions
 
-#### Light client instructions
+	```
+	geth --rinkeby --syncmode "light"  --http --http.port "8545"
+	```
 
-```
-geth --rinkeby --syncmode "light"  --http --http.port "8545"
-```
+	#### Fullnode instructions
 
-#### Fullnode instructions
-
-```
-geth --rinkeby --syncmode "full"  --http --http.port "8545"
-```
+	```
+	geth --rinkeby --syncmode "full"  --http --http.port "8545"
+	```
 
 You'll see this url, please note your IP and share both this node url and your IP in chat to be added to the light client nodes list:
 
@@ -152,45 +156,46 @@ Now that the validator node and gravity bridge setup is successfully done, you m
 
 
 
-# How to Become a Validator on the Onomy Network Testnet
+## <a name=advancedMethod></a> 2. Advanced Method
 
-## What do I need?
-
-You will need a Linux server with any modern Linux distribution, 16cores, 16gb of RAM and at least 320gb of SSD storage.
-
-The Onomy NEtwork can be run on Windows and Mac. Binaries are provided on the releases page, but validator instructions are not provided.
-
-We also suggest an open notepad or other document to keep track of the keys you will be generating.
-
-The following document will outline how to turn your node into a validator. You must first have a [full node running](setting-up-a-fullnode-manual.md) in order to become a validator.
 
 ### Generate your key
 
-Be sure to back up the phrase you get! You’ll need it in a bit. If you don't back up the phrase here, just follow the steps again to generate a new key.
+Be sure to back up the phrase you will get! You’ll need it in a bit. If you don't back up the phrase here, just follow the steps again to generate a new key.
 
-Note that 'myvalidatorkeyname' is just the name of your key here. You can pick any name you like, just make sure to remember it later.
+Note 'account_name' is just the name of your key here. You can pick anything you like, just make sure to remember it later.
 
-You'll be prompted to create a password, we suggest you pick something short since you'll be typing it a lot.
 
 ```
-cd $HOME
-onomyd --home $HOME/.onomy keys add {myvalidatorkeyname} --keyring-backend test --output json | jq . >> $HOME/.onomy/validator_key.json
+onomyd --home $HOME/.onomy keys add {account_name} --keyring-backend test --output json | jq . >> $HOME/.onomy/validator_key.json
 ```
+Now you will be able to access your wallet details in `$HOME/.onomy/validator_key.json`. Here, $HOME is path to your home directory. You will be able to see wallet name, wallet type, wallet address, wallet public key and your wallet mnemonic
+### Request tokens from the faucet
 
-### Request some funds be sent to your address
-
-First, find your address:
+First, list all of your keys:
 
 ```
 onomyd --home $HOME/.onomy keys list --keyring-backend test
 ```
 
-Copy your address from the 'address' field and paste it into the command below in place of $ONOMY_VALIDATOR_ADDRESS:
+You'll see an output like this:
+
+```
+- name: keyname
+  type: local
+  address: onomy1somerandomtext
+  pubkey: onomypub1somemorerandomtext
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+```
+
+Copy your address from the 'address' field and paste it into the command below in the place of $ONOMY_VALIDATOR_ADDRESS:
 
 ```
 curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"100000000nom\"  ]}"
 ```
-
 This will provide you 100000000nom from the faucet storage.
 
 ### Send your validator setup transaction, but make sure your node is fully synced before:
