@@ -1,4 +1,4 @@
-![onomy-docs-2-w](https://user-images.githubusercontent.com/76499838/136600840-a123064b-e1c6-4e40-a08d-d36499c48e4b.png)
+![onomy-docs-2-w](https://user-images.githubusercontent.com/6096171/137114490-3fb1de9c-f74c-4979-9089-2f116e57bec2.jpeg)
 
 # Overview
 
