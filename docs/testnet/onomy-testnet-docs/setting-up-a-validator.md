@@ -42,7 +42,7 @@ curl http//localhost:26657/validators
 ```
 or
 ```
-onomy q staking validators
+onomyd q staking validators
 ```
 
 
