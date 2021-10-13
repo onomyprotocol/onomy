@@ -46,7 +46,7 @@ to check what version of the tools you have run `gbt --version`
 
 In order to install using RPM, use the following command:
 ```
-sudo yum install "https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/onomy.rpm"
+sudo yum install "https://github.com/onomyprotocol/onomy/releases/download/v0.0.1/onomy-0.1.0-1x86_64.rpm"
 ```
 
 Running this command will take care of all the dependancies and it will install the required binaries in `$HOME/.onomy/bin` directory. It will also add this path to $PATH variable.

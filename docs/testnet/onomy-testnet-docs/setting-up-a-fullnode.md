@@ -30,7 +30,7 @@ This script will run the needed commands to generate keys and store those in fil
 
 
 ```
-bash peer-validator/init.sh
+bash peer-validator/init-full-node.sh
 ```
 Script will ask you a few questions for parameters:
 1. Validator name (Type any name for example validator1)
