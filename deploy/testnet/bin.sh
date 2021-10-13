@@ -1,6 +1,10 @@
 #Setting up constants
-GRAVITY_DIR=$HOME/gravity
-ONOMY_DIR=$HOME/go/onomy
+GRAVITY_DIR=$HOME/.onomy/gravity
+ONOMY_HOME=$HOME/.onomy
+#Creating Directories
+mkdir $HOME/.onomy
+mkdir $HOME/.onomy/bin
+mkdir $HOME/.onomy/gravity
 
 echo "-----------Installing_dependencies---------------"
 dnf -y update
@@ -16,7 +20,7 @@ cargo version
 
 echo "----------------cloning_repository-------------------"
 git clone -b v0.0.0-20210915184851-orch-nomarket https://github.com/onomyprotocol/cosmos-gravity-bridge.git $GRAVITY_DIR
-git clone -b v0.0.1 https://github.com/onomyprotocol/onomy.git $ONOMY_DIR
+git clone -b v0.0.1 https://github.com/onomyprotocol/onomy.git $ONOMY_HOME/onomy
 
 echo "--------------install_golang---------------------------"
 curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output $HOME/go.tar.gz
@@ -26,15 +30,15 @@ export PATH=$PATH:$HOME/go/bin
 echo "----------------------building_gravity_artifact---------------"
 #cd $GRAVITY_DIR/module
 #make install
-cd $ONOMY_DIR
+cd $ONOMY_HOME/onomy
 make build
-cp onomyd $HOME/go/bin/onomyd
+cp onomyd $ONOMY_HOME/bin/onomyd
 
 echo "----------------building_orchestrator_artifact-------------"
 cd $GRAVITY_DIR/orchestrator
 rustup target add x86_64-unknown-linux-musl
 cargo build --target=x86_64-unknown-linux-musl --release  --all
-cp $GRAVITY_DIR/orchestrator/target/x86_64-unknown-linux-musl/release/gbt $HOME/go/bin/gbt
+cp $GRAVITY_DIR/orchestrator/target/x86_64-unknown-linux-musl/release/gbt $ONOMY_HOME/bin/gbt
 
 
 echo "---------------Installing_solidity-------------------"
@@ -49,11 +53,11 @@ cd $HOME
 git clone https://github.com/ethereum/go-ethereum
 cd go-ethereum/
 make geth
-cp build/bin/geth $HOME/go/bin/geth
+cp build/bin/geth $ONOMY_HOME/bin/geth
 
 echo "------------------ install fauset ------------------"
 curl https://get.starport.network/faucet! | bash
 cd $HOME
 
-echo "export PATH=$PATH:$HOME/.cargo/bin:$HOME/go/bin" >> $HOME/.bashrc
+echo "export PATH=$PATH:$HOME/.cargo/bin:$ONOMY_HOME/bin" >> $HOME/.bashrc
 
