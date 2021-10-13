@@ -30,10 +30,9 @@ GRAVITY_CHAINID_FLAG="--chain-id $CHAINID"
 GRAVITY_VALIDATOR_NAME=$(jq .validator_name $HOME/val_info.json | sed 's#\"##g')
 # Gravity chain demons
 STAKE_DENOM="nom"
-#NORMAL_DENOM="samoleans"
 NORMAL_DENOM="footoken"
-echo "Please enter faucet url get faucet address for example http://domain_name:8000/"
-read url
+
+read -p "Please enter Faucet URL" -i "testnet1.onomy.io" -e url
 FAUCET_TOKEN_BASE_URL="$url"
 
 

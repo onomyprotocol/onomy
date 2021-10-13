@@ -35,11 +35,11 @@ GRAVITY_VALIDATOR_NAME=validator
 STAKE_DENOM="nom"
 #NORMAL_DENOM="samoleans"
 NORMAL_DENOM="footoken"
-echo "Please enter node-id of any validator that is running in chain to add seed"
-read seedline
-echo "Please enter ip of validator for which you have added node-id"
-read ip
+
+read -p "Enter node id of a validator that is eunning on chain: " seedline
+read -p "Please IP of the same node: " ip
 SEED="$seedline@$ip:26656"
+
 # make a file to store validator information
 echo '{
         "validator_name": "",
