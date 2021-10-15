@@ -1,7 +1,6 @@
 #Setting up constants
 GRAVITY_DIR=$HOME/.onomy/gravity
 ONOMY_HOME=$HOME/.onomy
-
 #Creating Directories
 mkdir $HOME/.onomy
 mkdir $HOME/.onomy/bin
@@ -55,6 +54,10 @@ git clone https://github.com/ethereum/go-ethereum
 cd go-ethereum/
 make geth
 cp build/bin/geth $ONOMY_HOME/bin/geth
+
+echo "------------------ install faucet ------------------"
+curl https://get.starport.network/faucet! | sudo bash
+cd $HOME
 
 echo "export PATH=$PATH:$HOME/.cargo/bin:$ONOMY_HOME/bin" >> $HOME/.bashrc
 

@@ -1,11 +1,12 @@
 #!/bin/bash
+#Setup Validator
 set -eu
 
 echo "building environment"
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
-CHAINID=$(jq .chain_id $HOME/val_info.json | sed 's#\"##g')
+CHAINID=$(jq .chain_id $ONOMY_HOME/$CHAINID/val_info.json | sed 's#\"##g')
 # Name of the gravity artifact
 GRAVITY=onomyd
 # The name of the gravity node
@@ -27,7 +28,7 @@ GRAVITY_KEYRING_FLAG="--keyring-backend test"
 # Chain ID flag
 GRAVITY_CHAINID_FLAG="--chain-id $CHAINID"
 # The name of the gravity validator
-GRAVITY_VALIDATOR_NAME=$(jq .validator_name $HOME/val_info.json | sed 's#\"##g')
+GRAVITY_VALIDATOR_NAME=$(jq .validator_name $ONOMY_HOME/CHAINID/val_info.json | sed 's#\"##g')
 # Gravity chain demons
 STAKE_DENOM="nom"
 NORMAL_DENOM="footoken"

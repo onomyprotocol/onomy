@@ -1,4 +1,5 @@
 #!/bin/bash
+#Setup Full Node
 set -eu
 
 echo "building environment"
@@ -36,7 +37,7 @@ STAKE_DENOM="nom"
 #NORMAL_DENOM="samoleans"
 NORMAL_DENOM="footoken"
 
-read -p "Enter node id of a validator that is eunning on chain: " seedline
+read -p "Enter node id of a validator that is running on chain: " seedline
 read -p "Please IP of the same node: " ip
 SEED="$seedline@$ip:26656"
 
@@ -45,7 +46,7 @@ echo '{
         "validator_name": "",
         "chain_id": "",
         "orchestrator_name": ""
-}' > $HOME/val_info.json
+}' > $ONOMY_HOME/val_info.json
 
 # ------------------ Init gravity ------------------
 
@@ -87,11 +88,8 @@ fsed 's#seeds = ""#seeds = "'$SEED'"#g' $GRAVITY_NODE_CONFIG
 fsed 's#enable = false#enable = true#g' $GRAVITY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $GRAVITY_APP_CONFIG
 # Save validator-info
-fsed 's#"validator_name": ""#"validator_name": "'$GRAVITY_VALIDATOR_NAME'"#g'  $HOME/val_info.json
-fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $HOME/val_info.json
+fsed 's#"validator_name": ""#"validator_name": "'$GRAVITY_VALIDATOR_NAME'"#g'  $ONOMY_HOME/val_info.json
+fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $ONOMY_HOME/val_info.json
 
 
-$GRAVITY $GRAVITY_HOME_FLAG start &
-
-
-
+$GRAVITY $GRAVITY_HOME_FLAG start
