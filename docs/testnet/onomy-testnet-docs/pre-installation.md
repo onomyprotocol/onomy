@@ -7,7 +7,7 @@ I also suggest an open notepad or other document to keep track of the keys you w
 Start by logging into your Linux server using ssh. The following commands are intended to be run on that machine. There are three options to install the binaries
 1. [Download them directly from github and install](#downloadInstall)
 2. [Compile binaries yourself using source code](#compileInstall)
-3. [Install an RPM Package (Requires Fedore or CentOS machine)][#rpmInstall]
+3. [Install an RPM Package (Requires Fedore or CentOS machine)](#rpmInstall)
 
 ### <a name="downloadInstall"></a> 1. Download/install Onomy chain binaries 
 To download and install binaries follow these steps
@@ -50,3 +50,5 @@ sudo yum install "https://github.com/onomyprotocol/onomy/releases/download/v0.0.
 ```
 
 Running this command will take care of all the dependancies and it will install the required binaries in `$HOME/.onomy/bin` directory. It will also add this path to $PATH variable.
+
+Script will also put `init-full-node.sh` and `init-validator.sh` file in your `$HOME/.onomy` directory
