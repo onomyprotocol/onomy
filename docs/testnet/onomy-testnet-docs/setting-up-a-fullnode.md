@@ -33,9 +33,9 @@ This script will run the needed commands to generate keys and store those in fil
 bash peer-validator/init-full-node.sh
 ```
 Script will ask you a few questions for parameters:
-1. Validator name (Type any name for example validator1)
-2. Node id of any validator that is running in chain to add seed (Please enter 5e0f5b9d54d3e038623ddb77c0b91b559ff13495)
-3. IP address or Host Name of validator for which you have added node-id (Please enter testnet1.onomy.io)
+1. Node name (Enter any name for your node)
+2. Node id of any validator that is running in chain to add seed (Please enter `5e0f5b9d54d3e038623ddb77c0b91b559ff13495`)
+3. IP address or Host Name of validator for which you have added node-id (Please enter `testnet1.onomy.io`)
 
 Note:- Here the default home directory path is `~/.onomy` or `$HOME/.onomy`, if you have changed it then you need add `--home` flag to `onomyd` command whenever you use it. If you are using the default path then its optional.
 
@@ -127,3 +127,5 @@ You should be good to go! You can check the status of the Onomy chain by running
 curl http://localhost:26657/status
 ```
 if catching_up is false means your node is fully synced
+
+
