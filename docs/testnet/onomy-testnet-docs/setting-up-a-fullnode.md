@@ -11,52 +11,6 @@ Minimum system requirements:
 
 Make sure you have gone through [Pre installation Steps](pre-installation.md) prior to setting up a node.
 
-There are two ways for setting up the node, one is the standard method where everything is done by running a pre-configured script while second one is for more advanced users who might want to customize their installation:
-1. [Standard Method](#standardMethod)
-2. [Advanced Method](#advancedMethod)
-
-## <a name="standardMethod"> 1. Standard Method
-### Initiate chain
-
-Clone the latest release of github repo
-```
-git clone -b v0.0.1 https://github.com/onomyprotocol/onomy.git
-cd onomy/deploy/testnet
-```
-
-### Run the first time bootstrapping playbook and script
-
-This script will run the needed commands to generate keys and store those in files. Be mindful of the generated keys, as you’ll need them later.
-
-
-```
-bash peer-validator/init-full-node.sh
-```
-Script will ask you a few questions for parameters:
-1. Validator name (Type any name for example validator1)
-2. Node id of any validator that is running in chain to add seed (Please enter 5e0f5b9d54d3e038623ddb77c0b91b559ff13495)
-3. IP address or Host Name of validator for which you have added node-id (Please enter testnet1.onomy.io)
-
-Note:- Here the default home directory path is `~/.onomy` or `$HOME/.onomy`, if you have changed it then you need add `--home` flag to `onomyd` command whenever you use it. If you are using the default path then its optional.
-
-```
-onomyd --home /path/to/your/onomy/home ......
-```
-
-Now, your node is finally up and has started the syncing with blockchain
-
-### Check the status of the Onomy Network Testnet
-
-You should be good to go! You can check the status of the Onomy chain by running:
-```
-curl http://localhost:26657/status
-```
-If catching_up is false, this means that your node is fully synced. Congratulations!
-
-
-
-
-## <a name="advancedMethod"> 2. Advanced Method
 ### Init the config files
 
 ```
