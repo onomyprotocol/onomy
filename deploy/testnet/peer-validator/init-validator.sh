@@ -52,19 +52,17 @@ fsed() {
 fsed 's#"validator_name": ""#"validator_name": "'$GRAVITY_VALIDATOR_NAME'"#g'  $ONOMY_HOME/node_info.json
 
 # -------------------Get Faucet URL----------------
-read -p "Please enter Faucet URL: " -i "http://testnet1.onomy.io:8000/" -e url
-FAUCET_TOKEN_BASE_URL="$url"
+read -p "Please enter Faucet URL: " -i "http://testnet1.onomy.io:8000/" -e FAUCET_TOKEN_BASE_URL
+
 # ------------------Get Tokens from Faucet------------------
 ONOMY_VALIDATOR_ADDRESS=$(jq -r .address $GRAVITY_HOME/validator_key.json)
-curl -X POST $FAUCET_TOKEN_BASE_URL -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"200000000nom\"  ]}"
+curl -X POST "$FAUCET_TOKEN_BASE_URL" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"200000000nom\"  ]}"
 
-echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
 #  wait 5 sec to sync balances in the validator account
 sleep 5
 # Store the public key of validator
 PUB_KEY=$($GRAVITY $GRAVITY_HOME_FLAG tendermint show-validator)
 
-echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
 # Do the create validator transaction
 $GRAVITY $GRAVITY_HOME_FLAG tx staking create-validator \
 --amount=100000000$STAKE_DENOM \
