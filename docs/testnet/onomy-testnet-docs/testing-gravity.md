@@ -17,7 +17,7 @@ Note that the 'amount' field for this command is now in whole coins rather than 
 ```
 gbt -a onomy client eth-to-cosmos \
         --ethereum-key "0x07a78996067f8049a73cefbe18ed114a47fc0136e8cf57fb153917b79cdc0066" \
-        --gravity-contract-address "0xD6F7ab117DF5172264221FA33299Dd6C290cE26f" \
+        --gravity-contract-address "0xB4BAd4Cef22a4EAeF67434644ebaB4cEC54Db37A" \
         --token-contract-address "0xFab46E002BbF0b4509813474841E0716E6730136" \
         --amount=100 \
         --destination "any Cosmos address, I suggest your delegate Cosmos address"
