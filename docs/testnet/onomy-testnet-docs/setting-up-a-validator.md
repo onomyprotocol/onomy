@@ -21,32 +21,6 @@ In order to become validator, you need to follow steps below
 ## <a name="validator"></a> 1. Set up Validator
 In order to set up your node as a validator, you first need to have a [full-node running](setting-up-a-fullnode.md). Once you have set up a full node and it has synced with the blockchain, you have two options to setup a validator:
 
-a. [Standard Method](standardMethod)
-
-b. [Advanced Method](advancedMethod)
-
-### <a name="standardMethod"></a> a. Standard Method
-Run the init-validator.sh script to convert your full node into a validator.
-
-Important Note: In the script, default file path is `$HOME/.onomy/onomy-testnet1/onomy`. If you have changed this path, than provide the home directory path accordingly in the `onomyd` command.
-
-```
-bash peer-validator/init-validator.sh
-```
-
-Script will ask for faucet url to get faucet token (Please enter http://testnet1.onomy.io:8000/)
-
-You can check the validators of the Onomy chain by running:
-```
-curl http//localhost:26657/validators
-```
-or
-```
-onomyd q staking validators
-```
-
-
-### <a name=advancedMethod></a> b. Advanced Method
 #### Generate your key
 
 Use the following command to generate your keys. Your keys will be stored in `$HOME/.onomy/validator_key.json`.
@@ -106,10 +80,13 @@ Run the following command and check for the output, if you don't see any output 
 onomyd --home $HOME/.onomy query staking validator $(onomyd --home $HOME/.onomy keys show <myvalidatorkeyname> --bech val --address --keyring-backend test)
 ```
 
-Be sure to replace 'my validator key name' with your actual key name. If you want to double check, you can see all your keys with 'onomyd --home $HOME/.onomy keys list --keyring-backend test'
+Be sure to replace 'my validator key name' with your actual key name. If you want to double check, you can see all your keys with 
 
+```
+onomyd --home $HOME/.onomy keys list --keyring-backend test'
+```
 
-## <a name="gravityBridge"> 2. Setup Gravity bridge
+## <a name="gravityBridge"></a> 2. Setup Gravity bridge
 
 You are now validating on the Onomy Network. However, as a validator, you also need to run the Gravity bridge components or you will be slashed and removed from the validator set after about 16 hours.
 
@@ -187,7 +164,7 @@ INFO [06-10|14:11:03.104] Started P2P networking self=enode://71b8bb569dad23b168
 
 Finally, you'll need to wait for several hours until your node is synced. You cannot continue with the instructions before your node is fully synced.
 
-## <a name="orchestrator"></a> 3. Start your Orchestrator
+## <a name="orchestrator"></a> 4. Start your Orchestrator
 
 Now that the setup is complete, you can start your Orchestrator. Use the Cosmos mnemonic and Ethereum private key generated in the 'register delegate keys' step. You should setup your Orchestrator in systemd or elsewhere to keep it running and restart it when it crashes.
 
