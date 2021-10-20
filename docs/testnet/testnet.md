@@ -18,9 +18,7 @@ testnet1.onomy.io:26657
 
 ## Documents
 
-- [How to Run a Full Node (Manual Setup - Recommended)](onomy-testnet-docs/setting-up-a-fullnode-manual.md)
 - [How to Run a Full Node](onomy-testnet-docs/setting-up-a-fullnode.md)
-- [How to Become a Validator (Manual Setup - Recommended)](onomy-testnet-docs/setting-up-a-validator-manual.md)
 - [How to Become a Validator](onomy-testnet-docs/setting-up-a-validator.md)
 - [How to Get NOM via the Testnet Faucet](onomy-testnet-docs/faucet.md)
 - [Testing the Onomy Network](onomy-testnet-docs/testing-gravity.md)
