@@ -28,9 +28,7 @@ curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output $HOME/go.tar.
 tar -C $HOME -xzf $HOME/go.tar.gz
 export PATH=$PATH:$HOME/go/bin
 
-echo "----------------------building_gravity_artifact---------------"
-#cd $GRAVITY_DIR/module
-#make install
+echo "----------------------building_onomy_artifact---------------"
 cd $ONOMY_HOME/onomy
 make build
 cp onomyd $ONOMY_HOME/bin/onomyd
@@ -40,14 +38,6 @@ cd $GRAVITY_DIR/orchestrator
 rustup target add x86_64-unknown-linux-musl
 cargo build --target=x86_64-unknown-linux-musl --release  --all
 cp $GRAVITY_DIR/orchestrator/target/x86_64-unknown-linux-musl/release/gbt $ONOMY_HOME/bin/gbt
-
-
-echo "---------------Installing_solidity-------------------"
-cd $GRAVITY_DIR/solidity
-npm ci
-chmod -R +x scripts
-npm run typechain
-
 
 echo "-------------------making_geth-----------------------"
 cd $HOME
