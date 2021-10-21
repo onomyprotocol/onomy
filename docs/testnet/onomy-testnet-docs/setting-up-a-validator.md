@@ -21,6 +21,32 @@ In order to become validator, you need to follow steps below
 ## <a name="validator"></a> 1. Set up Validator
 In order to set up your node as a validator, you first need to have a [full-node running](setting-up-a-fullnode.md). Once you have set up a full node and it has synced with the blockchain, you have two options to setup a validator:
 
+a. [Standard Method](standardMethod)
+
+b. [Advanced Method](advancedMethod)
+
+### <a name="standardMethod"></a> a. Standard Method
+Run the init-validator.sh script to convert your full node into a validator.
+
+Important Note: In the script, default file path is `$HOME/.onomy/onomy-testnet1/onomy`. If you have changed this path, than provide the home directory path accordingly in the `onomyd` command.
+
+```
+bash peer-validator/init-validator.sh
+```
+
+Script will ask for faucet url to get faucet token (Please enter http://testnet1.onomy.io:8000/)
+
+You can check the validators of the Onomy chain by running:
+```
+curl http//localhost:26657/validators
+```
+or
+```
+onomyd q staking validators
+```
+
+
+### <a name=advancedMethod></a> b. Advanced Method
 #### Generate your key
 
 Use the following command to generate your keys. Your keys will be stored in `$HOME/.onomy/validator_key.json`.
