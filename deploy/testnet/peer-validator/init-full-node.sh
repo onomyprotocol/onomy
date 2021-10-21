@@ -1,4 +1,5 @@
 #!/bin/bash
+#Setup Full Node
 set -eu
 
 echo "building environment"
@@ -12,7 +13,7 @@ CHAINID="onomy-testnet1"
 # Name of the gravity artifact
 GRAVITY=onomyd
 # The name of the gravity node
-GRAVITY_NODE_NAME="onomy"
+read -p "Enter a name for your node: " GRAVITY_NODE_NAME
 # The address to run gravity node
 GRAVITY_HOST="0.0.0.0"
 # Home folder for gravity config
@@ -29,23 +30,21 @@ GRAVITY_APP_CONFIG="$GRAVITY_HOME_CONFIG/app.toml"
 GRAVITY_KEYRING_FLAG="--keyring-backend test"
 # Chain ID flag
 GRAVITY_CHAINID_FLAG="--chain-id $CHAINID"
-# The name of the gravity validator
-GRAVITY_VALIDATOR_NAME=validator
 # Gravity chain demons
 STAKE_DENOM="nom"
-#NORMAL_DENOM="samoleans"
 NORMAL_DENOM="footoken"
 
-read -p "Enter node id of a validator that is eunning on chain: " seedline
+read -p "Enter node id of a validator that is running on chain: " seedline
 read -p "Please IP of the same node: " ip
 SEED="$seedline@$ip:26656"
 
 # make a file to store validator information
 echo '{
+	"node_name": "",
         "validator_name": "",
         "chain_id": "",
         "orchestrator_name": ""
-}' > $HOME/val_info.json
+}' > $ONOMY_HOME/node_info.json
 
 # ------------------ Init gravity ------------------
 
@@ -55,11 +54,6 @@ echo "Initializing genesis files"
 # Initialize the home directory and add some keys
 echo "Init test chain"
 $GRAVITY $GRAVITY_HOME_FLAG $GRAVITY_CHAINID_FLAG init $GRAVITY_NODE_NAME
-
-
-echo "Add validator key"
-$GRAVITY $GRAVITY_HOME_FLAG keys add $GRAVITY_VALIDATOR_NAME $GRAVITY_KEYRING_FLAG --output json | jq . >> $GRAVITY_HOME/validator_key.json
-jq .mnemonic $GRAVITY_HOME/validator_key.json | sed 's#\"##g' >> $HOME/validator-phrases
 
 
 #copy master genesis file 
@@ -86,12 +80,8 @@ fsed 's#external_address = ""#external_address = "tcp://'$GRAVITY_HOST:26656'"#g
 fsed 's#seeds = ""#seeds = "'$SEED'"#g' $GRAVITY_NODE_CONFIG
 fsed 's#enable = false#enable = true#g' $GRAVITY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $GRAVITY_APP_CONFIG
-# Save validator-info
-fsed 's#"validator_name": ""#"validator_name": "'$GRAVITY_VALIDATOR_NAME'"#g'  $HOME/val_info.json
-fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $HOME/val_info.json
+fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $ONOMY_HOME/node_info.json
+fsed 's#"node_name": ""#"node_name": "'$GRAVITY_NODE_NAME'"#g'  $ONOMY_HOME/node_info.json
 
 
-$GRAVITY $GRAVITY_HOME_FLAG start &
-
-
-
+$GRAVITY $GRAVITY_HOME_FLAG start

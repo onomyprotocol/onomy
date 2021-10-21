@@ -50,3 +50,5 @@ sudo yum install "https://github.com/onomyprotocol/onomy/releases/download/v0.0.
 ```
 
 Running this command will take care of all the dependancies and it will install the required binaries in `$HOME/.onomy/bin` directory. It will also add this path to $PATH variable.
+
+Script will also put `init-full-node.sh` and `init-validator.sh` file in your `$HOME/.onomy` directory

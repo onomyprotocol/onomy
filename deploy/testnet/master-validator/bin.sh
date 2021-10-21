@@ -7,11 +7,11 @@ mkdir $HOME/.onomy/bin
 mkdir $HOME/.onomy/gravity
 
 echo "-----------Installing_dependencies---------------"
-dnf -y update
-dnf -y copr enable ngompa/musl-libc
-dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo dnf -y update
+sudo dnf -y copr enable ngompa/musl-libc
+sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-dnf -y install curl nano ca-certificates tar git jq gcc-c++ musl-devel musl-gcc golang gmp-devel perl python3 moreutils wget nodejs make
+sudo dnf -y install curl nano ca-certificates tar git jq gcc-c++ musl-devel musl-gcc golang gmp-devel perl python3 moreutils wget nodejs make
 
 echo "--------------installing_rust---------------------------"
 curl https://sh.rustup.rs -sSf | bash -s -- -y
@@ -55,8 +55,8 @@ cd go-ethereum/
 make geth
 cp build/bin/geth $ONOMY_HOME/bin/geth
 
-echo "------------------ install fauset ------------------"
-curl https://get.starport.network/faucet! | bash
+echo "------------------ install faucet ------------------"
+curl https://get.starport.network/faucet! | sudo bash
 cd $HOME
 
 echo "export PATH=$PATH:$HOME/.cargo/bin:$ONOMY_HOME/bin" >> $HOME/.bashrc

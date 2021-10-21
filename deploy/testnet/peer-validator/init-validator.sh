@@ -1,15 +1,16 @@
 #!/bin/bash
+#Setup Validator
 set -eu
 
 echo "building environment"
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
-CHAINID=$(jq .chain_id $HOME/val_info.json | sed 's#\"##g')
+CHAINID=$(jq .chain_id $ONOMY_HOME/node_info.json | sed 's#\"##g')
 # Name of the gravity artifact
 GRAVITY=onomyd
 # The name of the gravity node
-GRAVITY_NODE_NAME="onomy"
+GRAVITY_NODE_NAME=$(jq .node_name $ONOMY_HOME/node_info.json | sed 's#\"##g')
 # The address to run gravity node
 GRAVITY_HOST="0.0.0.0"
 # Home folder for gravity config
@@ -26,19 +27,36 @@ GRAVITY_APP_CONFIG="$GRAVITY_HOME_CONFIG/app.toml"
 GRAVITY_KEYRING_FLAG="--keyring-backend test"
 # Chain ID flag
 GRAVITY_CHAINID_FLAG="--chain-id $CHAINID"
-# The name of the gravity validator
-GRAVITY_VALIDATOR_NAME=$(jq .validator_name $HOME/val_info.json | sed 's#\"##g')
 # Gravity chain demons
 STAKE_DENOM="nom"
 NORMAL_DENOM="footoken"
 
-read -p "Please enter Faucet URL" -i "ihttp://testnet1.onomy.io:8000/" -e url
-FAUCET_TOKEN_BASE_URL="$url"
+# -----------------Adding Validator---------------------
+echo "Adding validator key"
+read -p "Enter a name for your validator: " GRAVITY_VALIDATOR_NAME
+echo $GRAVITY_HOME
+$GRAVITY $GRAVITY_HOME_FLAG keys add $GRAVITY_VALIDATOR_NAME $GRAVITY_KEYRING_FLAG --output json | jq . >> $GRAVITY_HOME/validator_key.json
+jq .mnemonic $GRAVITY_HOME/validator_key.json | sed 's#\"##g' >> $HOME/validator-phrases
 
 
-# ------------------ get faucet token------------------
+# Save validator-info
+# Switch sed command in the case of linux
+fsed() {
+  if [ `uname` = 'Linux' ]; then
+    sed -i "$@"
+  else
+    sed -i '' "$@"
+  fi
+}
+
+fsed 's#"validator_name": ""#"validator_name": "'$GRAVITY_VALIDATOR_NAME'"#g'  $ONOMY_HOME/node_info.json
+
+# -------------------Get Faucet URL----------------
+read -p "Please enter Faucet URL: " -i "http://testnet1.onomy.io:8000/" -e FAUCET_TOKEN_BASE_URL
+
+# ------------------Get Tokens from Faucet------------------
 ONOMY_VALIDATOR_ADDRESS=$(jq -r .address $GRAVITY_HOME/validator_key.json)
-curl -X POST $FAUCET_TOKEN_BASE_URL -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"200000000nom\"  ]}"
+curl -X POST "$FAUCET_TOKEN_BASE_URL" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"200000000nom\"  ]}"
 
 #  wait 5 sec to sync balances in the validator account
 sleep 5
