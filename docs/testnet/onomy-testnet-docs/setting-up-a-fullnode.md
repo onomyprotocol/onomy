@@ -43,6 +43,12 @@ Note:- Here the default home directory path is `~/.onomy` or `$HOME/.onomy`, if 
 onomyd --home /path/to/your/onomy/home ......
 ```
 
+Once the node initialized, run it. 
+
+```
+bash peer-validator/start-full-node.sh
+```
+
 Now, your node is finally up and has started the syncing with blockchain
 
 ### Check the status of the Onomy Network Testnet

@@ -25,7 +25,7 @@ a. [Standard Method](standardMethod)
 
 b. [Advanced Method](advancedMethod)
 
-### <a name="standardMethod"></a> a. Standard Method
+### <a name="standardMethod"></a>. Standard Method
 Run the init-validator.sh script to convert your full node into a validator.
 
 Important Note: In the script, default file path is `$HOME/.onomy/onomy-testnet1/onomy`. If you have changed this path, than provide the home directory path accordingly in the `onomyd` command.
@@ -34,6 +34,7 @@ Important Note: In the script, default file path is `$HOME/.onomy/onomy-testnet1
 bash peer-validator/init-validator.sh
 ```
 
+Script will ask for validator name, use any for example validator1
 Script will ask for faucet url to get faucet token (Please enter http://testnet1.onomy.io:8000/)
 
 You can check the validators of the Onomy chain by running:

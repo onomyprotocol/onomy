@@ -31,7 +31,10 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 # Chain ID flag
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seed node
-ONOMY_SEED="5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656"
+
+read -p "Enter node id of a validator that is running on chain: " -i "5e0f5b9d54d3e038623ddb77c0b91b559ff13495" -e ONOMY_SEED_ID
+read -p "Enter IP/host of the same node: " -i "testnet1.onomy.io" -e ONOMY_SEED_IP
+ONOMY_SEED="$ONOMY_SEED_ID@$ONOMY_SEED_IP:26656"
 
 # create home directory
 mkdir -p $ONOMY_HOME
@@ -55,7 +58,7 @@ $ONOMY $ONOMY_CHAINID_FLAG init $ONOMY_NODE_NAME
 
 #copy master genesis file
 rm $ONOMY_HOME_CONFIG/genesis.json
-wget http://testnet1.onomy.io:26657/genesis? -O $HOME/raw.json
+wget $ONOMY_SEED_IP:26657/genesis? -O $HOME/raw.json
 jq .result.genesis $HOME/raw.json >> $ONOMY_HOME_CONFIG/genesis.json
 rm -rf $HOME/raw.json
 
