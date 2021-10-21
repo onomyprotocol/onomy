@@ -1,8 +1,8 @@
 #!/bin/bash
-#Setup Full Node
 set -eu
 
-echo "building environment"
+echo "Initializing full node"
+
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
 
@@ -18,7 +18,6 @@ while [[ $ONOMY_NODE_NAME == '' ]]
 do
    # The name of the onomy node
   read -p "Enter a name for your node: " ONOMY_NODE_NAME
-  echo "Node name is required"
 done
 
 # The address to run onomy node
@@ -31,8 +30,8 @@ ONOMY_NODE_CONFIG="$ONOMY_HOME_CONFIG/config.toml"
 ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 # Chain ID flag
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
-
-read -p "Submit or change seed node: " -i "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656" -e SEED
+# Seed node
+ONOMY_SEED="5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656"
 
 # create home directory
 mkdir -p $ONOMY_HOME
@@ -75,7 +74,7 @@ fsed "s#\"tcp://127.0.0.1:26656\"#\"tcp://$ONOMY_HOST:26656\"#g" $ONOMY_NODE_CON
 fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CONFIG
 fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
 fsed 's#external_address = ""#external_address = "tcp://'$ONOMY_HOST:26656'"#g' $ONOMY_NODE_CONFIG
-fsed 's#seeds = ""#seeds = "'$SEED'"#g' $ONOMY_NODE_CONFIG
+fsed 's#seeds = ""#seeds = "'$ONOMY_SEED'"#g' $ONOMY_NODE_CONFIG
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
 fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $ONOMY_HOME/node_info.json
