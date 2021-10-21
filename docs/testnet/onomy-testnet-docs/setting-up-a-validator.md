@@ -21,9 +21,8 @@ In order to become validator, you need to follow steps below
 ## <a name="validator"></a> 1. Set up Validator
 In order to set up your node as a validator, you first need to have a [full-node running](setting-up-a-fullnode.md). Once you have set up a full node and it has synced with the blockchain, you have two options to setup a validator:
 
-a. [Standard Method](standardMethod)
-
-b. [Advanced Method](advancedMethod)
+a. [Standard Method](#standardMethod)
+b. [Advanced Method](#advancedMethod)
 
 ### <a name="standardMethod"></a>. Standard Method
 Run the init-validator.sh script to convert your full node into a validator.

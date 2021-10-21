@@ -12,6 +12,7 @@ Minimum system requirements:
 Make sure you have gone through [Pre installation Steps](pre-installation.md) prior to setting up a node.
 
 There are two ways for setting up the node, one is the standard method where everything is done by running a pre-configured script while second one is for more advanced users who might want to customize their installation:
+
 1. [Standard Method](#standardMethod)
 2. [Advanced Method](#advancedMethod)
 
