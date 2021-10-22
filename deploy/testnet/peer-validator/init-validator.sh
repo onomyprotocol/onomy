@@ -32,7 +32,8 @@ fi
 while [[ $ONOMY_VALIDATOR_NAME == '' ]]
 do
    # The name of onomy validator
-  read -r -p "Enter a name for your validator: " ONOMY_VALIDATOR_NAME
+  read -r -p "Enter a name for your validator [validator]:" ONOMY_VALIDATOR_NAME
+  ONOMY_VALIDATOR_NAME=${ONOMY_VALIDATOR_NAME:-validator}
   $ONOMY keys add $ONOMY_VALIDATOR_NAME $ONOMY_KEYRING_FLAG --output json | jq . >> $ONOMY_HOME/validator_key.json
 done
 
