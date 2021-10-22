@@ -7,35 +7,34 @@ echo "Initializing validator"
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
-CHAINID=$(jq .chain_id $ONOMY_HOME/node_info.json | sed 's#\"##g')
+CHAINID=$(jq -r .chain_id $ONOMY_HOME/node_info.json)
 # Name of the gravity artifact
 ONOMY=onomyd
 # The name of the gravity node
-ONOMY_NODE_NAME=$(jq .node_name $ONOMY_HOME/node_info.json | sed 's#\"##g')
+ONOMY_NODE_NAME=$(jq -r .node_name $ONOMY_HOME/node_info.json)
 # Keyring flag
 ONOMY_KEYRING_FLAG="--keyring-backend test"
 # Gravity chain demons
 STAKE_DENOM="nom"
-NOM_REQUEST_AMOUNT=20000000
+NOM_REQUEST_AMOUNT=11000000
 NOM_STAKE_AMOUNT=10000000
 
 # -----------------Adding Validator---------------------
 
 ONOMY_VALIDATOR_NAME=''
-while [[ $ONOMY_VALIDATOR_NAME == '' ]]
-do
-   # The name of onomy validator
-  read -p "Enter a name for your validator: " ONOMY_VALIDATOR_NAME
-done
 
 if [[ -f "$ONOMY_HOME/validator_key.json" ]]
 then
-    echo "Validator key already exist in $ONOMY_HOME/validator_key.json"
-    exit
+    echo "Validator key already exist $ONOMY_HOME/validator_key.json"
+    ONOMY_VALIDATOR_NAME=$(jq -r .name $ONOMY_HOME/validator_key.json)
 fi
 
-$ONOMY keys add $ONOMY_VALIDATOR_NAME $ONOMY_KEYRING_FLAG --output json | jq . >> $ONOMY_HOME/validator_key.json
-jq .mnemonic $ONOMY_HOME/validator_key.json | sed 's#\"##g' >> $HOME/validator-phrases
+while [[ $ONOMY_VALIDATOR_NAME == '' ]]
+do
+   # The name of onomy validator
+  read -r -p "Enter a name for your validator: " ONOMY_VALIDATOR_NAME
+  $ONOMY keys add $ONOMY_VALIDATOR_NAME $ONOMY_KEYRING_FLAG --output json | jq . >> $ONOMY_HOME/validator_key.json
+done
 
 # Save validator-info
 # Switch sed command in the case of linux
@@ -50,7 +49,9 @@ fsed() {
 fsed 's#"validator_name": ""#"validator_name": "'$ONOMY_VALIDATOR_NAME'"#g'  $ONOMY_HOME/node_info.json
 
 # -------------------Get Faucet URL----------------
-read -p "Please enter Faucet URL: " -i "http://testnet1.onomy.io:8000/" -e FAUCET_TOKEN_BASE_URL
+
+read -r -p "Please enter Faucet URL. Default: http://testnet1.onomy.io:8000/: " FAUCET_TOKEN_BASE_URL
+FAUCET_TOKEN_BASE_URL=${FAUCET_TOKEN_BASE_URL:-http://testnet1.onomy.io:8000/}
 
 # ------------------Get Tokens from Faucet------------------
 
@@ -59,8 +60,8 @@ curl -X POST "$FAUCET_TOKEN_BASE_URL" -H  "accept: application/json" -H  "Conten
 
 echo -e '\nWaiting for balance synchronization'
 
-for i in {1..600}; do
-  amount=$(jq .amount <<< "$($ONOMY q bank balances --denom $STAKE_DENOM --output json $ONOMY_VALIDATOR_ADDRESS)" | sed 's#\"##g')
+for i in {1..20}; do
+  amount=$(jq -r .amount <<< "$($ONOMY q bank balances --denom $STAKE_DENOM --output json $ONOMY_VALIDATOR_ADDRESS)")
   if [ "$amount" -lt $NOM_REQUEST_AMOUNT  ]; then
      sleep 1
      continue
@@ -69,7 +70,8 @@ for i in {1..600}; do
 done
 
 if [ "$amount" -lt $NOM_REQUEST_AMOUNT  ]; then
- echo "The node hasn't received $STAKE_DENOM, check the node synchronization"
+ echo "The $ONOMY_VALIDATOR_ADDRESS hasn't received $STAKE_DENOM, check the node synchronization"
+ exit
 fi
 
 echo -e "\n Creating validator:"

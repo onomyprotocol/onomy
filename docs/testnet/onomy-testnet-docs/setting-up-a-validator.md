@@ -76,15 +76,15 @@ You'll see an output like this:
 Copy your address from the 'address' field and paste it into the command below in the place of $ONOMY_VALIDATOR_ADDRESS:
 
 ```
-curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"100000000nom\"  ]}"
+curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"10000000nom\"  ]}"
 ```
-This will provide you 100000000nom from the faucet.
+This will provide you 10000000nom from the faucet.
 
 #### Send your validator setup transaction, but make sure your node is fully synced before:
 
 ```
 onomyd --home $HOME/.onomy tx staking create-validator \
- --amount=100000000nom \
+ --amount=10000000nom \
  --pubkey=$(onomyd --home $HOME/.onomy tendermint show-validator) \
  --moniker="put your validator name here" \
  --chain-id=onomy-testnet1 \
@@ -138,7 +138,7 @@ Both your Ethereum delegate key and your Cosmos delegate key will need some toke
 
 In a production network, only relayers would need Ethereum to fund relaying, but for this testnet, all validators run relayers by default, allowing us to more easily simulate a lively economy of many relayers.
 
-You should have received 100000000 Onomy NOM tokens.
+You should have received 10000000 Onomy NOM tokens.
 
 To get the address for your validator key, you can run the command below, where 'myvalidatorkeyname' is whatever you named your key in the 'generate your key' step:
 
@@ -153,7 +153,7 @@ onomyd --home $HOME/.onomy tx bank send <your validator address> <your delegate 
 ```
 2. Using faucet command, from the Onomy-side faucet:
 ```
-curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"100000000nom\"  ]}"
+curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"10000000nom\"  ]}"
 ```
  Now, we need some Rinkeby ETH in the Ethereum delegate key. You can get some RInkeby ETH from official Rinkeby faucet:
 ```

@@ -13,12 +13,8 @@ CHAINID="onomy-testnet1"
 # Name of the onomy artifact
 ONOMY=onomyd
 
-ONOMY_NODE_NAME=''
-while [[ $ONOMY_NODE_NAME == '' ]]
-do
-   # The name of the onomy node
-  read -p "Enter a name for your node: " ONOMY_NODE_NAME
-done
+read -r -p "Enter a name for your node. Default: onomy: " ONOMY_NODE_NAME
+ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy}
 
 # The address to run onomy node
 ONOMY_HOST="0.0.0.0"
@@ -32,8 +28,13 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seed node
 
-read -p "Enter node id of a validator that is running on chain: " -i "5e0f5b9d54d3e038623ddb77c0b91b559ff13495" -e ONOMY_SEED_ID
-read -p "Enter IP/host of the same node: " -i "testnet1.onomy.io" -e ONOMY_SEED_IP
+read -r -p "Enter node id of an existing validator that is running on chain. Default: 5e0f5b9d54d3e038623ddb77c0b91b559ff13495: " ONOMY_SEED_ID
+ONOMY_SEED_ID=${ONOMY_SEED_ID:-5e0f5b9d54d3e038623ddb77c0b91b559ff13495}
+
+read -r -p "Enter Hostname/IP Address of the same node. Default: testnet1.onomy.io: " ONOMY_SEED_IP
+ONOMY_SEED_IP=${ONOMY_SEED_IP:-"testnet1.onomy.io"}
+
+
 ONOMY_SEED="$ONOMY_SEED_ID@$ONOMY_SEED_IP:26656"
 
 # create home directory
@@ -49,7 +50,7 @@ echo '{
 
 # ------------------ Init onomy ------------------
 
-echo "Creating $ONOMY_NODE_NAME validator with chain-id=$CHAINID..."
+echo "Creating $ONOMY_NODE_NAME node with chain-id=$CHAINID..."
 echo "Initializing genesis files"
 
 # Initialize the home directory and add some keys
@@ -58,9 +59,9 @@ $ONOMY $ONOMY_CHAINID_FLAG init $ONOMY_NODE_NAME
 
 #copy master genesis file
 rm $ONOMY_HOME_CONFIG/genesis.json
-wget $ONOMY_SEED_IP:26657/genesis? -O $HOME/raw.json
-jq .result.genesis $HOME/raw.json >> $ONOMY_HOME_CONFIG/genesis.json
-rm -rf $HOME/raw.json
+wget $ONOMY_SEED_IP:26657/genesis? -O $ONOMY_HOME/raw_genesis.json
+jq .result.genesis $ONOMY_HOME/raw_genesis.json >> $ONOMY_HOME_CONFIG/genesis.json
+rm $ONOMY_HOME/raw_genesis.json
 
 echo "Exposing ports and APIs of the $ONOMY_NODE_NAME"
 # Switch sed command in the case of linux
