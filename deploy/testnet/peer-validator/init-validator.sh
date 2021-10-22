@@ -50,13 +50,16 @@ fsed 's#"validator_name": ""#"validator_name": "'$ONOMY_VALIDATOR_NAME'"#g'  $ON
 
 # -------------------Get Faucet URL----------------
 
-read -r -p "Please enter Faucet URL. Default: http://testnet1.onomy.io:8000/: " FAUCET_TOKEN_BASE_URL
-FAUCET_TOKEN_BASE_URL=${FAUCET_TOKEN_BASE_URL:-http://testnet1.onomy.io:8000/}
-
-# ------------------Get Tokens from Faucet------------------
-
 ONOMY_VALIDATOR_ADDRESS=$(jq -r .address $ONOMY_HOME/validator_key.json)
-curl -X POST "$FAUCET_TOKEN_BASE_URL" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"$NOM_REQUEST_AMOUNT$STAKE_DENOM\"  ]}"
+
+# if the validator doesn't have enogh amount
+amount=$(jq -r .amount <<< "$($ONOMY q bank balances --denom $STAKE_DENOM --output json $ONOMY_VALIDATOR_ADDRESS)")
+if [ "$amount" -lt $NOM_REQUEST_AMOUNT  ]; then
+  read -r -p "Please enter Faucet URL. Default: http://testnet1.onomy.io:8000/: " FAUCET_TOKEN_BASE_URL
+  FAUCET_TOKEN_BASE_URL=${FAUCET_TOKEN_BASE_URL:-http://testnet1.onomy.io:8000/}
+
+  curl -X POST "$FAUCET_TOKEN_BASE_URL" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"$NOM_REQUEST_AMOUNT$STAKE_DENOM\"  ]}"
+fi
 
 echo -e '\nWaiting for balance synchronization'
 
