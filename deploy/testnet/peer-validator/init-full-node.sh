@@ -13,7 +13,7 @@ CHAINID="onomy-testnet1"
 # Name of the onomy artifact
 ONOMY=onomyd
 
-read -r -p "Enter a name for your node. Default: onomy: " ONOMY_NODE_NAME
+read -r -p "Enter a name for your node [onomy]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy}
 
 # The address to run onomy node
@@ -28,10 +28,10 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seed node
 
-read -r -p "Enter node id of an existing validator that is running on chain. Default: 5e0f5b9d54d3e038623ddb77c0b91b559ff13495: " ONOMY_SEED_ID
+read -r -p "Enter node id of an existing validator that is running on chain [5e0f5b9d54d3e038623ddb77c0b91b559ff13495]:" ONOMY_SEED_ID
 ONOMY_SEED_ID=${ONOMY_SEED_ID:-5e0f5b9d54d3e038623ddb77c0b91b559ff13495}
 
-read -r -p "Enter Hostname/IP Address of the same node. Default: testnet1.onomy.io: " ONOMY_SEED_IP
+read -r -p "Enter Hostname/IP Address of the same node [testnet1.onomy.io]:" ONOMY_SEED_IP
 ONOMY_SEED_IP=${ONOMY_SEED_IP:-"testnet1.onomy.io"}
 
 

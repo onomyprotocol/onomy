@@ -52,10 +52,10 @@ fsed 's#"validator_name": ""#"validator_name": "'$ONOMY_VALIDATOR_NAME'"#g'  $ON
 
 ONOMY_VALIDATOR_ADDRESS=$(jq -r .address $ONOMY_HOME/validator_key.json)
 
-# if the validator doesn't have enogh amount
+# if the validator doesn't have enough amount use faucet
 amount=$(jq -r .amount <<< "$($ONOMY q bank balances --denom $STAKE_DENOM --output json $ONOMY_VALIDATOR_ADDRESS)")
 if [ "$amount" -lt $NOM_REQUEST_AMOUNT  ]; then
-  read -r -p "Please enter Faucet URL. Default: http://testnet1.onomy.io:8000/: " FAUCET_TOKEN_BASE_URL
+  read -r -p "Please enter Faucet URL [http://testnet1.onomy.io:8000/]:" FAUCET_TOKEN_BASE_URL
   FAUCET_TOKEN_BASE_URL=${FAUCET_TOKEN_BASE_URL:-http://testnet1.onomy.io:8000/}
 
   curl -X POST "$FAUCET_TOKEN_BASE_URL" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"$NOM_REQUEST_AMOUNT$STAKE_DENOM\"  ]}"
