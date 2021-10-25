@@ -5,7 +5,7 @@ CONNECTIONS=$1
 TIME=$2
 RATE=$3
 SIZE=$4
-FILE_NAME=$5 || "log.txt"
+FILE_NAME="log.txt"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 result=$( docker images -q cosmoschain )
