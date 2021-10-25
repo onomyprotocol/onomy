@@ -16,7 +16,7 @@ There are two ways for setting up the node, one is the standard method where eve
 1. [Standard Method](#standardMethod)
 2. [Advanced Method](#advancedMethod)
 
-## <a name="standardMethod"> 1. Standard Method
+## <a name="standardMethod"></a> 1. Standard Method
 ### Initiate chain
 
 Clone the latest release of github repo
@@ -63,7 +63,7 @@ If catching_up is false, this means that your node is fully synced. Congratulati
 
 
 
-## <a name="advancedMethod"> 2. Advanced Method
+## <a name="advancedMethod"></a> 2. Advanced Method
 ### Init the config files
 
 ```
