@@ -1,9 +1,9 @@
 name: Setup chain and apply tm load test
 on:
   push:
-    branches: [master, dev]
+    branches: [main, dev]
   pull_request:
-    branches: [master, dev]
+    branches: [main, dev]
 
 jobs:
   Test_with_connections-1_time-20_rate-1000_size-250:
