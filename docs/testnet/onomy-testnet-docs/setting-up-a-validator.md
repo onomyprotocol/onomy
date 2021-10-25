@@ -10,7 +10,7 @@ Minimum Requirements:
 You also need to have [full node running](setting-up-a-fullnode.md) before trying to set up a validator.
 
 
-## How to vecome validator
+## How to become validator
 In order to become validator, you need to follow steps below
 1. [Set up Validator](#validator)
 2. [Set up Gravity Bridge](#gravityBridge)
