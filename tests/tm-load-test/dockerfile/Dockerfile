@@ -1,4 +1,4 @@
-FROM alpine:go
+FROM ubuntu:latest
 
 RUN apt-get update -y -q && apt-get upgrade -yq
 # common (DEBIAN_FRONTEND is a fix for tzdata)
@@ -15,12 +15,12 @@ ARG ONOMY_DIR=/go/src/github.com/onomyprotocol/onomy/
 # clone the repo
 COPY . $ONOMY_DIR
 
-# install golang
-# RUN curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output go.tar.gz
-# RUN tar -C /usr/local -xzf go.tar.gz
-# ENV PATH="/usr/local/go/bin:$PATH"
-# ENV GOPATH=/go
-# ENV PATH=$PATH:$GOPATH/bin
+#install golang
+RUN curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output go.tar.gz
+RUN tar -C /usr/local -xzf go.tar.gz
+ENV PATH="/usr/local/go/bin:$PATH"
+ENV GOPATH=/go
+ENV PATH=$PATH:$GOPATH/bin
 
 # build onomyd artifact
 WORKDIR $ONOMY_DIR
