@@ -46,10 +46,13 @@ rm -rf $HOME/raw.json
 	- change "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
 	- change addr_book_strict = true to addr_book_strict = false
 
-2. Make following changes in $ONOMY_HOME/config/app.toml:
+2. Under the [api] section of $ONOMY_HOME/config/app.toml, set both values to true:
 
-	- Change enable = false to enable = true
-	- Change swagger = false to swagger = true
+	# Enable defines if the API server should be enabled.
+	enable = false -> true
+
+	# Swagger defines if swagger documentation should automatically be registered.
+	swagger = false -> true
 
 ## Increasing the default open files limit
 If we don't raise this value nodes will crash once the network grows large enough
