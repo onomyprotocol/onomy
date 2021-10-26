@@ -1,7 +1,7 @@
 name: TM load tests
 on:
   push:
-    branches: [main, dev , tm-load-test]
+    branches: [main, dev]
   pull_request:
     branches: [main, dev]
 
