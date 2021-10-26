@@ -36,8 +36,8 @@ rm -rf $HOME/raw.json
 
 1. Make following changes in $ONOMY_HOME/config/config.toml:
 
-	- add *5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656* to seeds field. It should look somthing like this
-	`seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656"`
+	- add *5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656,ab9a013d00be662b65332adba918c2df3132108e@136.244.118.117:26656* to seeds field. It should look something like this
+	`seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656,ab9a013d00be662b65332adba918c2df3132108e@136.244.118.117:26656"`
 
 	- add *tcp://0.0.0.0:26656* to external_address field
 	`external_address = "" to external_address = "tcp://0.0.0.0:26656"`
