@@ -38,7 +38,7 @@ Script will ask for faucet url to get faucet token (Please enter http://testnet1
 
 You can check the validators of the Onomy chain by running:
 ```
-curl http//localhost:26657/validators
+curl http://localhost:26657/validators
 ```
 or
 ```
