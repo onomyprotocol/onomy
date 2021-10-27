@@ -1,0 +1,111 @@
+//go:build integration
+// +build integration
+
+package wnom
+
+import (
+	"context"
+	"fmt"
+	"testing"
+	"time"
+
+	sdkTypes "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/assert"
+
+	onomy "github.com/onomyprotocol/onomy/app"
+)
+
+func TestIntegrationWnomToNom(t *testing.T) { // nolint:gocyclo, cyclop
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+
+	ctx := context.Background()
+	const (
+		bootstrappingTimeout    = time.Minute
+		onomyDestinationAddress = "onomy1txg674n2km4ft6jfdccs94xtg8vl2kyksw3scl"
+		fauTokeAddress          = "0xFab46E002BbF0b4509813474841E0716E6730136"
+	)
+
+	wnomTestsBaseContainer, err := newWnomTestsBaseContainer(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Clean up the container after the test is complete
+	defer wnomTestsBaseContainer.Terminate(ctx) // nolint:errcheck
+
+	// run ethereum node
+	ethNodeURL, err := wnomTestsBaseContainer.runEthNode(ctx, bootstrappingTimeout)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("the eth node is running on %q", ethNodeURL)
+
+	// run onomy chain
+	onomyChain, err := newOnomyChain()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := onomyChain.start(bootstrappingTimeout); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("onomy chain is up, validator: %+v", onomyChain.Validator)
+
+	// deploy gravity
+	err = retryWithTimeout(func() error {
+		return wnomTestsBaseContainer.deployGravity(ctx)
+	}, bootstrappingTimeout)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("gravity contract deployed")
+
+	// start orchestrator
+	if err := wnomTestsBaseContainer.startOrchestrator(ctx, onomyChain.Validator.Mnemonic); err != nil {
+		t.Fatal(err)
+	}
+	t.Log("orchestrator is started")
+
+	// send wNOM tokens to onomy
+	erc20Amount := int64(10)
+	if err := wnomTestsBaseContainer.sendToCosmos(ctx, onomy.WnomERC20Address, erc20Amount, onomyDestinationAddress); err != nil {
+		t.Fatal(err)
+	}
+	if err := wnomTestsBaseContainer.sendToCosmos(ctx, fauTokeAddress, erc20Amount, onomyDestinationAddress); err != nil {
+		t.Fatal(err)
+	}
+	t.Log("orchestrator is started")
+
+	// waif for the wNOM on the validator balance
+	err = retryWithTimeout(func() error {
+		balance, err := onomyChain.getAccountBalance(onomyDestinationAddress)
+		if err != nil {
+			return err
+		}
+
+		checks := 0
+		for _, coin := range balance {
+			if coin.Denom == onomy.AnomDenom {
+				assert.Equal(t, coin.Amount, sdkTypes.NewIntWithDecimal(erc20Amount, 18))
+				checks++
+			}
+			if coin.Denom == fmt.Sprintf("gravity%s", fauTokeAddress) {
+				assert.Equal(t, coin.Amount, sdkTypes.NewIntWithDecimal(erc20Amount, 18))
+				checks++
+			}
+		}
+		if checks == 2 {
+			return nil
+		}
+
+		return fmt.Errorf("the node hasn't received the %s tokens, balance: %+v", onomy.WnomERC20Address, balance)
+	}, bootstrappingTimeout)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+}
