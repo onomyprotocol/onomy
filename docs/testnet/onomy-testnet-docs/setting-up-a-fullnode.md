@@ -36,11 +36,11 @@ rm -rf $HOME/raw.json
 
 1. Make following changes in $ONOMY_HOME/config/config.toml:
 
-	- add *5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656,6f533e6a06b948f5b5d94b88d6f50383f5577348@161.35.124.61:26656,ba9168215dc644065a7a5fface0c976582c7e529@137.184.192.172:26656* to seeds field. It should look somthing like this
-	  `seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656,6f533e6a06b948f5b5d94b88d6f50383f5577348@161.35.124.61:26656,ba9168215dc644065a7a5fface0c976582c7e529@137.184.192.172:26656"`
-	  
 
-	- add *tcp://0.0.0.0:26656* to external_address field
+	- add seeds:
+	`seeds = "5e0f5b9d54d3e038623ddb77c0b91b559ff13495@testnet1.onomy.io:26656,6f533e6a06b948f5b5d94b88d6f50383f5577348@161.35.124.61:26656,ba9168215dc644065a7a5fface0c976582c7e529@137.184.192.172:26656"`
+
+    - add *tcp://0.0.0.0:26656* to external_address field
 	`external_address = "" to external_address = "tcp://0.0.0.0:26656"`
 
 	- change "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
@@ -48,6 +48,7 @@ rm -rf $HOME/raw.json
 	- change addr_book_strict = true to addr_book_strict = false
 
 2. Make following changes in $ONOMY_HOME/config/app.toml:
+
 
 	- Change enable = false to enable = true
 	- Change swagger = false to swagger = true
