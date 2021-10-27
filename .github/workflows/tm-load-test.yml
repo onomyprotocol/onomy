@@ -1,0 +1,32 @@
+name: TM load tests
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  time-20_rate-1000_size-250:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run test-case first
+        run:  bash tests/tm-load-test/setup-chain.sh 1 20 1000 250 
+
+  time-15_rate-200_size-2500:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name:  Run test-case second
+        run: bash tests/tm-load-test/setup-chain.sh 1 15 200 2500 
+
+  time-10_rate-10_size-310:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run test-case third
+        run: bash tests/tm-load-test/setup-chain.sh 1 10 10 310 
+
+    
+    
+    
