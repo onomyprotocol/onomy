@@ -98,9 +98,6 @@ rm -rf $HOME/raw.json
 	- change "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
 	- change "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
 	- change addr_book_strict = true to addr_book_strict = false
-	- change cors_allowed_origins = [] to cors_allowed_origins = ["*"]
-	- change max_num_inbound_peers = 40 to max_num_inbound_peers = 100
-	
 
 2. Make following changes in $ONOMY_HOME/config/app.toml:
 
