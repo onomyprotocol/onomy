@@ -67,9 +67,14 @@ go.sum: go.mod
 test:
 	@go test -mod=readonly $(PACKAGES)
 
+# ALCHEMY_KEY env variable is required for the tests execution
+.PHONY: test-integration
+test-integration:
+	@go test -v ./tests/... -tags=integration
+
 .PHONY: lint
 lint:
-	golangci-lint -c dev/tools/.golangci.yml run
+	golangci-lint -c dev/tools/.golangci.yml run --build-tags "integration"
 	gofmt -d -s $(SCAN_FILES)
 
 .PHONY: format
