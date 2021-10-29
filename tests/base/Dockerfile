@@ -37,3 +37,11 @@ RUN chmod +x /usr/bin/contract-deployer
 
 ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.0-20210915184851-orch-nomarket/gbt /usr/bin/gbt
 RUN chmod +x /usr/bin/gbt
+
+# ------------------ ethereum go (geth) ------------------
+RUN add-apt-repository -y ppa:ethereum/ethereum
+RUN apt-get install --no-install-recommends -yq ethereum
+
+# ------------------ fauset ------------------
+
+RUN curl https://get.starport.network/faucet! | bash

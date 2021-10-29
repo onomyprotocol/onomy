@@ -70,6 +70,10 @@ func newOnomyChain() (*onomyChain, error) {
 		return nil, err
 	}
 
+	if err := replaceStringInFile(filepath.Join(dir, "config", "config.toml"), "log_level = \"info\"", "log_level = \"error\""); err != nil {
+		return nil, err
+	}
+
 	// add new user
 	val1KeyString := executeChainCmd("keys add", validator1Name, keyRingFlag, jsonOutFlag, homeFlag)
 	var val1KeyOutput keyring.KeyOutput

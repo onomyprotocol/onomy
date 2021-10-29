@@ -60,9 +60,8 @@ func newWnomTestsBaseContainer(ctx context.Context) (*wnomTestsBaseContainer, er
 	}
 
 	// print logs
-	err = container.StartLogProducer(ctx)
 	container.FollowOutput(newPrintLogConsumer())
-
+	err = container.StartLogProducer(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -15,12 +15,13 @@ import (
 	onomy "github.com/onomyprotocol/onomy/app"
 )
 
-func TestIntegrationWnomToNom(t *testing.T) { // nolint:gocyclo, cyclop
+func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 	if testing.Short() {
 		t.Skip("skipping integration test")
 	}
 
 	ctx := context.Background()
+	defer ctx.Done()
 	const (
 		bootstrappingTimeout    = time.Minute
 		onomyDestinationAddress = "onomy1txg674n2km4ft6jfdccs94xtg8vl2kyksw3scl"
@@ -78,7 +79,7 @@ func TestIntegrationWnomToNom(t *testing.T) { // nolint:gocyclo, cyclop
 	if err := wnomTestsBaseContainer.sendToCosmos(ctx, fauTokeAddress, erc20Amount, onomyDestinationAddress); err != nil {
 		t.Fatal(err)
 	}
-	t.Log("orchestrator is started")
+	t.Log("ERC20 tokens are sent to the gravity contract")
 
 	// waif for the wNOM on the validator balance
 	err = retryWithTimeout(func() error {
