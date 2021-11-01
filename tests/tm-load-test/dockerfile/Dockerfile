@@ -25,12 +25,11 @@ WORKDIR $ONOMY_DIR
 RUN make install
 
 #----------------------building binary of tm-load-test custom client-------------------
-RUN git clone -b customClient https://github.com/puneetsingh166/tm-load-test.git
-RUN ls
-WORKDIR tm-load-test/customclient/my-cosmos-tester
-RUN go build
-RUN cp my-cosmos-tester /usr/bin/my-cosmos-tester
-RUN my-cosmos-tester --help
+WORKDIR $ONOMY_DIR
+RUN make build-onomy-load-test
+WORKDIR $ONOMY_DIR/build
+RUN cp onomy-load-test /usr/bin/onomy-load-test
+RUN onomy-load-test --help
 
 
 # ------------------ soft to run the scripts ------------------

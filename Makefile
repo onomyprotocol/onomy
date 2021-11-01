@@ -106,3 +106,6 @@ format-in-docker:
 .PHONY: all-in-docker
 all-in-docker:
 	make in-docker ARGS="make all"
+#########################################Build onomy load test binary#########################
+build-onomy-load-test:
+	go build -o build/onomy-load-test ./cmd/onomy-load-test/
