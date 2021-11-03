@@ -312,7 +312,13 @@ func NewApp( // nolint:funlen
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.GravityKeeper = gravitykeeper.NewKeeper(
-		appCodec, keys[gravitytypes.StoreKey], app.GetSubspace(gravitytypes.ModuleName), stakingKeeper, app.BankKeeper, app.SlashingKeeper,
+		appCodec,
+		keys[gravitytypes.StoreKey],
+		app.GetSubspace(gravitytypes.ModuleName),
+		stakingKeeper,
+		app.BankKeeper,
+		app.SlashingKeeper,
+		gravitykeeper.WithEthDenomSwapper(WnomERC20GravityDenom, AnomDenom),
 	)
 
 	/****  Module Options ****/
