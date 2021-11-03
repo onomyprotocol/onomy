@@ -16,11 +16,8 @@ ONOMY_KEYRING_FLAG="--keyring-backend test"
 # Onomy chain demons
 STAKE_DENOM="nom"
 
-echo "Collecting gentxs in $ONOMY_NODE_NAME"
-$ONOMY collect-gentxs
-
 echo "Running onomy..."
-$ONOMY --home $ONOMY_HOME start --pruning=nothing &
+$ONOMY start --pruning=nothing &
 
 echo "Waiting $ONOMY_NODE_NAME to launch gRPC $ONOMY_GRPC_PORT..."
 
