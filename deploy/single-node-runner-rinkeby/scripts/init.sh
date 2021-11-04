@@ -93,6 +93,7 @@ fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CON
 fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
 fsed 's#external_address = ""#external_address = "tcp://'$ONOMY_HOST:26656'"#g' $ONOMY_NODE_CONFIG
 fsed 's#log_level = \"info\"#log_level = \"error\"#g' $ONOMY_NODE_CONFIG
+fsed 's#cors_allowed_origins = []#cors_allowed_origins = [\"*\"]#g' $ONOMY_NODE_CONFIG
 
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG

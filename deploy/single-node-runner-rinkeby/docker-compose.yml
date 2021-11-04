@@ -7,9 +7,9 @@ services:
     container_name: onomy-single-node-runner-rinkeby
     environment:
       ETH_RPC_ADDRESS: https://eth-rinkeby.alchemyapi.io/v2/...
-    volumes:
+    # volumes:
       # uncomment to update onomy config in runtime
-      - ./scripts:/root/home/scripts
+      # - ./scripts:/root/home/scripts
       # uncomment to update onomy config in runtime
       # - ./.onomy:/root/.onomy
     ports:
