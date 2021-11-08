@@ -21,6 +21,3 @@ jobs:
       - name: CI
         run: |
           make all-in-docker
-          
-          
-          
