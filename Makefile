@@ -102,10 +102,6 @@ lint-in-docker:
 .PHONY: format-in-docker
 format-in-docker:
 	make in-docker ARGS="make format"
-
-.PHONY: all-in-docker
-all-in-docker:
-	make in-docker ARGS="make all"
 #########################################Build onomy load test binary#########################
 
 .PHONY: lint-tm
@@ -115,3 +111,7 @@ lint-tm:
 
 build-onomy-load-test:
 	go build -tags tmload -o build/onomy-load-test ./cmd/onomy-load-test/
+
+.PHONY: all-in-docker
+all-in-docker:
+	make in-docker ARGS="make all"
