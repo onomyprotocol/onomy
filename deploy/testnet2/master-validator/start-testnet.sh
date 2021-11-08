@@ -113,9 +113,9 @@ $ONOMY $home1 eth_keys add --output=json | jq . >> $n1dir/eth_key.json
 $ONOMY $home2 eth_keys add --output=json | jq . >> $n2dir/eth_key.json
 
 echo "Creating gentxs"
-$ONOMY $home0 gentx --ip $ONOMY_HOST val 1000000000000$STAKE_DENOM "$(jq -r .address $n0dir/eth_key.json)" "$(jq -r .address $n0dir/orchestrator_key.json)" $kbt $cid &>/dev/null
-$ONOMY $home1 gentx --ip $ONOMY_HOST val 1000000000000$STAKE_DENOM "$(jq -r .address $n1dir/eth_key.json)" "$(jq -r .address $n1dir/orchestrator_key.json)" $kbt $cid &>/dev/null
-$ONOMY $home2 gentx --ip $ONOMY_HOST val 1000000000000$STAKE_DENOM "$(jq -r .address $n2dir/eth_key.json)" "$(jq -r .address $n2dir/orchestrator_key.json)" $kbt $cid &>/dev/null
+$ONOMY $home0 gentx --ip $ONOMY_HOST val 10000000000$STAKE_DENOM "$(jq -r .address $n0dir/eth_key.json)" "$(jq -r .address $n0dir/orchestrator_key.json)" $kbt $cid &>/dev/null
+$ONOMY $home1 gentx --ip $ONOMY_HOST val 10000000000$STAKE_DENOM "$(jq -r .address $n1dir/eth_key.json)" "$(jq -r .address $n1dir/orchestrator_key.json)" $kbt $cid &>/dev/null
+$ONOMY $home2 gentx --ip $ONOMY_HOST val 10000000000$STAKE_DENOM "$(jq -r .address $n2dir/eth_key.json)" "$(jq -r .address $n2dir/orchestrator_key.json)" $kbt $cid &>/dev/null
 
 echo "Collecting gentxs in $n0name"
 cp $n1cfgDir/gentx/*.json $n0cfgDir/gentx/
