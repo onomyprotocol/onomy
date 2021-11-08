@@ -106,3 +106,11 @@ format-in-docker:
 .PHONY: all-in-docker
 all-in-docker:
 	make in-docker ARGS="make all"
+
+.PHONY: lint-tm
+lint-tm:
+	golangci-lint -c dev/tools/.golangci.yml run --build-tags "tmload"
+	gofmt -d -s $(SCAN_FILES)
+
+build-onomy-load-test:
+	go build -tags tmload -o build/onomy-load-test ./cmd/onomy-load-test/
