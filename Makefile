@@ -106,4 +106,3 @@ format-in-docker:
 .PHONY: all-in-docker
 all-in-docker:
 	make in-docker ARGS="make all"
-
