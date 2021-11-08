@@ -106,7 +106,7 @@ format-in-docker:
 .PHONY: all-in-docker
 all-in-docker:
 	make in-docker ARGS="make all"
-
+#########################################Build onomy load test binary##########################
 .PHONY: lint-tm
 lint-tm:
 	golangci-lint -c dev/tools/.golangci.yml run --build-tags "tmload"
