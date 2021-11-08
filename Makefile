@@ -116,3 +116,5 @@ lint-tm:
 
 build-onomy-load-test:
 	go build -tags tmload -o build/onomy-load-test ./cmd/onomy-load-test/
+	
+	
