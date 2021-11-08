@@ -107,7 +107,7 @@ format-in-docker:
 all-in-docker:
 	make in-docker ARGS="make all"
 
-#########################################Build onomy load test binary#########################
+#########################################Build onomy load test binary##########################
 
 .PHONY: lint-tm
 lint-tm:
