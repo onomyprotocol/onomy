@@ -104,7 +104,6 @@ lint-in-docker:
 format-in-docker:
 	make in-docker ARGS="make format"
 #########################################Build onomy load test binary#########################
-
 build-onomy-load-test:
 	go build -tags tmload -o build/onomy-load-test ./cmd/onomy-load-test/
 ###############################################################################################
