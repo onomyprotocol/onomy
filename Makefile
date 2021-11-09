@@ -74,8 +74,7 @@ test-integration:
 
 .PHONY: lint
 lint:
-	golangci-lint -c dev/tools/.golangci.yml run --build-tags "integration"
-	golangci-lint -c dev/tools/.golangci.yml run --build-tags "tmload"
+	golangci-lint -c dev/tools/.golangci.yml run --build-tags "integration tmload"
 	gofmt -d -s $(SCAN_FILES)
 
 .PHONY: format
