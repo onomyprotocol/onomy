@@ -75,6 +75,7 @@ test-integration:
 .PHONY: lint
 lint:
 	golangci-lint -c dev/tools/.golangci.yml run --build-tags "integration"
+	golangci-lint -c dev/tools/.golangci.yml run --build-tags "tmload"
 	gofmt -d -s $(SCAN_FILES)
 
 .PHONY: format
@@ -103,11 +104,6 @@ lint-in-docker:
 format-in-docker:
 	make in-docker ARGS="make format"
 #########################################Build onomy load test binary#########################
-
-.PHONY: lint-tm
-lint-tm:
-	golangci-lint -c dev/tools/.golangci.yml run --build-tags "tmload"
-	gofmt -d -s $(SCAN_FILES)
 
 build-onomy-load-test:
 	go build -tags tmload -o build/onomy-load-test ./cmd/onomy-load-test/
