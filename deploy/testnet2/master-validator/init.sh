@@ -5,7 +5,7 @@ echo "Initializing master node"
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
-CHAINID="onomy-testnet1"
+CHAINID="onomy-testnet2"
 # Name of the onomy artifact
 ONOMY=onomyd
 # The name of the onomy node
