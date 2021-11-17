@@ -68,12 +68,12 @@ fsed "s#\"stake\"#\"$STAKE_DENOM\"#g" $ONOMY_HOME_CONFIG/genesis.json
 jq '.app_state.bank.denom_metadata += [{"base": "footoken", display: "mfootoken", "description": "A non-staking test token", "denom_units": [{"denom": "footoken", "exponent": 0}, {"denom": "mfootoken", "exponent": 6}]}, {"base": "nom", display: "mnom", "description": "A staking test token", "denom_units": [{"denom": "nom", "exponent": 0}, {"denom": "mnom", "exponent": 6}]}]' $ONOMY_HOME_CONFIG/genesis.json > $ONOMY_HOME/metadata-genesis.json
 
 # a 172800 second voting period to allow us to pass governance proposals in the tests
-jq '.app_state.gov.voting_params.voting_period = "172800s"' $$ONOMY_HOME/metadata-genesis.json > $$ONOMY_HOME/edited-genesis.json
-jq '.consensus_params.evidence.max_age_duration = "259200000000000"' $$ONOMY_HOME/metadata-genesis.json > $$ONOMY_HOME/edited-genesis.json
-jq '.app_state.staking.params.unbonding_time = "259200s"' $$ONOMY_HOME/metadata-genesis.json > $$ONOMY_HOME/edited-genesis.json
-jq '.app_state.mint.params.blocks_per_year = "5006000"' $$ONOMY_HOME/metadata-genesis.json > $$ONOMY_HOME/edited-genesis.json
-jq '.app_state.slashing.params.signed_blocks_window = "7200"' $$ONOMY_HOME/metadata-genesis.json > $$ONOMY_HOME/edited-genesis.json
-jq '.app_state.slashing.params.min_signed_per_window = "0.050000000000000000"' $$ONOMY_HOME/metadata-genesis.json > $$ONOMY_HOME/edited-genesis.json
+jq '.app_state.gov.voting_params.voting_period = "172800s"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
+jq '.consensus_params.evidence.max_age_duration = "259200000000000"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
+jq '.app_state.staking.params.unbonding_time = "259200s"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
+jq '.app_state.mint.params.blocks_per_year = "5006000"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
+jq '.app_state.slashing.params.signed_blocks_window = "7200"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
+jq '.app_state.slashing.params.min_signed_per_window = "0.050000000000000000"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
 jq '.app_state.mint.minter.inflation = "0.300000000000000000"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
 
 mv $ONOMY_HOME/edited-genesis.json $ONOMY_HOME/genesis.json
