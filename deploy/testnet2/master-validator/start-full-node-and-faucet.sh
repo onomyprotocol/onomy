@@ -31,4 +31,4 @@ echo "$ONOMY_NODE_NAME launched"
 ONOMY_ORCHESTRATOR_NAME=$(jq -r .name $ONOMY_HOME/orchestrator_key.json)
 
 echo "Starting faucet based on validator account"
-faucet -cli-name=$ONOMY -account-name="$ONOMY_ORCHESTRATOR_NAME" $ONOMY_KEYRING_FLAG --denoms $STAKE_DENOM credit-amount=100000000  -max-credit=200000000 &
+faucet -cli-name=$ONOMY -account-name="$ONOMY_ORCHESTRATOR_NAME" $ONOMY_KEYRING_FLAG --denoms $STAKE_DENOM credit-amount=100000000  -max-credit=2000000000 &

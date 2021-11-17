@@ -16,8 +16,8 @@ ONOMY_NODE_NAME=$(jq -r .node_name $ONOMY_HOME/node_info.json)
 ONOMY_KEYRING_FLAG="--keyring-backend test"
 # Gravity chain demons
 STAKE_DENOM="nom"
-NOM_REQUEST_AMOUNT=11000000
-NOM_STAKE_AMOUNT=10000000
+NOM_REQUEST_AMOUNT=110000000
+NOM_STAKE_AMOUNT=100000000
 
 # -----------------Adding Validator---------------------
 

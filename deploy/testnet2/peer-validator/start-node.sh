@@ -4,6 +4,6 @@ set -eu
 # Name of the onomy artifact
 ONOMY=onomyd
 
-echo "Starting onomy full node"
+echo "Starting onomy node"
 
 $ONOMY start
