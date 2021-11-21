@@ -19,34 +19,13 @@ In order to become validator, you need to follow steps below
 
 
 ## <a name="validator"></a> 1. Set up Validator
-In order to set up your node as a validator, you first need to have a [full-node running](setting-up-a-fullnode.md). Once you have set up a full node and it has synced with the blockchain, you have two options to setup a validator:
 
-a. [Standard Method](#standardMethod)
-b. [Advanced Method](#advancedMethod)
+In order to set up your node as a validator, you first need to have a [full-node running](setting-up-a-fullnode.md). Once you have set up a full node and it has synced with the blockchain, you can create a validator.
 
-### <a name="standardMethod"></a>. Standard Method
-Run the init-validator.sh script to convert your full node into a validator.
+There are a lot of ways to setup your validator in order to secure it. This document will guide you through setting up sentry node architecture for your validator as well. Setting up a sentry node is optional and it is used only to increase security of the validator node.
 
-Important Note: In the script, default file path is `$HOME/.onomy/onomy-testnet1/onomy`. If you have changed this path, than provide the home directory path accordingly in the `onomyd` command.
+First, you can convert your full node to validator by follwoing steps below:
 
-```
-bash peer-validator/init-validator.sh
-```
-
-Script will ask for validator name, use any for example validator1
-Script will ask for faucet url to get faucet token (Please enter http://testnet1.onomy.io:8000/)
-
-You can check the validators of the Onomy chain by running:
-```
-curl http//localhost:26657/validators
-```
-or
-```
-onomyd q staking validators
-```
-
-
-### <a name=advancedMethod></a> b. Advanced Method
 #### Generate your key
 
 Use the following command to generate your keys. Your keys will be stored in `$HOME/.onomy/validator_key.json`.
@@ -76,15 +55,15 @@ You'll see an output like this:
 Copy your address from the 'address' field and paste it into the command below in the place of $ONOMY_VALIDATOR_ADDRESS:
 
 ```
-curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"10000000nom\"  ]}"
+curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"100000000nom\"  ]}"
 ```
-This will provide you 10000000nom from the faucet.
+This will provide you 100000000nom from the faucet.
 
 #### Send your validator setup transaction, but make sure your node is fully synced before:
 
 ```
 onomyd --home $HOME/.onomy tx staking create-validator \
- --amount=10000000nom \
+ --amount=100000000nom \
  --pubkey=$(onomyd --home $HOME/.onomy tendermint show-validator) \
  --moniker="put your validator name here" \
  --chain-id=onomy-testnet1 \
@@ -99,18 +78,44 @@ onomyd --home $HOME/.onomy tx staking create-validator \
  --keyring-backend test
 ```
 
+### \[Optional\]create a sentry structure
+In order to increase security of your validator, you can add a few sentry nodes to your validator setup. The validator will only talk to the sentry nodes on a private network. and your sentry nodes in turn will communicate with rest of the network. Diagram below shows the sentry architecture.
+
+![Sentry Architecture](sentry_architecture.png)
+
+
+In order to set up the sentry nodes, we will first setup a few [full nodes](setting-up-a-fullnode.md). Once you initialize the full node, either using the script or manually, do not start it. We will need to change some parameters in`$ONOMY_HOME/config/config.toml`
+
+change the following parameters in config file of sentry nodes:
+```
+pex: true
+persistent-peers: nodeid@ip:port (for validator node)
+private-peer-ids: node id of validator
+unconditional-peer-ids: node id of validator and optionally sentries
+addr-book-strict: false
+```
+
+change the following parameters in config file of validator node:
+```
+pex: false
+persistent-peers: nodeid@ip:port (for all the sentry nodes)
+unconditional-peer-ids: optionally sentries
+addr-book-strict: false
+double-sign-check-height: 10
+```
+
+After these changes, restart both validator and sentry nodes and your sentry structure should be ready.
+
+Also dont forget to make necessary changes to firewall in your validator node to stop unauthorized access.
+
 #### Confirm that you are validating
-Run the following command and check for the output, if you don't see any output from this command, you are not validating.
 
+You can check your validator status by using the following command
 ```
-onomyd --home $HOME/.onomy query staking validator $(onomyd --home $HOME/.onomy keys show <myvalidatorkeyname> --bech val --address --keyring-backend test)
+onomyd query staking validator "$($ONOMY keys show $ONOMY_VALIDATOR_NAME --bech val --address --keyring-backend test)"
 ```
 
-Be sure to replace 'my validator key name' with your actual key name. If you want to double check, you can see all your keys with 
-
-```
-onomyd --home $HOME/.onomy keys list --keyring-backend test'
-```
+If you see `status: BOND_STATUS_BONDED`, you are validating.
 
 ## <a name="gravityBridge"></a> 2. Setup Gravity bridge
 
@@ -138,7 +143,7 @@ Both your Ethereum delegate key and your Cosmos delegate key will need some toke
 
 In a production network, only relayers would need Ethereum to fund relaying, but for this testnet, all validators run relayers by default, allowing us to more easily simulate a lively economy of many relayers.
 
-You should have received 10000000 Onomy NOM tokens.
+You should have received 100000000 Onomy NOM tokens.
 
 To get the address for your validator key, you can run the command below, where 'myvalidatorkeyname' is whatever you named your key in the 'generate your key' step:
 
@@ -153,7 +158,7 @@ onomyd --home $HOME/.onomy tx bank send <your validator address> <your delegate 
 ```
 2. Using faucet command, from the Onomy-side faucet:
 ```
-curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"10000000nom\"  ]}"
+curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"<your delegate cosmos address>\",  \"coins\": [    \"100000000nom\"  ]}"
 ```
  Now, we need some Rinkeby ETH in the Ethereum delegate key. You can get some RInkeby ETH from official Rinkeby faucet:
 ```

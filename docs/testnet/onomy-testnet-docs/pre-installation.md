@@ -1,4 +1,3 @@
-
 In theory, Onomy chain can be run on Windows and Mac. Binaries will be provided on the releases page and currently scripts files are provided to make binaries.
 I also suggest an open notepad or other document to keep track of the keys you will be generating.
 
@@ -26,23 +25,25 @@ export PATH=$PATH:$HOME/.onomy/bin
 `
 
 ### <a name="compileInstall"></a> 2. Compile Onomy chain binaries 
-If you have Fedora 34 or Red Hat Enterprise Linux 8 and you want to make binaries yourself, then follow these steps
+if you want to compile binaries yourself, then follow these steps
 1. Clone Onomy repo. (You might need to install git using `dnf install git`).
 ```
 git clone -b dev https://github.com/onomyprotocol/onomy.git
 ```
-2. go to deploy/testnet and run bin.sh script file
+2. go to deploy/testnet/peer-validator and run bin.sh script file
 ```
 cd onomy/deploy/testnet
 bash bin.sh
 ```
-The second way may be unsafe because it used the latest version of the artifacts.
+This might be unsafe as source files might have been updated after latest stable release.
 
-At specific points during the testnet you may be told to `update your orchestrator` or `update your onomyd binary`. In order to do that you can simply repeat the above instructions and then restart the affected software.
+At specific points during the testnet you might need to update your orchestrator or binary files. In order to do that you can simply repeat the above steps and then restart the affected services.
 
 to check what version of the tools you have run `gbt --version`
 
 ### <a name="rpmInstall"></a> 3. Install RPM package
+
+If you are using a Red Hat or Fedora based OS, you can use following RPM to install the binaries and download required script files.
 
 In order to install using RPM, use the following command:
 ```
