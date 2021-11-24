@@ -6,4 +6,4 @@ ONOMY=onomyd
 
 echo "Starting onomy node"
 
-$ONOMY start &> validator.log
+$ONOMY start &> seedNode.log

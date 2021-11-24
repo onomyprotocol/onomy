@@ -17,7 +17,7 @@ ONOMY_KEYRING_FLAG="--keyring-backend test"
 STAKE_DENOM="nom"
 
 echo "Running onomy..."
-$ONOMY start --pruning=nothing &
+$ONOMY start --pruning=nothing &> validator.log
 
 echo "Waiting $ONOMY_NODE_NAME to launch gRPC $ONOMY_GRPC_PORT..."
 
