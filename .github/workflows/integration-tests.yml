@@ -22,6 +22,7 @@ jobs:
         run: |
           set -x
           docker version
+          dokcer info
       - name: make test-integration
         run: |
           export ALCHEMY_KEY=${{ secrets.ALCHEMY_KEY }}
