@@ -55,7 +55,11 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 
 	// deploy gravity
 	err = retryWithTimeout(func() error {
-		return wnomTestsBaseContainer.deployGravity(ctx)
+		err := wnomTestsBaseContainer.deployGravity(ctx)
+		if err != nil {
+			t.Logf("deployGravity failed: %v, will be retried in %d", err, bootstrappingTimeout)
+		}
+		return err
 	}, bootstrappingTimeout)
 
 	if err != nil {

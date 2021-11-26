@@ -114,7 +114,7 @@ func (c *wnomTestsBaseContainer) execBash(ctx context.Context, command string) e
 		return err
 	}
 	if exitCode != 0 {
-		return fmt.Errorf("unexpexted exit code %d", exitCode)
+		return fmt.Errorf("unexpexted exit code %d, %v", exitCode, err)
 	}
 	return nil
 }

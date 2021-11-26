@@ -6,7 +6,7 @@ set -eu
 ONOMY_HOST="host.docker.internal"
 
 # The URL of the running mock eth node.
-ETH_ADDRESS="http://0.0.0.0:8545/"
+ETH_ADDRESS="http://127.0.0.1:8545/"
 
 # The ETH key used for orchestrator signing of the transactions
 ETH_ORCHESTRATOR_PRIVATE_KEY=c40f62e75a11789dbaf6ba82233ce8a52c20efb434281ae6977bb0b3a69bf709
