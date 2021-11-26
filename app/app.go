@@ -318,7 +318,6 @@ func NewApp( // nolint:funlen
 		stakingKeeper,
 		app.BankKeeper,
 		app.SlashingKeeper,
-		gravitykeeper.WithEthDenomSwapper(WnomERC20GravityDenom, AnomDenom),
 	)
 
 	/****  Module Options ****/

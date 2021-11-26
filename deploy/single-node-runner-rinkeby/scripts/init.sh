@@ -42,6 +42,8 @@ ETH_ORCHESTRATOR_VALIDATOR_ADDRESS=0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d
 ONOMY_GENESIS_COINS="100000000000000000000000$STAKE_DENOM"
 # Equal to 10000 noms
 ONOMY_STAKE_COINS="10000000000000000000000$STAKE_DENOM"
+# The address of WNOM ERC20 token on ethereum.
+ONOMY_WNOM_ERC20_ADDRESS="0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C"
 
 # ------------------ Init onomy ------------------
 
@@ -71,6 +73,8 @@ jq '.app_state.bank.denom_metadata = [{ "description": "nom coin", "denom_units"
 jq ".app_state.staking.params.max_validators = $ONOMY_MAX_VALIDATORS" $ONOMY_HOME_CONFIG/genesis.json | sponge $ONOMY_HOME_CONFIG/genesis.json
 # add change min gov deposit
 jq ".app_state.gov.deposit_params.min_deposit = [{\"denom\": \"$STAKE_DENOM\", \"amount\": \"$ONOMY_GOV_MIN_DEPOSIT\"}]" $ONOMY_HOME_CONFIG/genesis.json | sponge $ONOMY_HOME_CONFIG/genesis.json
+# add wnom -> anom swap settings
+jq ".app_state.gravity.params.erc20_to_denom_permanent_swap = {\"erc20\": \"$ONOMY_WNOM_ERC20_ADDRESS\", \"denom\": \"$STAKE_DENOM\"}" $ONOMY_HOME_CONFIG/genesis.json | sponge $ONOMY_HOME_CONFIG/genesis.json
 
 echo "Add validator key"
 $ONOMY keys add $ONOMY_VALIDATOR_NAME $ONOMY_KEYRING_FLAG --output json | jq . >> $ONOMY_HOME/validator_key.json
@@ -93,7 +97,7 @@ fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CON
 fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
 fsed 's#external_address = ""#external_address = "tcp://'$ONOMY_HOST:26656'"#g' $ONOMY_NODE_CONFIG
 fsed 's#log_level = \"info\"#log_level = \"error\"#g' $ONOMY_NODE_CONFIG
-fsed 's#cors_allowed_origins = []#cors_allowed_origins = [\"*\"]#g' $ONOMY_NODE_CONFIG
+fsed 's#cors_allowed_origins = \[\]#cors_allowed_origins = \[\"*\"\]#g' $ONOMY_NODE_CONFIG
 
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG

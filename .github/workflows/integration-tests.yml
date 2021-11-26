@@ -1,0 +1,24 @@
+name: Integration tests
+
+on:
+  push:
+    branches:
+      - 'dev'
+      - 'main'
+  pull_request:
+    branches:
+      - 'dev'
+      - 'main'
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install docker
+        uses: docker-practice/actions-setup-docker@master
+      - name: make test-integration
+        run: |
+          export ALCHEMY_KEY=${{ secrets.ALCHEMY_KEY }}
+          make test-integration

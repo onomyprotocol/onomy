@@ -11,8 +11,6 @@ import (
 
 	sdkTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
-
-	onomy "github.com/onomyprotocol/onomy/app"
 )
 
 func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
@@ -73,7 +71,7 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 
 	// send wNOM tokens to onomy
 	erc20Amount := int64(10)
-	if err := wnomTestsBaseContainer.sendToCosmos(ctx, onomy.WnomERC20Address, erc20Amount, onomyDestinationAddress); err != nil {
+	if err := wnomTestsBaseContainer.sendToCosmos(ctx, wnomERC20Address, erc20Amount, onomyDestinationAddress); err != nil {
 		t.Fatal(err)
 	}
 	if err := wnomTestsBaseContainer.sendToCosmos(ctx, fauTokeAddress, erc20Amount, onomyDestinationAddress); err != nil {
@@ -90,7 +88,7 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 
 		checks := 0
 		for _, coin := range balance {
-			if coin.Denom == onomy.AnomDenom {
+			if coin.Denom == anomDenom {
 				assert.Equal(t, coin.Amount, sdkTypes.NewIntWithDecimal(erc20Amount, 18))
 				checks++
 			}
@@ -103,7 +101,7 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 			return nil
 		}
 
-		return fmt.Errorf("the node hasn't received the %s tokens, balance: %+v", onomy.WnomERC20Address, balance)
+		return fmt.Errorf("the node hasn't received the %s tokens, balance: %+v", wnomERC20Address, balance)
 	}, bootstrappingTimeout)
 
 	if err != nil {
