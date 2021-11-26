@@ -105,7 +105,10 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 			return nil
 		}
 
-		return fmt.Errorf("the node hasn't received the %s tokens, balance: %+v", wnomERC20Address, balance)
+		err = fmt.Errorf("the node hasn't received the %s tokens yet, balance: %+v", wnomERC20Address, balance)
+		t.Logf("%v, will be retried in %d", err, bootstrappingTimeout)
+
+		return err
 	}, bootstrappingTimeout)
 
 	if err != nil {
