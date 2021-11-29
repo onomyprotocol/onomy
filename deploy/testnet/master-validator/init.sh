@@ -27,7 +27,7 @@ ONOMY_VALIDATOR_NAME=validator1
 # The name of the onomy orchestrator/validator
 ONOMY_ORCHESTRATOR_NAME=orch
 # Onomy chain demons
-STAKE_DENOM="nom"
+STAKE_DENOM="anom"
 #NORMAL_DENOM="samoleans"
 NORMAL_DENOM="footoken"
 # The port of the onomy gRPC
@@ -72,7 +72,7 @@ echo "Set stake/mint demon to $STAKE_DENOM"
 fsed "s#\"stake\"#\"$STAKE_DENOM\"#g" $ONOMY_HOME_CONFIG/genesis.json
 
 # add in denom metadata for both native tokens
-jq '.app_state.bank.denom_metadata += [{"base": "footoken", display: "mfootoken", "description": "A non-staking test token", "denom_units": [{"denom": "footoken", "exponent": 0}, {"denom": "mfootoken", "exponent": 6}]}, {"base": "nom", display: "mnom", "description": "A staking test token", "denom_units": [{"denom": "nom", "exponent": 0}, {"denom": "mnom", "exponent": 6}]}]' $ONOMY_HOME_CONFIG/genesis.json > $ONOMY_HOME/metadata-genesis.json
+jq '.app_state.bank.denom_metadata += [{"base": "footoken", display: "mfootoken", "description": "A non-staking test token", "denom_units": [{"denom": "footoken", "exponent": 0}, {"denom": "mfootoken", "exponent": 6}]}, {"base": "anom", display: "manom", "description": "A staking test token", "denom_units": [{"denom": "anom", "exponent": 0}, {"denom": "manom", "exponent": 6}]}]' $ONOMY_HOME_CONFIG/genesis.json > $ONOMY_HOME/metadata-genesis.json
 
 # a 60 second voting period to allow us to pass governance proposals in the tests
 jq '.app_state.gov.voting_params.voting_period = "60s"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
