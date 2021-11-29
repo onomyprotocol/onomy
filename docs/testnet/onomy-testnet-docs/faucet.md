@@ -1,6 +1,6 @@
-# Get NOM via the Testnet Faucet
+# Get ANOM via the Testnet Faucet
 
-In order to test the Onomy faucet and receive faucet testnet NOM tokens, you'll first need to setup a wallet/account.
+In order to test the Onomy faucet and receive faucet testnet ANOM tokens, you'll first need to setup a wallet/account.
 
 ## What do I need?
 
@@ -47,7 +47,7 @@ Copy your address from the 'address' field and paste it into the command below i
 curl -X POST http://testnet1.onomy.io:8000/ -H  "accept: application/json" -H  "Content-Type: application/json" -d "{  \"address\": \"$ONOMY_VALIDATOR_ADDRESS\",  \"coins\": [    \"10nom\"  ]}"
 ```
 
-This will provide you 10 NOM from the faucet.
+This will provide you 10 ANOM from the faucet.
 
 You can check your account balances by using this command:
 ```

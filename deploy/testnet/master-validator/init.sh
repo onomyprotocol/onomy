@@ -27,7 +27,7 @@ ONOMY_VALIDATOR_NAME=validator1
 # The name of the onomy orchestrator/validator
 ONOMY_ORCHESTRATOR_NAME=orch
 # Onomy chain demons
-STAKE_DENOM="nom"
+STAKE_DENOM="anom"
 #NORMAL_DENOM="samoleans"
 NORMAL_DENOM="footoken"
 # The port of the onomy gRPC
@@ -50,6 +50,13 @@ fsed() {
     sed -i '' "$@"
   fi
 }
+
+# ------------------ Get IP Address --------------
+ip=hostname -I | awk '{print $1}'
+
+read -i "Enter your ip address [$ip]: " ip
+ip=${ip:-onomy}
+
 # ------------------ Init onomy ------------------
 
 echo "Creating $ONOMY_NODE_NAME validator with chain-id=$CHAINID..."
@@ -65,7 +72,7 @@ echo "Set stake/mint demon to $STAKE_DENOM"
 fsed "s#\"stake\"#\"$STAKE_DENOM\"#g" $ONOMY_HOME_CONFIG/genesis.json
 
 # add in denom metadata for both native tokens
-jq '.app_state.bank.denom_metadata += [{"base": "footoken", display: "mfootoken", "description": "A non-staking test token", "denom_units": [{"denom": "footoken", "exponent": 0}, {"denom": "mfootoken", "exponent": 6}]}, {"base": "nom", display: "mnom", "description": "A staking test token", "denom_units": [{"denom": "nom", "exponent": 0}, {"denom": "mnom", "exponent": 6}]}]' $ONOMY_HOME_CONFIG/genesis.json > $ONOMY_HOME/metadata-genesis.json
+jq '.app_state.bank.denom_metadata += [{"base": "footoken", display: "mfootoken", "description": "A non-staking test token", "denom_units": [{"denom": "footoken", "exponent": 0}, {"denom": "mfootoken", "exponent": 6}]}, {"base": "anom", display: "manom", "description": "A staking test token", "denom_units": [{"denom": "anom", "exponent": 0}, {"denom": "manom", "exponent": 6}]}]' $ONOMY_HOME_CONFIG/genesis.json > $ONOMY_HOME/metadata-genesis.json
 
 # a 60 second voting period to allow us to pass governance proposals in the tests
 jq '.app_state.gov.voting_params.voting_period = "60s"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
@@ -115,7 +122,7 @@ echo "Exposing ports and APIs of the $ONOMY_NODE_NAME"
 fsed "s#\"tcp://127.0.0.1:26656\"#\"tcp://$ONOMY_HOST:26656\"#g" $ONOMY_NODE_CONFIG
 fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CONFIG
 fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
-fsed 's#external_address = ""#external_address = "tcp://'$ONOMY_HOST:26656'"#g' $ONOMY_NODE_CONFIG
+fsed 's#external_address = ""#external_address = "tcp://'$ip:26656'"#g' $ONOMY_NODE_CONFIG
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
 

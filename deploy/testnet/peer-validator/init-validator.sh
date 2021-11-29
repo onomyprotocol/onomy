@@ -15,9 +15,14 @@ ONOMY_NODE_NAME=$(jq -r .node_name $ONOMY_HOME/node_info.json)
 # Keyring flag
 ONOMY_KEYRING_FLAG="--keyring-backend test"
 # Gravity chain demons
-STAKE_DENOM="nom"
+STAKE_DENOM="anom"
 NOM_REQUEST_AMOUNT=11000000
 NOM_STAKE_AMOUNT=10000000
+# ------------------ Get IP Address --------------
+ip=hostname -I | awk '{print $1}'
+
+read -i "Enter your ip address [$ip]: " ip
+ip=${ip:-onomy}
 
 # -----------------Adding Validator---------------------
 
