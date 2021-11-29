@@ -139,11 +139,11 @@ gbt -a onomy keys register-orchestrator-address --validator-phrase "the phrase y
 ```
 ### Fund your delegate keys
 
-Both your Ethereum delegate key and your Cosmos delegate key will need some tokens to pay for gas. On the Onomy Network side you were sent some 'footoken' along with your NOM. We're essentially using NOM as a gas token for this testnet.
+Both your Ethereum delegate key and your Cosmos delegate key will need some tokens to pay for gas. On the Onomy Network side you were sent some 'footoken' along with your ANOM. We're essentially using ANOM as a gas token for this testnet.
 
 In a production network, only relayers would need Ethereum to fund relaying, but for this testnet, all validators run relayers by default, allowing us to more easily simulate a lively economy of many relayers.
 
-You should have received 100000000 Onomy NOM tokens.
+You should have received 100000000 Onomy ANOM tokens.
 
 To get the address for your validator key, you can run the command below, where 'myvalidatorkeyname' is whatever you named your key in the 'generate your key' step:
 
