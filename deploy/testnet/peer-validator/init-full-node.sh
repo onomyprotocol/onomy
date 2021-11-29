@@ -48,6 +48,12 @@ echo '{
   "orchestrator_name": ""
 }' > $ONOMY_HOME/node_info.json
 
+# ------------------ Get IP Address --------------
+ip=hostname -I | awk '{print $1}'
+
+read -i "Enter your ip address [$ip]: " ip
+ip=${ip:-onomy}
+
 # ------------------ Init onomy ------------------
 
 echo "Creating $ONOMY_NODE_NAME node with chain-id=$CHAINID..."
@@ -77,7 +83,7 @@ fsed() {
 fsed "s#\"tcp://127.0.0.1:26656\"#\"tcp://$ONOMY_HOST:26656\"#g" $ONOMY_NODE_CONFIG
 fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CONFIG
 fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
-fsed 's#external_address = ""#external_address = "tcp://'$ONOMY_HOST:26656'"#g' $ONOMY_NODE_CONFIG
+fsed 's#external_address = ""#external_address = "tcp://'$ip:26656'"#g' $ONOMY_NODE_CONFIG
 fsed 's#seeds = ""#seeds = "'$ONOMY_SEED'"#g' $ONOMY_NODE_CONFIG
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
