@@ -3,7 +3,12 @@ set -eu
 
 # The address to run onomy node
 # The node is running on the host machine be the call to it we expect from the container.
+# The hist to make the test pass on mac and linux
 ONOMY_HOST="host.docker.internal"
+if ! ping -c 1 $ONOMY_HOST &> /dev/null
+then
+  ONOMY_HOST="0.0.0.0"
+fi
 
 # The port of the onomy gRPC
 ONOMY_GRPC_PORT="9090"

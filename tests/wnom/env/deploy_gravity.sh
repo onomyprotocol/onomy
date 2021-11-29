@@ -3,7 +3,15 @@ set -eu
 
 # The address to run onomy node
 # The node is running on the host machine be the call to it we expect from the container.
+# The hist to make the test pass on mac and linux
 ONOMY_HOST="host.docker.internal"
+
+if ! ping -c 1 $ONOMY_HOST &> /dev/null
+then
+  ONOMY_HOST="0.0.0.0"
+fi
+
+echo "ONOMY_HOST: $ONOMY_HOST"
 
 # The URL of the running mock eth node.
 ETH_ADDRESS="http://0.0.0.0:8545/"
