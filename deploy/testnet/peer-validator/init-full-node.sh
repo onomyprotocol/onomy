@@ -49,9 +49,9 @@ echo '{
 }' > $ONOMY_HOME/node_info.json
 
 # ------------------ Get IP Address --------------
-ip=hostname -I | awk '{print $1}'
+ip=$(hostname -I | awk '{print $1}')
 
-read -i "Enter your ip address [$ip]: " ip
+read -r -p "Enter your ip address [$ip]: " ip
 ip=${ip:-onomy}
 
 # ------------------ Init onomy ------------------
