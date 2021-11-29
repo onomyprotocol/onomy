@@ -249,6 +249,10 @@
         "valset_reward": {
           "denom": "",
           "amount": "0"
+        },
+        "erc20_to_denom_permanent_swap": {
+          "erc20": "0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C",
+          "denom": "anom"
         }
       },
       "last_observed_nonce": "0",
