@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -39,6 +40,9 @@ const (
 
 	onomyGrpcHost = "127.0.0.1"
 	onomyGrpcPort = "9090"
+
+	anomDenom        = "anom"
+	wnomERC20Address = "0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C"
 )
 
 type onomyChain struct {
@@ -67,6 +71,12 @@ func newOnomyChain() (*onomyChain, error) {
 	}
 
 	if err := replaceStringInFile(filepath.Join(dir, "config", "genesis.json"), "\"stake\"", "\""+chainDenom+"\""); err != nil {
+		return nil, err
+	}
+
+	// set up swap parameters
+	if err := replaceGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.gravity.params.erc20_to_denom_permanent_swap",
+		json.RawMessage(fmt.Sprintf(`{"erc20": "%s", "denom": "%s"}`, wnomERC20Address, anomDenom))); err != nil {
 		return nil, err
 	}
 
@@ -190,4 +200,56 @@ func replaceStringInFile(filePath, from, to string) error {
 	}
 	output := bytes.ReplaceAll(input, []byte(from), []byte(to))
 	return ioutil.WriteFile(filePath, output, 0666) // nolint:gomnd
+}
+
+func replaceGenesysSettings(filePath, settingPath string, newValue json.RawMessage) error {
+	input, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	var fileRawJSON map[string]json.RawMessage
+	if err := json.Unmarshal(input, &fileRawJSON); err != nil {
+		return err
+	}
+
+	if err := replaceJSONInJSONmap(fileRawJSON, strings.Split(settingPath, "."), newValue); err != nil {
+		return err
+	}
+
+	output, err := json.Marshal(fileRawJSON)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(filePath, output, 0666) // nolint:gomnd
+}
+
+func replaceJSONInJSONmap(object map[string]json.RawMessage, settingPath []string, newValue json.RawMessage) error {
+	if len(settingPath) == 0 {
+		return nil
+	}
+	for key := range object {
+		if key == settingPath[0] && len(settingPath) == 1 {
+			object[key] = newValue
+			return nil
+		}
+
+		var nextRawJSON map[string]json.RawMessage
+		if err := json.Unmarshal(object[key], &nextRawJSON); err != nil {
+			// not object
+			continue
+		}
+
+		if err := replaceJSONInJSONmap(nextRawJSON, settingPath[1:], newValue); err != nil {
+			return err
+		}
+
+		nextRawJSONBytes, err := json.Marshal(nextRawJSON)
+		if err != nil {
+			return err
+		}
+		object[key] = nextRawJSONBytes
+	}
+	return nil
 }

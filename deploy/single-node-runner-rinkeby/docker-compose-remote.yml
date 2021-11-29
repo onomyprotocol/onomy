@@ -17,8 +17,7 @@ services:
       - 61278:61278
       - 9090:9090
       - 8000:8000 # fauset
-      # ethereum
-      - 8545:8545
+
   watchtower:
     image: containrrr/watchtower
     restart: on-failure

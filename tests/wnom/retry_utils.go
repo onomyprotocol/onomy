@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const defaultRetryTimeout = 500 * time.Millisecond
+const defaultRetryTimeout = time.Second
 
 // awaitForPort awaits for the port within the timeout.
 func awaitForPort(host, port string, timeout time.Duration) error {
@@ -20,13 +20,13 @@ func awaitForPort(host, port string, timeout time.Duration) error {
 
 // retryWithTimeout retries the operation within the timout.
 func retryWithTimeout(operation func() error, timeout time.Duration) error {
-	startTime := time.Now().Nanosecond()
+	startTime := time.Now().UnixNano()
 	for {
 		err := operation()
 		if err == nil {
 			return nil
 		}
-		if time.Now().Nanosecond()-startTime > int(timeout.Nanoseconds()) {
+		if time.Now().UnixNano()-startTime > timeout.Nanoseconds() {
 			return err
 		}
 		time.Sleep(defaultRetryTimeout)

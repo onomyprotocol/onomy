@@ -4,18 +4,19 @@
 package wnom
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
 	"os"
 	"strings"
-	"time"
+	"testing"
 
 	"github.com/testcontainers/testcontainers-go"
 )
 
 const (
-	ethGrpcPort = "8545"
+	alchemyKey = "ALCHEMY_KEY"
 )
 
 type wnomTestsBaseContainer struct {
@@ -36,9 +37,9 @@ func (c *printLogConsumer) Accept(logline testcontainers.Log) {
 }
 
 func newWnomTestsBaseContainer(ctx context.Context) (*wnomTestsBaseContainer, error) {
-	alchemyKey := os.Getenv("ALCHEMY_KEY")
-	if alchemyKey == "" {
-		return nil, fmt.Errorf("ALCHEMY_KEY env not found")
+	alchemyKeyValue := os.Getenv(alchemyKey)
+	if alchemyKeyValue == "" {
+		return nil, fmt.Errorf("%s env not found", alchemyKey)
 	}
 
 	req := testcontainers.ContainerRequest{
@@ -47,8 +48,9 @@ func newWnomTestsBaseContainer(ctx context.Context) (*wnomTestsBaseContainer, er
 			Dockerfile:    "env/Dockerfile",
 			PrintBuildLog: true,
 		},
-		Env:          map[string]string{"ALCHEMY_KEY": alchemyKey},
-		ExposedPorts: []string{ethGrpcPort + "/tcp"},
+		Env:         map[string]string{alchemyKey: alchemyKeyValue},
+		AutoRemove:  true,
+		NetworkMode: "host",
 	}
 
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
@@ -70,32 +72,14 @@ func newWnomTestsBaseContainer(ctx context.Context) (*wnomTestsBaseContainer, er
 }
 
 // runEthNode runs the mocked eth node amd return it's address.
-func (c *wnomTestsBaseContainer) runEthNode(ctx context.Context, timeout time.Duration) (string, error) {
-	if err := c.execBash(ctx, "./run_eth.sh &>> logs/eth.log &"); err != nil {
-		return "", err
-	}
-
-	host, err := c.Host(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	mappedPort, err := c.MappedPort(ctx, ethGrpcPort)
-	if err != nil {
-		return "", err
-	}
-
-	if err := awaitForPort(host, mappedPort.Port(), timeout); err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("http://%s:%s", host, mappedPort.Port()), nil
+func (c *wnomTestsBaseContainer) runEthNode(ctx context.Context) error {
+	return c.execBash(ctx, "./run_eth.sh &>> logs/eth.log &")
 }
 
 // deployGravity deploys the gravity contract to the running node
 // and save the deployed address to the gravity_contract_address file.
 func (c *wnomTestsBaseContainer) deployGravity(ctx context.Context) error {
-	return c.execBash(ctx, "./deploy_gravity.sh")
+	return c.execBash(ctx, "./deploy_gravity.sh &>> logs/orchestrator.log")
 }
 
 // startOrchestrator start the orchestrator.
@@ -114,7 +98,33 @@ func (c *wnomTestsBaseContainer) execBash(ctx context.Context, command string) e
 		return err
 	}
 	if exitCode != 0 {
-		return fmt.Errorf("unexpexted exit code %d", exitCode)
+		return fmt.Errorf("unexpexted exit code %d, %w", exitCode, err)
 	}
 	return nil
+}
+
+func (c *wnomTestsBaseContainer) terminate(ctx context.Context, t *testing.T) {
+	t.Helper()
+
+	t.Logf("container logs:")
+	logs, err := c.logs(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf(logs)
+	c.Container.Terminate(ctx) // nolint:errcheck
+}
+
+func (c *wnomTestsBaseContainer) logs(ctx context.Context) (string, error) {
+	readCloser, err := c.Container.Logs(ctx)
+	if err != nil {
+		return "", err
+	}
+	buf := new(bytes.Buffer)
+	_, err = buf.ReadFrom(readCloser)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
 }
