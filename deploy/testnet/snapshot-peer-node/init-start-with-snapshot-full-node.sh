@@ -9,7 +9,7 @@ ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
 #echo "Enter chain-id"
 #read chainid
-CHAINID="onomy-testnet2"
+CHAINID="onomy-testnet1"
 # Name of the onomy artifact
 ONOMY=onomyd
 
@@ -28,16 +28,16 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seed node
 
-STAKE_DENOM="nom"
+SHOULD_USE_STATE_SYNC="true"
 
-read -r -p "Enter node id of an existing validator that is running on chain [5e0f5b9d54d3e038623ddb77c0b91b559ff13495]:" ONOMY_SEED_ID
-ONOMY_SEED_ID=${ONOMY_SEED_ID:-5e0f5b9d54d3e038623ddb77c0b91b559ff13495}
+STAKE_DENOM="anom"
 
-read -r -p "Enter Hostname/IP Address of the same node [testnet1.onomy.io]:" ONOMY_SEED_IP
+
+read -r -p "Enter Hostname/IP Address to fetch genesis file [testnet1.onomy.io]:" ONOMY_SEED_IP
 ONOMY_SEED_IP=${ONOMY_SEED_IP:-"testnet1.onomy.io"}
 
-
-ONOMY_SEED="$ONOMY_SEED_ID@$ONOMY_SEED_IP:26656"
+read -r -p "Enter seeds of nodes that have enabled snapshot [node_Id1@IP_node_Id1:26656,node_Id2@IP_node_Id2:26656]:" ONOMY_SEED
+ONOMY_SEED=$ONOMY_SEED
 
 # create home directory
 mkdir -p $ONOMY_HOME
@@ -76,6 +76,37 @@ sed -i '' "$@"
 }
 
 
+# STATE SYNC
+if [ "$SHOULD_USE_STATE_SYNC" = "true" ]; then
+
+    read -r -p "Enter state sync RPC servers that have enabled snapshot [http://node1_IP:26657,http://node2_IP:26657]:" STATE_SYNC_RPC_SERVERS
+    STATE_SYNC_RPC_SERVERS=${STATE_SYNC_RPC_SERVERS}
+    IFS=', ' read -r -a STATE_SYNC_RPC_SERVERS_ARRAY <<< ${STATE_SYNC_RPC_SERVERS}
+
+    TEMP_STATE_HEIGHT=$(curl -s ${STATE_SYNC_RPC_SERVERS_ARRAY[0]}/commit | jq -r ".result.signed_header.header.height")
+    STATE_SYNC_HEIGHT=$(((($TEMP_STATE_HEIGHT/500)-1)*500))
+    STATE_SYNC_HASH=$(curl -s ${STATE_SYNC_RPC_SERVERS_ARRAY[0]}/commit?height=${STATE_SYNC_HEIGHT} | jq '.result.signed_header.commit.block_id.hash')
+
+    HASHES_MATCH=true
+    for SERVER in "${STATE_SYNC_RPC_SERVERS_ARRAY[@]}"
+    do
+        TEMP_HASH=$(curl -s ${SERVER}/commit?height=${STATE_SYNC_HEIGHT} | jq '.result.signed_header.commit.block_id.hash')
+        if [ "$STATE_SYNC_HASH" != "$TEMP_HASH" ]; then
+            HASHES_MATCH=false
+            break
+        fi
+    done
+
+    if [ "$HASHES_MATCH" = "true" ]; then
+        echo "Hashed matched"
+        fsed -i "s/enable = false/enable = true/g" $ONOMY_NODE_CONFIG
+        fsed -i "s~rpc_servers = \".*\"~rpc_servers = \"${STATE_SYNC_RPC_SERVERS}\"~g" $ONOMY_NODE_CONFIG
+        fsed -i "s/trust_height = 0/trust_height = ${STATE_SYNC_HEIGHT}/g" $ONOMY_NODE_CONFIG
+        fsed -i "s/trust_hash = \".*\"/trust_hash = ${STATE_SYNC_HASH}/g" $ONOMY_NODE_CONFIG
+    else
+        echo "Hashed from different peers don't match. State sync is OFF"
+    fi
+fi
 
 # Change ports
 fsed "s#\"tcp://127.0.0.1:26656\"#\"tcp://$ONOMY_HOST:26656\"#g" $ONOMY_NODE_CONFIG

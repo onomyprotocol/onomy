@@ -9,7 +9,7 @@ ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
 #echo "Enter chain-id"
 #read chainid
-CHAINID="onomy-testnet2"
+CHAINID="onomy-testnet1"
 # Name of the onomy artifact
 ONOMY=onomyd
 
@@ -28,7 +28,7 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seed node
 
-STAKE_DENOM="nom"
+STAKE_DENOM="anom"
 
 read -r -p "Enter node id of an existing validator that is running on chain [5e0f5b9d54d3e038623ddb77c0b91b559ff13495]:" ONOMY_SEED_ID
 ONOMY_SEED_ID=${ONOMY_SEED_ID:-5e0f5b9d54d3e038623ddb77c0b91b559ff13495}
@@ -49,6 +49,12 @@ echo '{
   "chain_id": "",
   "orchestrator_name": ""
 }' > $ONOMY_HOME/node_info.json
+
+# ------------------ Get IP Address --------------
+ip=$(hostname -I | awk '{print $1}')
+
+read -r -p "Enter your ip address [$ip]: " ip
+ip=${ip:-onomy}
 
 # ------------------ Init onomy ------------------
 
@@ -78,14 +84,22 @@ fsed() {
 # Change ports
 fsed "s#\"tcp://127.0.0.1:26656\"#\"tcp://$ONOMY_HOST:26656\"#g" $ONOMY_NODE_CONFIG
 fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CONFIG
-fsed 's#seed_mode = false#seed_mode = true#g' $ONOMY_NODE_CONFIG
 fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
-fsed 's#external_address = ""#external_address = "tcp://'$ONOMY_HOST:26656'"#g' $ONOMY_NODE_CONFIG
+fsed 's#external_address = ""#external_address = "tcp://'$ip:26656'"#g' $ONOMY_NODE_CONFIG
 fsed 's#seeds = ""#seeds = "'$ONOMY_SEED'"#g' $ONOMY_NODE_CONFIG
 
 fsed 's#minimum-gas-prices = ""#minimum-gas-prices = "0'$STAKE_DENOM'"#g' $ONOMY_APP_CONFIG
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
+
+# enable snapshots
+fsed 's#pruning-keep-recent = "0"#pruning-keep-recent = "100"#g' $ONOMY_APP_CONFIG
+fsed 's#pruning-keep-every = "0"#pruning-keep-every = "500"#g' $ONOMY_APP_CONFIG
+fsed 's#pruning-interval = "0"#pruning-interval = "10"#g' $ONOMY_APP_CONFIG
+fsed 's#snapshot-interval = 0#snapshot-interval = 500#g' $ONOMY_APP_CONFIG
+fsed 's#snapshot-keep-recent = 2#snapshot-keep-recent = 3#g' $ONOMY_APP_CONFIG
+
+
 fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $ONOMY_HOME/node_info.json
 fsed 's#"node_name": ""#"node_name": "'$ONOMY_NODE_NAME'"#g'  $ONOMY_HOME/node_info.json
 
