@@ -5,7 +5,7 @@ echo "Initializing master node"
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
-CHAINID="onomy-testnet1"
+CHAINID="onomy-testnet2"
 # Name of the onomy artifact
 ONOMY=onomyd
 # The name of the onomy node
@@ -52,9 +52,9 @@ fsed() {
 }
 
 # ------------------ Get IP Address --------------
-ip=hostname -I | awk '{print $1}'
+ip=$(hostname -I | awk '{print $1}')
 
-read -i "Enter your ip address [$ip]: " ip
+read -r -p "Enter your ip address [$ip]: " ip
 ip=${ip:-onomy}
 
 # ------------------ Init onomy ------------------

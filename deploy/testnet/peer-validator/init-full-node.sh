@@ -9,7 +9,8 @@ ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
 #echo "Enter chain-id"
 #read chainid
-CHAINID="onomy-testnet1"
+CHAINID="onomy-testnet2
+"
 # Name of the onomy artifact
 ONOMY=onomyd
 
