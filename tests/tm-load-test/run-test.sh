@@ -18,4 +18,4 @@ set -e
 pushd $DIR/../
 
 # Run new test container instance
-docker run -it --name cosmos_test_instance -it cosmoschain /bin/bash -c "bash start-node.sh && bash master-slave.sh $CONNECTIONS $TIME $RATE $SIZE"
+docker run -i --name cosmos_test_instance cosmoschain /bin/bash -c "bash start-node.sh && bash master-slave.sh $CONNECTIONS $TIME $RATE $SIZE"
