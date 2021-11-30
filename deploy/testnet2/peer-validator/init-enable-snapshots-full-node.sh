@@ -28,8 +28,6 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seed node
 
-SHOULD_USE_STATE_SYNC="true"
-
 STAKE_DENOM="nom"
 
 read -r -p "Enter node id of an existing validator that is running on chain [5e0f5b9d54d3e038623ddb77c0b91b559ff13495]:" ONOMY_SEED_ID
@@ -71,45 +69,11 @@ echo "Exposing ports and APIs of the $ONOMY_NODE_NAME"
 # Switch sed command in the case of linux
 fsed() {
   if [ `uname` = 'Linux' ]; then
-sed -i "$@"
+    sed -i "$@"
   else
-sed -i '' "$@"
+    sed -i '' "$@"
   fi
 }
-
-
-# STATE SYNC
-if [ "$SHOULD_USE_STATE_SYNC" = "true" ]; then
-
-    read -r -p "Enter state sync rpc servers [http://188.166.62.34:26657,http://188.166.98.209:26657]:" STATE_SYNC_RPC_SERVERS
-    STATE_SYNC_RPC_SERVERS=${STATE_SYNC_RPC_SERVERS:-"http://testnet1.onomy.io:26657"}
-    echo "STATE_SYNC_RPC_SERVERS===== $STATE_SYNC_RPC_SERVERS"
-    IFS=', ' read -r -a STATE_SYNC_RPC_SERVERS_ARRAY <<< ${STATE_SYNC_RPC_SERVERS}
-
-    TEMP_STATE_HEIGHT=$(curl -s ${STATE_SYNC_RPC_SERVERS_ARRAY[0]}/commit | jq -r ".result.signed_header.header.height")
-    STATE_SYNC_HEIGHT=$(((($TEMP_STATE_HEIGHT/500)-1)*500))
-    STATE_SYNC_HASH=$(curl -s ${STATE_SYNC_RPC_SERVERS_ARRAY[0]}/commit?height=${STATE_SYNC_HEIGHT} | jq '.result.signed_header.commit.block_id.hash')
-
-    HASHES_MATCH=true
-    for SERVER in "${STATE_SYNC_RPC_SERVERS_ARRAY[@]}"
-    do
-        TEMP_HASH=$(curl -s ${SERVER}/commit?height=${STATE_SYNC_HEIGHT} | jq '.result.signed_header.commit.block_id.hash')
-        if [ "$STATE_SYNC_HASH" != "$TEMP_HASH" ]; then
-            HASHES_MATCH=false
-            break
-        fi
-    done
-
-    if [ "$HASHES_MATCH" = "true" ]; then
-        echo "Hashed matched"
-        fsed -i "s/enable = false/enable = true/g" $ONOMY_NODE_CONFIG
-        fsed -i "s~rpc_servers = \".*\"~rpc_servers = \"${STATE_SYNC_RPC_SERVERS}\"~g" $ONOMY_NODE_CONFIG
-        fsed -i "s/trust_height = 0/trust_height = ${STATE_SYNC_HEIGHT}/g" $ONOMY_NODE_CONFIG
-        fsed -i "s/trust_hash = \".*\"/trust_hash = ${STATE_SYNC_HASH}/g" $ONOMY_NODE_CONFIG
-    else
-        echo "Hashed from different peers don't match. State sync is OFF"
-    fi
-fi
 
 # Change ports
 fsed "s#\"tcp://127.0.0.1:26656\"#\"tcp://$ONOMY_HOST:26656\"#g" $ONOMY_NODE_CONFIG
@@ -121,6 +85,15 @@ fsed 's#seeds = ""#seeds = "'$ONOMY_SEED'"#g' $ONOMY_NODE_CONFIG
 fsed 's#minimum-gas-prices = ""#minimum-gas-prices = "0'$STAKE_DENOM'"#g' $ONOMY_APP_CONFIG
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
+
+# enable snapshots
+fsed 's#pruning-keep-recent = "0"#pruning-keep-recent = "100"#g' $ONOMY_APP_CONFIG
+fsed 's#pruning-keep-every = "0"#pruning-keep-every = "500"#g' $ONOMY_APP_CONFIG
+fsed 's#pruning-interval = "0"#pruning-interval = "10"#g' $ONOMY_APP_CONFIG
+fsed 's#snapshot-interval = 0#pruning-interval = 500#g' $ONOMY_APP_CONFIG
+fsed 's#snapshot-keep-recent = 2#pruning-interval = 3#g' $ONOMY_APP_CONFIG
+
+
 fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $ONOMY_HOME/node_info.json
 fsed 's#"node_name": ""#"node_name": "'$ONOMY_NODE_NAME'"#g'  $ONOMY_HOME/node_info.json
 

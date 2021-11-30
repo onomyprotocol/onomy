@@ -52,8 +52,7 @@ fsed() {
 }
 
 # ------------------ Get IP Address --------------
-ip=hostname -I | awk '{print $1}'
-
+ip=$(hostname -I | awk '{print $1}')
 read -i "Enter your ip address [$ip]: " ip
 ip=${ip:-onomy}
 
