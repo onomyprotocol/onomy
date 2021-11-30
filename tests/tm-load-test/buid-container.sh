@@ -5,4 +5,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPOFOLDER=$DIR/../..
 pushd $REPOFOLDER
 
-docker build --pull -f tests/tm-load-test/dockerfile/Dockerfile  -t cosmoschain .
+docker build -f tests/tm-load-test/Dockerfile  -t cosmoschain .
