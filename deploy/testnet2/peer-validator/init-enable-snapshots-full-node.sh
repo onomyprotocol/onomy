@@ -90,8 +90,8 @@ fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
 fsed 's#pruning-keep-recent = "0"#pruning-keep-recent = "100"#g' $ONOMY_APP_CONFIG
 fsed 's#pruning-keep-every = "0"#pruning-keep-every = "500"#g' $ONOMY_APP_CONFIG
 fsed 's#pruning-interval = "0"#pruning-interval = "10"#g' $ONOMY_APP_CONFIG
-fsed 's#snapshot-interval = 0#pruning-interval = 500#g' $ONOMY_APP_CONFIG
-fsed 's#snapshot-keep-recent = 2#pruning-interval = 3#g' $ONOMY_APP_CONFIG
+fsed 's#snapshot-interval = 0#snapshot-interval = 500#g' $ONOMY_APP_CONFIG
+fsed 's#snapshot-keep-recent = 2#snapshot-keep-recent = 3#g' $ONOMY_APP_CONFIG
 
 
 fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $ONOMY_HOME/node_info.json
