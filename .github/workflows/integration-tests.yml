@@ -1,4 +1,4 @@
-name: CI
+name: Integration tests
 
 on:
   push:
@@ -9,8 +9,9 @@ on:
     branches:
       - 'dev'
       - 'main'
+
 jobs:
-  ci:
+  integration:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,6 +25,7 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      - name: CI
+      - name: Integration tests
         run: |
-          make all-in-docker
+          export ALCHEMY_KEY=${{ secrets.ALCHEMY_KEY }}
+          make test-integration

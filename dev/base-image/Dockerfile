@@ -10,6 +10,7 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install --no-install-recommends -yq
                                                 git
 # scripts utils
 RUN apt-get install --no-install-recommends -yq jq \
+                                                iputils-ping \
                                                 moreutils
 
 # ------------------go ------------------
