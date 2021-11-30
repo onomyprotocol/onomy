@@ -6,7 +6,7 @@ In order to connect to Onomy testnet, go through the documents in the following 
 	- This will guide you through the process of setting up and starting a full node.
 3. [Setting up a validator](setting-up-a-validator.md)
 	- This will help you convert your full node into validator.
-4. [Testing geavity bridge](testing-gravity.md)
+4. [Testing gravity bridge](testing-gravity.md)
 	- This documents outlines the process to test the gravity bridge.
 	
 
