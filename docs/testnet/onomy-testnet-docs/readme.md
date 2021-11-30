@@ -1,4 +1,4 @@
-# Connecting to Ononmy Chain
+# Connecting to Onomy Chain
 In order to connect to Onomy testnet, go through the documents in the following order
 1. [Pre-installation](pre-installation.md)
 	- This will help you set up your machine for setting up a validator or a full node.
