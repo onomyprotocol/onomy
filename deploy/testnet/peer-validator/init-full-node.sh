@@ -9,7 +9,8 @@ ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
 #echo "Enter chain-id"
 #read chainid
-CHAINID="onomy-testnet1"
+CHAINID="onomy-testnet
+"
 # Name of the onomy artifact
 ONOMY=onomyd
 
@@ -49,10 +50,10 @@ echo '{
 }' > $ONOMY_HOME/node_info.json
 
 # ------------------ Get IP Address --------------
-ip=$(hostname -I | awk '{print $1}')
+deafult_ip=$(hostname -I | awk '{print $1}')
 
 read -r -p "Enter your ip address [$ip]: " ip
-ip=${ip:-onomy}
+ip=${ip:-deafult_ip}
 
 # ------------------ Init onomy ------------------
 
