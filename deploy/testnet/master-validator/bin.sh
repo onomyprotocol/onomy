@@ -1,63 +1,66 @@
 #Setting up constants
-GRAVITY_DIR=$HOME/.onomy/gravity
 ONOMY_HOME=$HOME/.onomy
+GRAVITY_SRC=$HOME/gravity-src
+ONOMY_SRC=$HOME/onomy-src
+
+GRAVITY_VERSION="v0.0.0-20210915184851-orch-nomarket"
+ONOMY_VERSION="v0.0.3"
+
 #Creating Directories
 mkdir $HOME/.onomy
 mkdir $HOME/.onomy/bin
-mkdir $HOME/.onomy/gravity
 
-echo "-----------Installing_dependencies---------------"
+echo "-----------installing dependencies---------------"
 sudo dnf -y update
 sudo dnf -y copr enable ngompa/musl-libc
 sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo dnf -y install subscription-manager
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-sudo dnf -y install curl nano ca-certificates tar git jq gcc-c++ musl-devel musl-gcc golang gmp-devel perl python3 moreutils wget nodejs make
+sudo dnf -y install curl nano ca-certificates tar git jq gcc-c++ musl-devel musl-gcc gmp-devel perl python3 moreutils wget nodejs make hostname procps-ng
 
-echo "--------------installing_rust---------------------------"
+echo "--------------installing rust---------------------------"
 curl https://sh.rustup.rs -sSf | bash -s -- -y
 export PATH=$HOME/.cargo/bin:$PATH
 cargo version
 
-echo "----------------cloning_repository-------------------"
-git clone -b v0.0.0-20210915184851-orch-nomarket https://github.com/onomyprotocol/cosmos-gravity-bridge.git $GRAVITY_DIR
-git clone -b v0.0.3 https://github.com/onomyprotocol/onomy.git $ONOMY_HOME/onomy
-
-echo "--------------install_golang---------------------------"
+echo "--------------installing golang---------------------------"
 curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output $HOME/go.tar.gz
 tar -C $HOME -xzf $HOME/go.tar.gz
 export PATH=$PATH:$HOME/go/bin
+go env
 
-echo "----------------------building_gravity_artifact---------------"
-#cd $GRAVITY_DIR/module
-#make install
-cd $ONOMY_HOME/onomy
+echo "----------------cloning repositories-------------------"
+git clone -b $GRAVITY_VERSION https://github.com/onomyprotocol/cosmos-gravity-bridge.git $GRAVITY_SRC
+git clone -b $ONOMY_VERSION https://github.com/onomyprotocol/onomy.git $ONOMY_SRC
+
+echo "----------------------installing onomy---------------"
+cd $ONOMY_SRC
 make build
 cp onomyd $ONOMY_HOME/bin/onomyd
 
-echo "----------------building_orchestrator_artifact-------------"
-cd $GRAVITY_DIR/orchestrator
+echo "----------------installing gravity gbt-------------"
+cd $GRAVITY_SRC/orchestrator
 rustup target add x86_64-unknown-linux-musl
 cargo build --target=x86_64-unknown-linux-musl --release  --all
-cp $GRAVITY_DIR/orchestrator/target/x86_64-unknown-linux-musl/release/gbt $ONOMY_HOME/bin/gbt
+cp $GRAVITY_SRC/orchestrator/target/x86_64-unknown-linux-musl/release/gbt $ONOMY_HOME/bin/gbt
 
-
-echo "---------------Installing_solidity-------------------"
-cd $GRAVITY_DIR/solidity
+echo "---------------installing gravity solidity-------------------"
+cd $GRAVITY_SRC/solidity
 npm ci
 chmod -R +x scripts
 npm run typechain
+npm run compile-deployer
 
-
-echo "-------------------making_geth-----------------------"
+echo "-------------------installing geth-----------------------"
 cd $HOME
 git clone https://github.com/ethereum/go-ethereum
 cd go-ethereum/
 make geth
 cp build/bin/geth $ONOMY_HOME/bin/geth
 
-echo "------------------ install faucet ------------------"
-curl https://get.starport.network/faucet! | sudo bash
-cd $HOME
+echo "-------------------adding binaries to path-----------------------"
+export PATH=$ONOMY_HOME/bin:$PATH
 
-echo "export PATH=$PATH:$HOME/.cargo/bin:$ONOMY_HOME/bin" >> $HOME/.bashrc
+cd $ONOMY_HOME
 
+echo "Onomy binaries are installed successfully."
