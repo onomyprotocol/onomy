@@ -5,10 +5,13 @@ echo "Starting onomy full node"
 
 # Name of the onomy artifact
 ONOMY=onomyd
-ONOMY_LOG_FILE=$HOME/.onomy/onomyd.log
+ONOMY_HOME="$HOME/.onomy"
+
+mkdir -p $ONOMY_HOME/logs
+ONOMY_LOG_FILE=$ONOMY_HOME/logs/onomyd.log
 
 if [ "$(ulimit -n)" -lt 65536 ]; then
-    echo "Fail: $(ulimit -n) < 65536"
+    echo "Fail ulimit: $(ulimit -n) < 65536"
     exit
 fi
 

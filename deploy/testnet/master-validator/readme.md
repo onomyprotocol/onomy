@@ -8,7 +8,7 @@
 
 ## Init node and genesys
 
-Before run the script please set evn variable:
+Before run the script please set env variable:
 
 * ETH_ORCHESTRATOR_VALIDATOR_ADDRESS - this is the Ethereum public address with which the orchestrator will be running.
 
@@ -26,7 +26,7 @@ Before run the script please set up "ulimit > 65536":
 
 ## Deploy gravity contract
 
-Before run the script please set evn variable:
+Before run the script please set env variable:
 
 * ETH_RPC_ADDRESS - the RPC address of the Ethereum node
 * ETH_PRIVATE_KEY - the Ethereum private key which deploys the contract

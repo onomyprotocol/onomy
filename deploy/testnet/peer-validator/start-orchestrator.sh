@@ -16,7 +16,8 @@ ONOMY_ORCHESTRATOR_MNEMONIC=$(jq -r .mnemonic $ONOMY_HOME/orchestrator_key.json)
 # Onomy chain demons
 STAKE_DENOM="anom"
 # The path to orchestrator logs
-ORCHESTRATOR_LOG_FILE=$HOME/.onomy/orchestrator.log
+mkdir -p $ONOMY_HOME/logs
+ORCHESTRATOR_LOG_FILE=$ONOMY_HOME/logs/orchestrator.log
 
 if [[ -z "${ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY}" ]]; then
   echo "Fail: ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY is not set"
@@ -25,7 +26,7 @@ fi
 
 # TODO Parth, once the new contract is deployed remove this and set fixed address of ETH_GRAVITY_CONTRACT_ADDRESS
 if [[ -z "${ETH_GRAVITY_CONTRACT_ADDRESS}" ]]; then
-  echo "Fail: ETH_GRAVITY_CONTRACT_ADDRESS is empty, check the file: $ONOMY_HOME/eth_contract_address"
+  echo "Fail: ETH_GRAVITY_CONTRACT_ADDRESS is empty"
   exit
 fi
 

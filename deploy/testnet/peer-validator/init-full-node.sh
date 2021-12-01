@@ -53,7 +53,7 @@ echo '{
 # ------------------ Get IP Address --------------
 default_ip=$(hostname -I | awk '{print $1}')
 
-read -r -p "Enter your ip address [$default_ip]: "
+read -r -p "Enter your ip address [$default_ip]:" ip
 ip=${ip:-$default_ip}
 
 # ------------------ Init onomy ------------------

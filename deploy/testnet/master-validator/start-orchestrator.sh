@@ -17,8 +17,10 @@ ONOMY_ORCHESTRATOR_MNEMONIC=$(jq -r .mnemonic $ONOMY_HOME/orchestrator_key.json)
 STAKE_DENOM="anom"
 # Contract address from file
 ETH_GRAVITY_CONTRACT_ADDRESS=$(cat $ONOMY_HOME/eth_contract_address)
+
 # The path to orchestrator logs
-ORCHESTRATOR_LOG_FILE=$HOME/.onomy/orchestrator.log
+mkdir -p $ONOMY_HOME/logs
+ORCHESTRATOR_LOG_FILE=$ONOMY_HOME/logs/orchestrator.log
 
 if [[ -z "${ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY}" ]]; then
   echo "Fail: ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY is not set"

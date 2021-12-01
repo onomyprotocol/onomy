@@ -4,7 +4,7 @@ set -eu
 echo "Deploying gravity contract"
 
 ONOMY_HOME=$HOME/.onomy
-GRAVITY_SRC=$HOME/gravity-src
+GRAVITY_SRC=$ONOMY_HOME/src/gravity
 
 # The address to run onomy node
 ONOMY_HOST="0.0.0.0"

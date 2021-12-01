@@ -1,13 +1,15 @@
 #Setting up constants
 ONOMY_HOME=$HOME/.onomy
-GRAVITY_SRC=$HOME/gravity-src
-ONOMY_SRC=$HOME/onomy-src
+GRAVITY_SRC=$ONOMY_HOME/src/gravity
+ONOMY_SRC=$ONOMY_HOME/src/onomy
+GETH_SRC=$ONOMY_HOME/src/go-ethereum
 
 GRAVITY_VERSION="v0.0.0-20210915184851-orch-nomarket"
 ONOMY_VERSION="v0.0.3"
 
 #Creating Directories
 mkdir $HOME/.onomy
+mkdir $ONOMY_HOME/src
 mkdir $HOME/.onomy/bin
 
 echo "-----------installing dependencies---------------"
@@ -29,16 +31,14 @@ tar -C $HOME -xzf $HOME/go.tar.gz
 export PATH=$PATH:$HOME/go/bin
 go env
 
-echo "----------------cloning repositories-------------------"
-git clone -b $GRAVITY_VERSION https://github.com/onomyprotocol/cosmos-gravity-bridge.git $GRAVITY_SRC
-git clone -b $ONOMY_VERSION https://github.com/onomyprotocol/onomy.git $ONOMY_SRC
-
 echo "----------------------installing onomy---------------"
+git clone -b $ONOMY_VERSION https://github.com/onomyprotocol/onomy.git $ONOMY_SRC
 cd $ONOMY_SRC
 make build
 cp onomyd $ONOMY_HOME/bin/onomyd
 
 echo "----------------installing gravity gbt-------------"
+git clone -b $GRAVITY_VERSION https://github.com/onomyprotocol/cosmos-gravity-bridge.git $GRAVITY_SRC
 cd $GRAVITY_SRC/orchestrator
 rustup target add x86_64-unknown-linux-musl
 cargo build --target=x86_64-unknown-linux-musl --release  --all
@@ -52,14 +52,15 @@ npm run typechain
 npm run compile-deployer
 
 echo "-------------------installing geth-----------------------"
-cd $HOME
-git clone https://github.com/ethereum/go-ethereum
-cd go-ethereum/
+git clone https://github.com/ethereum/go-ethereum $GETH_SRC
+cd $GETH_SRC
 make geth
 cp build/bin/geth $ONOMY_HOME/bin/geth
 
 echo "-------------------adding binaries to bin-----------------------"
 
-sudo cp -r $ONOMY_HOME/bin/. /bin/ -y
+export PATH=$PATH:$ONOMY_HOME/bin
+
+echo "export PATH=$PATH" >> ~/.bashrc
 
 echo "Onomy binaries are installed successfully."
