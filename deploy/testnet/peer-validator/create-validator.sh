@@ -1,8 +1,7 @@
 #!/bin/bash
-#Setup Validator
 set -eu
 
-echo "Initializing validator"
+echo "Creating validator"
 
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
@@ -16,6 +15,8 @@ ONOMY_VALIDATOR_NAME=$(jq -r .validator_name $ONOMY_HOME/node_info.json)
 ONOMY_KEYRING_FLAG="--keyring-backend test"
 # Gravity chain demons
 STAKE_DENOM="anom"
+# The initial amount to start the validator
+NOM_STAKE_AMOUNT=10000000000000000000
 
 echo -e "\n Creating validator:"
 
@@ -38,7 +39,7 @@ $ONOMY tx staking create-validator \
 --from=$ONOMY_VALIDATOR_NAME \
 $ONOMY_KEYRING_FLAG -y
 
-sleep 2
+sleep 5
 echo -e "\n Validator information:"
 
 $ONOMY query staking validator "$($ONOMY keys show $ONOMY_VALIDATOR_NAME --bech val --address $ONOMY_KEYRING_FLAG)"

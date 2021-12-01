@@ -58,9 +58,8 @@ cd go-ethereum/
 make geth
 cp build/bin/geth $ONOMY_HOME/bin/geth
 
-echo "-------------------adding binaries to path-----------------------"
-export PATH=$ONOMY_HOME/bin:$PATH
+echo "-------------------adding binaries to bin-----------------------"
 
-cd $ONOMY_HOME
+sudo cp -r $ONOMY_HOME/bin/. /bin/ -y
 
 echo "Onomy binaries are installed successfully."

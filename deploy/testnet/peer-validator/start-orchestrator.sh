@@ -11,12 +11,10 @@ ONOMY_HOST="0.0.0.0"
 ONOMY_GRPC_PORT="9191"
 # Home folder for onomy config
 ONOMY_HOME="$HOME/.onomy"
-# Onomy mnemonic used for orchestrator signing of the transactions (orchestrator_key.json file)
-ONOMY_ORCHESTRATOR_MNEMONIC=$(jq -r .mnemonic $ONOMY_HOME/orchestrator_key.json)
+# The mnemonic of orchestrator
+ONOMY_ORCHESTRATOR_MNEMONIC=$(jq -r .mnemonic $ONOMY_HOME/validator_key.json)
 # Onomy chain demons
 STAKE_DENOM="anom"
-# Contract address from file
-ETH_GRAVITY_CONTRACT_ADDRESS=$(cat $ONOMY_HOME/eth_contract_address)
 # The path to orchestrator logs
 ORCHESTRATOR_LOG_FILE=$HOME/.onomy/orchestrator.log
 
@@ -25,13 +23,14 @@ if [[ -z "${ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY}" ]]; then
   exit
 fi
 
+# TODO Parth, once the new contract is deployed remove this and set fixed address of ETH_GRAVITY_CONTRACT_ADDRESS
 if [[ -z "${ETH_GRAVITY_CONTRACT_ADDRESS}" ]]; then
-  echo "Fail: ETH_GRAVITY_CONTRACT_ADDRESS is empty, check the file:  $ONOMY_HOME/eth_contract_address"
+  echo "Fail: ETH_GRAVITY_CONTRACT_ADDRESS is empty, check the file: $ONOMY_HOME/eth_contract_address"
   exit
 fi
 
 if [[ -z "${ONOMY_ORCHESTRATOR_MNEMONIC}" ]]; then
-  echo "Fail: ONOMY_ORCHESTRATOR_MNEMONIC is empty, check the file:  $ONOMY_HOME/orchestrator_key.json"
+  echo "Fail: ONOMY_ORCHESTRATOR_MNEMONIC is empty, check the file: $ONOMY_HOME/validator_key.json"
   exit
 fi
 

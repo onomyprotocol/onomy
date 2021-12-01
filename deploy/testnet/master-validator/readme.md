@@ -6,8 +6,6 @@
 ./bin.sh
 ```
 
-Restart the console session
-
 ## Init node and genesys
 
 Before run the script please set evn variable:
@@ -15,12 +13,12 @@ Before run the script please set evn variable:
 * ETH_ORCHESTRATOR_VALIDATOR_ADDRESS - this is the Ethereum public address with which the orchestrator will be running.
 
 ```
-./init.sh
+./init-master.sh
 ```
 
 ## Start the node
 
-Before run the script please set up "ulimit >= 65536":
+Before run the script please set up "ulimit > 65536":
 
 ```
 ./start-node.sh
