@@ -30,7 +30,7 @@ Init the validator account to be deposited
 
 ## Get tokens from master account
 
-Request tokens from the master account by "text" request to onomy.
+Request tokens (for validator) from the master account by "text" request to onomy.
 
 ### To do it from the master node call:
 
@@ -55,6 +55,16 @@ Also you cat check all current validators now.
 
 ```
 onomyd q staking validators
+```
+
+## Send som tokens from you validator to your orchestrator
+
+```
+onomyd tx bank send {validator-address} {orchestrator-address} 5000000000000000000anom --chain-id=onomy-testnet --keyring-backend test
+```
+Check the orchestrator balance now
+```
+onomyd q bank balances {orchestrator-address}
 ```
 
 ## Init gbt

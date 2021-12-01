@@ -12,7 +12,7 @@ ONOMY_GRPC_PORT="9191"
 # Home folder for onomy config
 ONOMY_HOME="$HOME/.onomy"
 # The mnemonic of orchestrator
-ONOMY_ORCHESTRATOR_MNEMONIC=$(jq -r .mnemonic $ONOMY_HOME/validator_key.json)
+ONOMY_ORCHESTRATOR_MNEMONIC=$(jq -r .mnemonic $ONOMY_HOME/orchestrator_key.json)
 # Onomy chain demons
 STAKE_DENOM="anom"
 # The path to orchestrator logs
@@ -30,7 +30,7 @@ if [[ -z "${ETH_GRAVITY_CONTRACT_ADDRESS}" ]]; then
 fi
 
 if [[ -z "${ONOMY_ORCHESTRATOR_MNEMONIC}" ]]; then
-  echo "Fail: ONOMY_ORCHESTRATOR_MNEMONIC is empty, check the file: $ONOMY_HOME/validator_key.json"
+  echo "Fail: ONOMY_ORCHESTRATOR_MNEMONIC is empty, check the file: $ONOMY_HOME/orchestrator_key.json"
   exit
 fi
 
@@ -46,11 +46,11 @@ echo "ETH_RPC_ADDRESS: $ETH_RPC_ADDRESS, ETH_GRAVITY_CONTRACT_ADDRESS: $ETH_GRAV
 echo "Starting orchestrator"
 
 gbt -a $ONOMY_ADDRESS_PREFIX orchestrator \
-             --cosmos-phrase="$ONOMY_ORCHESTRATOR_MNEMONIC" \
-             --ethereum-key="$ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY" \
              --cosmos-grpc="http://$ONOMY_HOST:$ONOMY_GRPC_PORT/" \
              --ethereum-rpc="$ETH_RPC_ADDRESS" \
              --fees="1$STAKE_DENOM" \
              --gravity-contract-address="$ETH_GRAVITY_CONTRACT_ADDRESS" &>> $ORCHESTRATOR_LOG_FILE &
 
 echo "Orchestrator is started, check the logs file $ORCHESTRATOR_LOG_FILE"
+
+
