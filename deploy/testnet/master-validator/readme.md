@@ -17,11 +17,13 @@ Before run the script please set env variable:
 ```
 
 Get the node id:
+
 ```
 onomyd tendermint show-node-id
 ```
 
 Get the node ip:
+
 ```
 hostname -I | awk '{print $1}'
 ```

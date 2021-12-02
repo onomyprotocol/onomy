@@ -16,12 +16,14 @@ You can use default or get in from the master node
 ./init-full-node.sh
 ```
 
-Get the node id: 
+Get the node id:
+
 ```
 onomyd tendermint show-node-id
 ```
 
 Get the node ip:
+
 ```
 hostname -I | awk '{print $1}'
 ```

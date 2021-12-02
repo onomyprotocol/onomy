@@ -25,11 +25,13 @@ Before run the script please set up "ulimit > 65536":
 ```
 
 Get the node id:
+
 ```
 onomyd tendermint show-node-id
 ```
 
 Get the node ip:
+
 ```
 hostname -I | awk '{print $1}'
 ```

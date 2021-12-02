@@ -35,10 +35,6 @@ for sentryIP in ${ONOMY_SENTRY_IPS//,/ } ; do
   ONOMY_SENTRY_PEERS="$ONOMY_SENTRY_PEERS$sentryID@$sentryIP:26656,"
 done
 
-echo  "ONOMY_SENTRY_IDS: $ONOMY_SENTRY_IDS"
-echo  "ONOMY_SENTRY_PEERS: $ONOMY_SENTRY_PEERS"
-exit
-
 # Switch sed command in the case of linux
 fsed() {
   if [ `uname` = 'Linux' ]; then

@@ -1,5 +1,5 @@
-
 # Build testnet-node
+
 ```
 DOCKER_BUILDKIT=0 docker build -t onomy/testnet-node:local .
 ```
@@ -50,7 +50,6 @@ docker run -dit --name onomy-testnet-seed1 -v `pwd`:/root/testnet --network test
 docker exec -it onomy-testnet-seed1 bash
 ```
 
-
 ## Run the sentry1
 
 ```
@@ -89,7 +88,7 @@ docker exec -it onomy-testnet-sentry3 bash
 
 Now you are ready to set up any config
 
-# Utils 
+# Utils
 
 ## Ping master node
 

@@ -6,16 +6,9 @@ echo "Initializing seed node"
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
 
-# Name of the network to bootstrap
-#echo "Enter chain-id"
-#read chainid
 CHAINID="onomy-testnet"
 # Name of the onomy artifact
 ONOMY=onomyd
-
-read -r -p "Enter a name for your node [onomy-seed]:" ONOMY_NODE_NAME
-ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-seed}
-
 # The address to run onomy node
 ONOMY_HOST="0.0.0.0"
 # Config directories for onomy node
@@ -24,7 +17,16 @@ ONOMY_HOME_CONFIG="$ONOMY_HOME/config"
 ONOMY_NODE_CONFIG="$ONOMY_HOME_CONFIG/config.toml"
 # Chain ID flag
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
-# Seed node
+
+read -r -p "Enter a name for your node [onomy-seed]:" ONOMY_NODE_NAME
+ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-seed}
+
+ONOMY_SEEDS=
+read -r -p "Optionally enter seeds peers, id@ip:port,id2@ip2:port :" ONOMY_SEEDS
+
+default_ip=$(hostname -I | awk '{print $1}')
+read -r -p "Enter your ip address [$default_ip]:" ip
+ip=${ip:-$default_ip}
 
 # create home directory
 mkdir -p $ONOMY_HOME
@@ -36,15 +38,6 @@ echo '{
   "chain_id": "",
   "orchestrator_name": ""
 }' > $ONOMY_HOME/node_info.json
-
-ONOMY_SEEDS=
-read -r -p "Optionally enter seed peers, id@ip:port,id2@ip2:port :" ONOMY_SEEDS
-
-# ------------------ Get IP Address --------------
-default_ip=$(hostname -I | awk '{print $1}')
-
-read -r -p "Enter your ip address [$default_ip]:" ip
-ip=${ip:-$default_ip}
 
 # ------------------ Init onomy ------------------
 
