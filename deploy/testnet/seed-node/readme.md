@@ -24,6 +24,14 @@ Before run the script please set up "ulimit > 65536":
 ./start-node.sh
 ```
 
-## Curl for status to get the seed ID
+Get the node id:
+```
+onomyd tendermint show-node-id
+```
 
-The id: .result.node_info.id
+Get the node ip:
+```
+hostname -I | awk '{print $1}'
+```
+
+The seed peer is: id@$ip:26656

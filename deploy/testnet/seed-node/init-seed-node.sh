@@ -38,7 +38,7 @@ echo '{
 }' > $ONOMY_HOME/node_info.json
 
 ONOMY_SEEDS=
-read -r -p "Optionally enter seed peer id@ip:port,id2@ip2:port :" ONOMY_SEEDS
+read -r -p "Optionally enter seed peers, id@ip:port,id2@ip2:port :" ONOMY_SEEDS
 
 # ------------------ Get IP Address --------------
 default_ip=$(hostname -I | awk '{print $1}')
