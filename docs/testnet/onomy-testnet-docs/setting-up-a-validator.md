@@ -89,19 +89,19 @@ In order to set up the sentry nodes, we will first setup a few [full nodes](sett
 change the following parameters in config file of sentry nodes:
 ```
 pex: true
-persistent-peers: nodeid@ip:port (for validator node)
-private-peer-ids: node id of validator
-unconditional-peer-ids: node id of validator and optionally sentries
-addr-book-strict: false
+persistent_peers: nodeid@ip:port (for validator node)
+private_peer_ids: node id of validator
+unconditional_peer_ids: node id of validator and optionally sentries
+addr_book_strict: false
 ```
 
 change the following parameters in config file of validator node:
 ```
 pex: false
-persistent-peers: nodeid@ip:port (for all the sentry nodes)
-unconditional-peer-ids: optionally sentries
-addr-book-strict: false
-double-sign-check-height: 10
+persistent_peers: nodeid@ip:port (for all the sentry nodes)
+unconditional_peer_ids: optionally sentries
+addr_book_strict: false
+double_sign_check_height: 10
 ```
 
 After these changes, restart both validator and sentry nodes and your sentry structure should be ready.

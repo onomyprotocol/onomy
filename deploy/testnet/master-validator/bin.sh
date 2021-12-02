@@ -57,7 +57,7 @@ cd $GETH_SRC
 make geth
 cp build/bin/geth $ONOMY_HOME/bin/geth
 
-echo "-------------------adding binaries to bin-----------------------"
+echo "-------------------adding binaries to path-----------------------"
 
 export PATH=$PATH:$ONOMY_HOME/bin
 
