@@ -1,21 +1,15 @@
 #!/bin/bash
-#Setup Validator
 set -eu
 
 echo "Initializing validator"
 
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
-# Name of the network to bootstrap
-CHAINID=$(jq -r .chain_id $ONOMY_HOME/node_info.json)
 # Name of the Onomy artifact
 ONOMY=onomyd
-# The name of the Onomy node
-ONOMY_NODE_NAME=$(jq -r .node_name $ONOMY_HOME/node_info.json)
+
 # Keyring flag
 ONOMY_KEYRING_FLAG="--keyring-backend test"
-# Onomy chain demons
-STAKE_DENOM="anom"
 
 # -----------------Adding Validator---------------------
 
@@ -35,6 +29,25 @@ do
   $ONOMY keys add $ONOMY_VALIDATOR_NAME $ONOMY_KEYRING_FLAG --output json | jq . >> $ONOMY_HOME/validator_key.json
 done
 
+
+ONOMY_ORCHESTRATOR_NAME=''
+
+if [[ -f "$ONOMY_HOME/orchestrator_key.json" ]]
+then
+    echo "Orchestrator key already exist $ONOMY_HOME/orchestrator_key.json"
+    ONOMY_ORCHESTRATOR_NAME=$(jq -r .name $ONOMY_HOME/orchestrator_key.json)
+fi
+
+while [[ $ONOMY_ORCHESTRATOR_NAME == '' ]]
+do
+   # The name of onomy orchestrator
+  read -r -p "Enter a name for your orchestrator [orchestrator]:" ONOMY_ORCHESTRATOR_NAME
+  ONOMY_ORCHESTRATOR_NAME=${ONOMY_ORCHESTRATOR_NAME:-orchestrator}
+  $ONOMY keys add $ONOMY_ORCHESTRATOR_NAME $ONOMY_KEYRING_FLAG --output json | jq . >> $ONOMY_HOME/orchestrator_key.json
+done
+
+
+
 # Save validator-info
 # Switch sed command in the case of linux
 fsed() {
@@ -47,3 +60,8 @@ fsed() {
 
 fsed 's#"validator_name": ""#"validator_name": "'$ONOMY_VALIDATOR_NAME'"#g'  $ONOMY_HOME/node_info.json
 ONOMY_VALIDATOR_ADDRESS=$(jq -r .address $ONOMY_HOME/validator_key.json)
+echo "The validator address is: $ONOMY_VALIDATOR_ADDRESS"
+
+fsed 's#"orchestrator_name": ""#"orchestrator_name": "'$ONOMY_ORCHESTRATOR_NAME'"#g'  $ONOMY_HOME/node_info.json
+ONOMY_ORCHESTRATOR_ADDRESS=$(jq -r .address $ONOMY_HOME/orchestrator_key.json)
+echo "The orchestrator address is: $ONOMY_ORCHESTRATOR_ADDRESS"

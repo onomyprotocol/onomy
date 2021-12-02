@@ -12,6 +12,8 @@ ONOMY=onomyd
 ONOMY_NODE_NAME="onomy"
 # The address to run onomy node
 ONOMY_HOST="0.0.0.0"
+# The port of the onomy gRPC
+ONOMY_GRPC_PORT="9191"
 # Config directories for onomy node
 ONOMY_HOME_CONFIG="$ONOMY_HOME/config"
 # Config file for onomy node
@@ -26,16 +28,24 @@ ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 ONOMY_VALIDATOR_NAME=validator1
 # The name of the onomy orchestrator/validator
 ONOMY_ORCHESTRATOR_NAME=orch
+# Genesys params
 # Onomy chain demons
 STAKE_DENOM="anom"
-#NORMAL_DENOM="samoleans"
-NORMAL_DENOM="footoken"
-# The port of the onomy gRPC
-ONOMY_GRPC_PORT="9191"
+# Equal to 10000 noms
+ONOMY_STAKE_COINS="10000000000000000000000$STAKE_DENOM"
+# The coins for genesys account
+ONOMY_GENESIS_COINS="100000000000000000000000000$STAKE_DENOM"
+# Max validators on the chain
+ONOMY_MAX_VALIDATORS=10
+# The address of WNOM ERC20 token on ethereum.
+ONOMY_WNOM_ERC20_ADDRESS="0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C"
+
+if [[ -z "${ETH_ORCHESTRATOR_VALIDATOR_ADDRESS}" ]]; then
+  echo "Fail: ETH_ORCHESTRATOR_VALIDATOR_ADDRESS is not set"
+  exit
+fi
 
 mkdir -p $ONOMY_HOME
-# The host of ethereum node
-ETH_HOST="0.0.0.0"
 echo '{
         "validator_name": "",
         "chain_id": "",
@@ -52,17 +62,15 @@ fsed() {
 }
 
 # ------------------ Get IP Address --------------
-ip=$(hostname -I | awk '{print $1}')
+default_ip=$(hostname -I | awk '{print $1}')
 
-read -r -p "Enter your ip address [$ip]: " ip
-ip=${ip:-onomy}
+read -r -p "Enter your ip address [$default_ip]:" ip
+ip=${ip:-$default_ip}
 
 # ------------------ Init onomy ------------------
 
 echo "Creating $ONOMY_NODE_NAME validator with chain-id=$CHAINID..."
 echo "Initializing genesis files"
-# Build genesis file incl account for passed address
-ONOMY_GENESIS_COINS="100000000000000000000000000$STAKE_DENOM,"
 
 # Initialize the home directory and add some keys
 echo "Init test chain"
@@ -72,14 +80,13 @@ echo "Set stake/mint demon to $STAKE_DENOM"
 fsed "s#\"stake\"#\"$STAKE_DENOM\"#g" $ONOMY_HOME_CONFIG/genesis.json
 
 # add in denom metadata for both native tokens
-jq '.app_state.bank.denom_metadata += [{"description": "nom coin","denom_units": [{"denom": "anom","exponent": 0,"aliases": []},{"denom": "mnom","exponent": 6,"aliases": []},{"denom": "nom","exponent": 18,"aliases": []}],"base": "anom","display": "nom"}]' $ONOMY_HOME_CONFIG/genesis.json > $ONOMY_HOME/metadata-genesis.json
+jq '.app_state.bank.denom_metadata += [{"description": "nom coin","denom_units": [{"denom": "anom","exponent": 0,"aliases": []},{"denom": "mnom","exponent": 6,"aliases": []},{"denom": "nom","exponent": 18,"aliases": []}],"base": "anom","display": "nom"}]' $ONOMY_HOME_CONFIG/genesis.json | sponge $ONOMY_HOME_CONFIG/genesis.json
 
+# add change max validators
+jq ".app_state.staking.params.max_validators = $ONOMY_MAX_VALIDATORS" $ONOMY_HOME_CONFIG/genesis.json | sponge $ONOMY_HOME_CONFIG/genesis.json
 
-# a 60 second voting period to allow us to pass governance proposals in the tests
-# jq '.app_state.gov.voting_params.voting_period = "60s"' $ONOMY_HOME/metadata-genesis.json > $ONOMY_HOME/edited-genesis.json
-# mv $ONOMY_HOME/edited-genesis.json $ONOMY_HOME/genesis.json
-# mv $ONOMY_HOME/genesis.json $ONOMY_HOME_CONFIG/genesis.json
-mv $ONOMY_HOME/metadata-genesis.json $ONOMY_HOME_CONFIG/genesis.json
+# add wnom -> anom swap settings
+jq ".app_state.gravity.params.erc20_to_denom_permanent_swap = {\"erc20\": \"$ONOMY_WNOM_ERC20_ADDRESS\", \"denom\": \"$STAKE_DENOM\"}" $ONOMY_HOME_CONFIG/genesis.json | sponge $ONOMY_HOME_CONFIG/genesis.json
 
 echo "Add validator key"
 $ONOMY keys add $ONOMY_VALIDATOR_NAME $ONOMY_KEYRING_FLAG --output json | jq . >> $ONOMY_HOME/validator_key.json
@@ -94,23 +101,17 @@ $ONOMY add-genesis-account "$($ONOMY keys show $ONOMY_VALIDATOR_NAME -a $ONOMY_K
 echo "Adding orchestrator addresses to genesis files"
 $ONOMY add-genesis-account "$($ONOMY keys show $ONOMY_ORCHESTRATOR_NAME -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
 
-echo "Adding faucet account addresses to genesis files"
+echo "Adding additional accounts to genesis files"
 
 for i in {1..5};
 do
-	echo "Adding faucet account $i"
-	$ONOMY keys add --output=json faucet_account$i $ONOMY_KEYRING_FLAG | jq . >> $ONOMY_HOME/faucet_account$i.json
-	$ONOMY add-genesis-account "$($ONOMY keys show faucet_account$i -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
+	echo "Adding additional account $i"
+	$ONOMY keys add --output=json account$i $ONOMY_KEYRING_FLAG | jq . >> $ONOMY_HOME/account$i.json
+	$ONOMY add-genesis-account "$($ONOMY keys show account$i -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
 done
 
-echo "Generating ethereum keys"
-$ONOMY eth_keys add --output=json | jq . >> $ONOMY_HOME/eth_key.json
-echo "private: $(jq -r .private_key $ONOMY_HOME/eth_key.json)" > $ONOMY_HOME/validator-eth-keys
-echo "public: $(jq -r .public_key $ONOMY_HOME/eth_key.json)" >> $ONOMY_HOME/validator-eth-keys
-echo "address: $(jq -r .address $ONOMY_HOME/eth_key.json)" >> $ONOMY_HOME/validator-eth-keys
-
 echo "Creating gentxs"
-$ONOMY gentx --ip $ONOMY_HOST $ONOMY_VALIDATOR_NAME 1000000000000000000000$STAKE_DENOM "$(jq -r .address $ONOMY_HOME/eth_key.json)" "$(jq -r .address $ONOMY_HOME/orchestrator_key.json)" $ONOMY_KEYRING_FLAG $ONOMY_CHAINID_FLAG
+$ONOMY gentx --ip $ONOMY_HOST $ONOMY_VALIDATOR_NAME $ONOMY_STAKE_COINS $ETH_ORCHESTRATOR_VALIDATOR_ADDRESS "$(jq -r .address $ONOMY_HOME/orchestrator_key.json)" $ONOMY_KEYRING_FLAG $ONOMY_CHAINID_FLAG
 
 echo "Collecting gentxs in $ONOMY_NODE_NAME"
 $ONOMY collect-gentxs
@@ -122,6 +123,7 @@ fsed "s#\"tcp://127.0.0.1:26656\"#\"tcp://$ONOMY_HOST:26656\"#g" $ONOMY_NODE_CON
 fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CONFIG
 fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
 fsed 's#external_address = ""#external_address = "tcp://'$ip:26656'"#g' $ONOMY_NODE_CONFIG
+fsed "s#0.0.0.0:9090#$ONOMY_HOST:$ONOMY_GRPC_PORT#g" $ONOMY_APP_CONFIG
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
 

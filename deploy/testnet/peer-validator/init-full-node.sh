@@ -9,8 +9,7 @@ ONOMY_HOME=$HOME/.onomy
 # Name of the network to bootstrap
 #echo "Enter chain-id"
 #read chainid
-CHAINID="onomy-testnet
-"
+CHAINID="onomy-testnet"
 # Name of the onomy artifact
 ONOMY=onomyd
 
@@ -19,6 +18,8 @@ ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy}
 
 # The address to run onomy node
 ONOMY_HOST="0.0.0.0"
+# The port of the onomy gRPC
+ONOMY_GRPC_PORT="9191"
 # Config directories for onomy node
 ONOMY_HOME_CONFIG="$ONOMY_HOME/config"
 # Config file for onomy node
@@ -29,12 +30,12 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seed node
 
-read -r -p "Enter node id of an existing validator that is running on chain [5e0f5b9d54d3e038623ddb77c0b91b559ff13495]:" ONOMY_SEED_ID
+# @TODO @Parth update it to multiple seed nodes
+read -r -p "Enter node id of an existing seed [5e0f5b9d54d3e038623ddb77c0b91b559ff13495]:" ONOMY_SEED_ID
 ONOMY_SEED_ID=${ONOMY_SEED_ID:-5e0f5b9d54d3e038623ddb77c0b91b559ff13495}
-
+# @TODO @Parth update it to any of seed nodes
 read -r -p "Enter Hostname/IP Address of the same node [testnet1.onomy.io]:" ONOMY_SEED_IP
 ONOMY_SEED_IP=${ONOMY_SEED_IP:-"testnet1.onomy.io"}
-
 
 ONOMY_SEED="$ONOMY_SEED_ID@$ONOMY_SEED_IP:26656"
 
@@ -50,10 +51,10 @@ echo '{
 }' > $ONOMY_HOME/node_info.json
 
 # ------------------ Get IP Address --------------
-deafult_ip=$(hostname -I | awk '{print $1}')
+default_ip=$(hostname -I | awk '{print $1}')
 
-read -r -p "Enter your ip address [$ip]: " ip
-ip=${ip:-deafult_ip}
+read -r -p "Enter your ip address [$default_ip]:" ip
+ip=${ip:-$default_ip}
 
 # ------------------ Init onomy ------------------
 
@@ -86,6 +87,7 @@ fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CON
 fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
 fsed 's#external_address = ""#external_address = "tcp://'$ip:26656'"#g' $ONOMY_NODE_CONFIG
 fsed 's#seeds = ""#seeds = "'$ONOMY_SEED'"#g' $ONOMY_NODE_CONFIG
+fsed "s#0.0.0.0:9090#$ONOMY_HOST:$ONOMY_GRPC_PORT#g" $ONOMY_APP_CONFIG
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
 fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $ONOMY_HOME/node_info.json
