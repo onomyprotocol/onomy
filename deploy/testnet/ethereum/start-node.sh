@@ -15,7 +15,7 @@ fi
 
 geth --rinkeby --http --http.addr 0.0.0.0 --http.api eth,net,web3,personal,txpool,admin --syncmode full &>> $GETH_LOG_FILE &
 
-echo "Ethereum rinkeby is started, check the logs file $ONOMY_LOG_FILE"
+echo "Ethereum rinkeby is started, check the logs file $GETH_LOG_FILE"
 
 GETH_SYNCING_COMMAND="geth --rinkeby attach --exec \"eth.syncing\""
 echo "You can check the sync status by command: $GETH_SYNCING_COMMAND"
