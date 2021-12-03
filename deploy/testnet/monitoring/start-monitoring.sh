@@ -1,12 +1,7 @@
 #!/bin/bash
 set -eu
 
-if [[ -z "${ONOMY_NODE_IP}" ]]; then
-  echo "The variable ONOMY-NODE-IP is required: "
-  exit
-fi
-
-echo "Starting monitoring for: $ONOMY_NODE_IP"
+echo "Starting monitoring"
 
 docker-compose up -d
 
