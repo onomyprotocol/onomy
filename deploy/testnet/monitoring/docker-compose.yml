@@ -1,0 +1,54 @@
+version: "3.5"
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
+networks:
+  cosmos-monitoring:
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+       - type: volume
+         source: prometheus_data
+         target: /prometheus
+       - type: bind
+         source: ./prometheus
+         target: /etc/prometheus
+         read_only: true 
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    ports:
+      - 9090:9090
+    networks:
+      - cosmos-monitoring
+    restart: always
+
+  # default login credentials: admin/admin
+  grafana:
+    image: grafana/grafana:latest
+    env_file: ./grafana/grafana.conf
+    container_name: grafana
+    volumes:
+      - type: volume
+        source: grafana_data
+        target: /var/lib/grafana
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+    ports:
+      - 3000:3000
+    networks:
+      - cosmos-monitoring
+    restart: always
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - 9100:9100
+    networks:
+      - cosmos-monitoring

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-echo "Updating the validator to work with sentries"
+echo "Enable the node's monitoring"
 
 # Initial dir
 ONOMY_HOME=$HOME/.onomy
@@ -19,6 +19,6 @@ fsed() {
   fi
 }
 
-fsed 's#prometheus = false""#prometheus = true#g' $ONOMY_NODE_CONFIG
+fsed 's#prometheus = false#prometheus = true#g' $ONOMY_NODE_CONFIG
 
 echo "The prometheus is enabled"

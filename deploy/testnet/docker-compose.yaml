@@ -1,14 +1,13 @@
 version: '3'
 
 services:
-  onomy:
+  validator1:
     image: onomy/testnet-node:local
     restart: on-failure
-    container_name: onomy-testnet-node-runner
-    environment:
-      ETH_RPC_ADDRESS: https://eth-rinkeby.alchemyapi.io/v2/...
+    container_name: onomy-testnet-validator1
     volumes:
-      - ./testnet:/root/testnet
+      - .:/root/testnet
+    command: "sleep 100000000"
     ports:
       # onomy
       - 26656:26656
@@ -16,5 +15,11 @@ services:
       - 26660:26660 # prometheus
       - 1317:1317 # swagger
       - 61278:61278
-      - 9090:9090
-      - 8000:8000 # fauset
+      - 9191:9191
+  validator2:
+    image: onomy/testnet-node:local
+    restart: on-failure
+    container_name: onomy-testnet-validator2
+    volumes:
+      - .:/root/testnet
+    command: "sleep 100000000"
