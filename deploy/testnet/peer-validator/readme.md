@@ -1,4 +1,4 @@
-# Steps to run the master node
+# Steps to run the peer-validator node
 
 ## Install dependencies from source code
 
@@ -14,6 +14,30 @@ You can use default or get in from the master node
 
 ```
 ./init-full-node.sh
+```
+
+Get the node id:
+
+```
+onomyd tendermint show-node-id
+```
+
+Get the node ip:
+
+```
+hostname -I | awk '{print $1}'
+```
+
+## Optional with seeds
+
+### Start sentry nodes based on instructions from the [sentry-node](../sentry-node/readme.md)
+
+### Run script to set up the private connection of the validator and sentries
+
+You will need to provide the sentry IPs.
+
+```
+./set-sentry.sh
 ```
 
 ## Start the node
@@ -78,7 +102,7 @@ onomyd q bank balances {orchestrator-address}
 
 Before run the script please set env variable:
 
-* $ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY - the Ethereum private key which will be use for the orchestrator
+* ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY - the Ethereum private key which will be use for the orchestrator
 * ETH_GRAVITY_CONTRACT_ADDRESS - gravity contract address (will be a constant later)
 
 ```
@@ -101,57 +125,3 @@ Before run the script please set env variable:
 ```
 ./start-orchestrator.sh
 ```
-
-# Run inside the container with master validator
-
-## Set up the master node from the instruction in the master-validator.
-
-## Commit master node
-
-```
-docker commit onomy-testnet-master onomy-testnet-master-working
-```
-
-## Create network to conntct container
-
-```
-docker network create --driver bridge testnet
-```
-
-## Run the master (from the testnet folder)
-
-```
-docker run -dit --name onomy-testnet-master-working -v `pwd`/master-validator:/root/master-validator -w /root/master-validator --network testnet onomy-testnet-master-working sleep 10000000000
-```
-
-## Login to onomy-testnet-master-working
-
-```
-docker exec -it onomy-testnet-master-working bash
-```
-
-## Run the validator (from the testnet folder)
-
-```
-docker run -dit --name onomy-testnet-peer-working -v `pwd`/peer-validator:/root/peer-validator -w /root/peer-validator --network testnet fedora:35 sleep 10000000000
-```
-
-## Login to onomy-testnet-peer-working
-
-```
-docker exec -it onomy-testnet-peer-working bash
-```
-
-## Ping master node
-
-```
-yum install iputils
-```
-
-Ping and capture the output
-
-```
-ping onomy-testnet-master-working
-```
-
-Then the node is ready to start the main steps.

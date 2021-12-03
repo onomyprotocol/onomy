@@ -16,6 +16,36 @@ Before run the script please set env variable:
 ./init-master.sh
 ```
 
+Get the node id:
+
+```
+onomyd tendermint show-node-id
+```
+
+Get the node ip:
+
+```
+hostname -I | awk '{print $1}'
+```
+
+## Optional seed/sentry
+
+### Start seed nodes based on instructions from the [seed-node](../seed-node/readme.md)
+
+### Start sentry nodes based on instructions from the [sentry-node](../sentry-node/readme.md)
+
+The genesys path is: /root/.onomy/config/genesis.json
+
+### Run script to set up the private connection of the validator and sentries
+
+You will need to provide the sentry IPs.
+
+```
+./set-sentry.sh
+```
+
+--------------------------------------------------------------
+
 ## Start the node
 
 Before run the script please set up "ulimit > 65536":

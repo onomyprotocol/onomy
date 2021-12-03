@@ -45,6 +45,10 @@ if [[ -z "${ETH_ORCHESTRATOR_VALIDATOR_ADDRESS}" ]]; then
   exit
 fi
 
+default_ip=$(hostname -I | awk '{print $1}')
+read -r -p "Enter your ip address [$default_ip]:" ip
+ip=${ip:-$default_ip}
+
 mkdir -p $ONOMY_HOME
 echo '{
         "validator_name": "",
@@ -60,12 +64,6 @@ fsed() {
     sed -i '' "$@"
   fi
 }
-
-# ------------------ Get IP Address --------------
-default_ip=$(hostname -I | awk '{print $1}')
-
-read -r -p "Enter your ip address [$default_ip]:" ip
-ip=${ip:-$default_ip}
 
 # ------------------ Init onomy ------------------
 
