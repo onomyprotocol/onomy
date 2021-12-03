@@ -29,7 +29,9 @@ echo "--------------installing golang---------------------------"
 curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output $HOME/go.tar.gz
 tar -C $HOME -xzf $HOME/go.tar.gz
 export PATH=$PATH:$HOME/go/bin
-go env
+export GOPATH=$HOME/go
+echo "export GOPATH=$HOME/go" >> ~/.bashrc
+go version
 
 echo "----------------------installing onomy---------------"
 git clone -b $ONOMY_VERSION https://github.com/onomyprotocol/onomy.git $ONOMY_SRC

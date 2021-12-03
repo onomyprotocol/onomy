@@ -21,8 +21,24 @@ ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 read -r -p "Enter a name for your node [onomy-seed]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-seed}
 
+ONOMY_SEEDS_IPS=
+read -r -p "Optionally enter seeds ips, ip1,ip2:" ONOMY_SEEDS_IPS
+
 ONOMY_SEEDS=
-read -r -p "Optionally enter seeds peers, id@ip:port,id2@ip2:port :" ONOMY_SEEDS
+for seedIP in ${ONOMY_SEEDS_IPS//,/ } ; do
+  wget $seedIP:26657/status? -O $ONOMY_HOME/seed_status.json
+  seedID=$(jq -r .result.node_info.id $ONOMY_HOME/seed_status.json)
+
+  if [[ -z "${seedID}" ]]; then
+    echo "Something went wrong, can't fetch $seedIP info: "
+    cat $ONOMY_HOME/seed_status.json
+    exit
+  fi
+
+  rm $ONOMY_HOME/seed_status.json
+
+  ONOMY_SEEDS="$ONOMY_SEEDS$seedID@$seedIP:26656,"
+done
 
 default_ip=$(hostname -I | awk '{print $1}')
 read -r -p "Enter your ip address [$default_ip]:" ip
@@ -47,6 +63,16 @@ echo "Initializing genesis files"
 # Initialize the home directory and add some keys
 echo "Init test chain"
 $ONOMY $ONOMY_CHAINID_FLAG init $ONOMY_NODE_NAME
+
+# if variable not empty load genesys from the seed
+if [[ -n "${ONOMY_SEEDS}" ]]; then
+  #copy master genesis file from the seed
+  seed_id=$(sed 's/.*@\(.*\):.*/\1/' <<< "$ONOMY_SEEDS")
+  wget $seed_id:26657/genesis? -O $ONOMY_HOME/raw_genesis.json
+  rm $ONOMY_HOME_CONFIG/genesis.json
+  jq .result.genesis $ONOMY_HOME/raw_genesis.json >> $ONOMY_HOME_CONFIG/genesis.json
+  rm $ONOMY_HOME/raw_genesis.json
+fi
 
 echo "Exposing ports and APIs of the $ONOMY_NODE_NAME"
 # Switch sed command in the case of linux

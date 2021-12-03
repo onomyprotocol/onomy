@@ -30,9 +30,9 @@ hostname -I | awk '{print $1}'
 
 ## Optional seed/sentry
 
-### Start seed nodes based on instructions from the [seed-node](../seed-node/readme.md)
+### Start seed nodes based on instructions from the [seed](../seed/readme.md)
 
-### Start sentry nodes based on instructions from the [sentry-node](../sentry-node/readme.md)
+### Start sentry nodes based on instructions from the [sentry](../sentry/readme.md)
 
 The genesys path is: /root/.onomy/config/genesis.json
 
