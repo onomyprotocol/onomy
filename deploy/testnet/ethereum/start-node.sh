@@ -8,8 +8,8 @@ ONOMY_HOME="$HOME/.onomy"
 mkdir -p $ONOMY_HOME/logs
 GETH_LOG_FILE=$ONOMY_HOME/logs/geth.log
 
-if [ "$(ulimit -n)" -lt 65536 ]; then
-    echo "Fail ulimit: $(ulimit -n) < 65536"
+if [ "$(ulimit -n)" -lt 65535 ]; then
+    echo "Fail ulimit: $(ulimit -n) < 65535"
     exit
 fi
 

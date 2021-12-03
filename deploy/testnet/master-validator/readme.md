@@ -48,7 +48,7 @@ You will need to provide the sentry IPs.
 
 ## Start the node
 
-Before run the script please set up "ulimit > 65536":
+Before run the script please set up "ulimit > 65535":
 
 ```
 ./start-node.sh
