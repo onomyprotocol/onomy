@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-echo "Starting onomy full node"
+echo "Starting ethereum full node"
 
 # Name of the onomy artifact
 ONOMY_HOME="$HOME/.onomy"
@@ -14,6 +14,8 @@ if [ "$(ulimit -n)" -lt 65535 ]; then
 fi
 
 geth --rinkeby --http --http.addr 0.0.0.0 --http.api eth,net,web3,personal,txpool,admin --syncmode full &>> $GETH_LOG_FILE &
+
+echo "Ethereum rinkeby is started, check the logs file $ONOMY_LOG_FILE"
 
 GETH_SYNCING_COMMAND="geth --rinkeby attach --exec \"eth.syncing\""
 echo "You can check the sync status by command: $GETH_SYNCING_COMMAND"
