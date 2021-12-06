@@ -46,6 +46,10 @@ echo "ETH_RPC_ADDRESS: $ETH_RPC_ADDRESS, ETH_GRAVITY_CONTRACT_ADDRESS: $ETH_GRAV
 
 #-------------------- Run orchestrator --------------------
 
+while ! timeout 1 bash -c "</dev/tcp/$ONOMY_HOST/$ONOMY_GRPC_PORT"; do
+  sleep 1
+done
+
 echo "Starting orchestrator"
 
 gbt -a $ONOMY_ADDRESS_PREFIX orchestrator \
