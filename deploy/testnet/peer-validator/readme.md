@@ -42,8 +42,6 @@ You will need to provide the sentry IPs.
 
 ## Optionally expose monitoring
 
-Open the [monitoring](../monitoring) folder and run
-
 ```
 ./expose-metrics.sh
 ```
