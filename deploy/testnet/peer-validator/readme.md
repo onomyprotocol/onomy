@@ -130,8 +130,12 @@ onomyd q gravity current-valset
 Before run the script please set env variable:
 
 * ETH_RPC_ADDRESS - the RPC address of the Ethereum node
-* ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY - the Ethereum private key which will be use for the orchestrator
 
 ```
 ./start-orchestrator.sh
 ```
+
+## Setup auto-start
+
+Add env ETH_RPC_ADDRESS, start-node.sh and start-orchestrator.sh
+to your ~/.bashrc in order to start automatically after the OS restart.

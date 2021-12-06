@@ -45,3 +45,8 @@ hostname -I | awk '{print $1}'
 ```
 
 The seed peer is: id@$ip:26656
+
+
+## Setup auto-start
+
+Add start-node.sh to your ~/.bashrc in order to start automatically after the OS restart.
