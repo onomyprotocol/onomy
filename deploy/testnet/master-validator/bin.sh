@@ -18,7 +18,8 @@ sudo dnf -y copr enable ngompa/musl-libc
 sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 sudo dnf -y install subscription-manager
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-sudo dnf -y install curl nano ca-certificates tar git jq gcc-c++ openssl-devel musl-devel musl-gcc gmp-devel perl python3 moreutils wget nodejs make hostname procps-ng
+sudo dnf -y --skip-broken install curl nano ca-certificates tar git jq gcc-c++ gcc-toolset-9 openssl-devel musl-devel musl-gcc gmp-devel perl python3 moreutils wget nodejs make hostname procps-ng
+source "/opt/rh/gcc-toolset-9/enable"
 
 echo "--------------installing rust---------------------------"
 curl https://sh.rustup.rs -sSf | bash -s -- -y
