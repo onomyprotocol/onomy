@@ -16,4 +16,4 @@ Before run the script please set up "ulimit > 65535":
 
 ## Setup auto-start
 
-Add start-node.sh to your ~/.bashrc in order to start automatically after the OS restart.
+Add start-node.sh to your crontab or /etc/init.d in order to start automatically after the OS restart.

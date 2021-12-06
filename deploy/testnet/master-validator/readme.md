@@ -85,7 +85,7 @@ Before run the script please set env variable:
 ## Setup auto-start 
 
 Add envs ETH_RPC_ADDRESS and ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY,  start-node.sh,  start-orchestrator.sh 
-to your ~/.bashrc in order to start automatically after the OS restart.
+to your crontab or /etc/init.d in order to start automatically after the OS restart.
 
 # Run inside the container
 

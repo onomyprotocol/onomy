@@ -136,4 +136,4 @@ Before run the script please set env variable:
 ## Setup auto-start
 
 Add env ETH_RPC_ADDRESS, start-node.sh and start-orchestrator.sh
-to your ~/.bashrc in order to start automatically after the OS restart.
+to your crontab or /etc/init.d in order to start automatically after the OS restart.
