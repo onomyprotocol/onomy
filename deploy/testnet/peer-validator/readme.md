@@ -136,4 +136,11 @@ Before run the script please set env variable:
 ## Setup auto-start
 
 Add env ETH_RPC_ADDRESS, start-node.sh and start-orchestrator.sh
-to your ~/.bashrc in order to start automatically after the OS restart.
+to your crontab or /etc/init.d in order to start automatically after the OS restart.
+
+If you used the bin.sh installation then additionally you need to add
+```
+export PATH=$PATH:$ONOMY_HOME/bin
+```
+
+In your start scripts (after the ONOMY_HOME initialization)

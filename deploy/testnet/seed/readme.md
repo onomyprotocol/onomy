@@ -49,4 +49,11 @@ The seed peer is: id@$ip:26656
 
 ## Setup auto-start
 
-Add start-node.sh to your ~/.bashrc in order to start automatically after the OS restart.
+Add start-node.sh to your crontab or /etc/init.d in order to start automatically after the OS restart.
+
+If you used the bin.sh installation then additionally you need to add
+```
+export PATH=$PATH:$ONOMY_HOME/bin
+```
+
+In your start scripts (after the ONOMY_HOME initialization)
