@@ -20,12 +20,12 @@ STAKE_DENOM="anom"
 
 if [[ -z "${ONOMY_VALIDATOR_MNEMONIC}" ]]; then
   echo "Fail: ONOMY_VALIDATOR_MNEMONIC is empty, check the file: $ONOMY_HOME/validator_key.json"
-  exit
+  exit 1
 fi
 
 if [[ -z "${ONOMY_ORCHESTRATOR_MNEMONIC}" ]]; then
   echo "Fail: ONOMY_ORCHESTRATOR_MNEMONIC is empty, check the file: $ONOMY_HOME/orchestrator_key.json"
-  exit
+  exit 1
 fi
 
 gbt init

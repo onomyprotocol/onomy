@@ -26,7 +26,7 @@ for sentryIP in ${ONOMY_SENTRY_IPS//,/ } ; do
   if [[ -z "${sentryID}" ]]; then
     echo "Something went wrong, can't fetch $sentryIP info: "
     cat $ONOMY_HOME/sentry_status.json
-    exit
+    exit 1
   fi
 
   rm $ONOMY_HOME/sentry_status.json

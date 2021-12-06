@@ -10,7 +10,7 @@ GETH_LOG_FILE=$ONOMY_HOME/logs/geth.log
 
 if [ "$(ulimit -n)" -lt 65535 ]; then
     echo "Fail ulimit: $(ulimit -n) < 65535"
-    exit
+    exit 1
 fi
 
 geth --rinkeby --http --http.addr 0.0.0.0 --http.api eth,net,web3,personal,txpool,admin --syncmode full &>> $GETH_LOG_FILE &

@@ -32,7 +32,7 @@ for seedIP in ${ONOMY_SEEDS_IPS//,/ } ; do
   if [[ -z "${seedID}" ]]; then
     echo "Something went wrong, can't fetch $seedIP info: "
     cat $ONOMY_HOME/seed_status.json
-    exit
+    exit 1
   fi
 
   rm $ONOMY_HOME/seed_status.json

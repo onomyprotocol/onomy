@@ -13,12 +13,12 @@ ONOMY_HOST="0.0.0.0"
 
 if [[ -z "${ETH_RPC_ADDRESS}" ]]; then
   echo "Fail: ETH_RPC_ADDRESS is not set"
-  exit
+  exit 1
 fi
 
 if [[ -z "${ETH_PRIVATE_KEY}" ]]; then
   echo "Fail: ETH_PRIVATE_KEY is not set"
-  exit
+  exit 1
 fi
 
 echo "ETH_RPC_ADDRESS: $ETH_RPC_ADDRESS and ETH_PRIVATE_KEY: $ETH_PRIVATE_KEY"
@@ -36,7 +36,7 @@ CONTRACT_ADDRESS=$(echo "$deploy_response" | grep "Gravity deployed at Address" 
 
 if [[ -z "${CONTRACT_ADDRESS}" ]]; then
   echo "Something went wrong: $deploy_response"
-  exit
+  exit 1
 fi
 
 echo $CONTRACT_ADDRESS >> $ONOMY_HOME/eth_contract_address
