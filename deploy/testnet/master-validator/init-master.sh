@@ -42,7 +42,7 @@ ONOMY_WNOM_ERC20_ADDRESS="0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C"
 
 if [[ -z "${ETH_ORCHESTRATOR_VALIDATOR_ADDRESS}" ]]; then
   echo "Fail: ETH_ORCHESTRATOR_VALIDATOR_ADDRESS is not set"
-  exit
+  exit 1
 fi
 
 default_ip=$(hostname -I | awk '{print $1}')

@@ -28,7 +28,7 @@ Get the node ip:
 hostname -I | awk '{print $1}'
 ```
 
-## Optional with seeds
+## Optionally with seeds
 
 ### Start sentry nodes based on instructions from the [sentry](../sentry/readme.md)
 
@@ -39,6 +39,14 @@ You will need to provide the sentry IPs.
 ```
 ./set-sentry.sh
 ```
+
+## Optionally expose monitoring
+
+```
+./expose-metrics.sh
+```
+
+This script will enable the prometheus metrics in your node config.
 
 ## Start the node
 
@@ -80,7 +88,7 @@ If the "amount" is updated you are ready to become a validator
 ./create-validator.sh
 ```
 
-Also you cat check all current validators now.
+Also you can check all current validators now.
 
 ```
 onomyd q staking validators
@@ -120,8 +128,19 @@ onomyd q gravity current-valset
 Before run the script please set env variable:
 
 * ETH_RPC_ADDRESS - the RPC address of the Ethereum node
-* ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY - the Ethereum private key which will be use for the orchestrator
 
 ```
 ./start-orchestrator.sh
 ```
+
+## Setup auto-start
+
+Add env ETH_RPC_ADDRESS, start-node.sh and start-orchestrator.sh
+to your crontab or /etc/init.d in order to start automatically after the OS restart.
+
+If you used the bin.sh installation then additionally you need to add
+```
+export PATH=$PATH:$ONOMY_HOME/bin
+```
+
+In your start scripts (after the ONOMY_HOME initialization)

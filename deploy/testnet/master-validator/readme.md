@@ -28,7 +28,7 @@ Get the node ip:
 hostname -I | awk '{print $1}'
 ```
 
-## Optional seed/sentry
+## Optionally seed/sentry
 
 ### Start seed nodes based on instructions from the [seed](../seed/readme.md)
 
@@ -45,6 +45,14 @@ You will need to provide the sentry IPs.
 ```
 
 --------------------------------------------------------------
+
+## Optionally expose monitoring
+
+```
+./expose-metrics.sh
+```
+
+This script will enable the prometheus metrics in your node config.
 
 ## Start the node
 
@@ -73,6 +81,18 @@ Before run the script please set env variable:
 ```
 ./start-orchestrator.sh
 ```
+
+## Setup auto-start
+
+Add envs ETH_RPC_ADDRESS and ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY,  start-node.sh,  start-orchestrator.sh
+to your crontab or /etc/init.d in order to start automatically after the OS restart.
+
+If you used the bin.sh installation then additionally you need to add
+```
+export PATH=$PATH:$ONOMY_HOME/bin
+```
+
+In your start scripts (after the ONOMY_HOME initialization)
 
 # Run inside the container
 
