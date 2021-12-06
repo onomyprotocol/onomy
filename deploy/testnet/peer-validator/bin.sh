@@ -18,7 +18,7 @@ sudo dnf -y copr enable ngompa/musl-libc
 sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 sudo dnf -y install subscription-manager
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-sudo dnf -y install curl nano ca-certificates tar git jq gcc-c++ musl-devel musl-gcc gmp-devel perl python3 moreutils wget nodejs make hostname procps-ng
+sudo dnf -y install curl nano ca-certificates tar git jq gcc-c++ openssl-devel musl-devel musl-gcc gmp-devel perl python3 moreutils wget nodejs make hostname procps-ng
 
 echo "--------------installing rust---------------------------"
 curl https://sh.rustup.rs -sSf | bash -s -- -y
@@ -29,7 +29,9 @@ echo "--------------installing golang---------------------------"
 curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output $HOME/go.tar.gz
 tar -C $HOME -xzf $HOME/go.tar.gz
 export PATH=$PATH:$HOME/go/bin
-go env
+export GOPATH=$HOME/go
+echo "export GOPATH=$HOME/go" >> ~/.bashrc
+go version
 
 echo "----------------------installing onomy---------------"
 git clone -b $ONOMY_VERSION https://github.com/onomyprotocol/onomy.git $ONOMY_SRC

@@ -88,6 +88,10 @@ docker exec -it onomy-testnet-sentry3 bash
 
 Now you are ready to set up any config
 
+# How to set up the ulimit for HREL8
+
+./set-ulimit-hrel8.sh
+
 # Utils
 
 ## Ping master node
@@ -101,3 +105,4 @@ Ping and capture the output
 ```
 ping onomy-testnet-master
 ```
+

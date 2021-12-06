@@ -30,7 +30,7 @@ hostname -I | awk '{print $1}'
 
 ## Optional with seeds
 
-### Start sentry nodes based on instructions from the [sentry-node](../sentry-node/readme.md)
+### Start sentry nodes based on instructions from the [sentry](../sentry/readme.md)
 
 ### Run script to set up the private connection of the validator and sentries
 
@@ -42,7 +42,7 @@ You will need to provide the sentry IPs.
 
 ## Start the node
 
-Before run the script please set up "ulimit > 65536":
+Before run the script please set up "ulimit > 65535":
 
 ```
 ./start-node.sh
