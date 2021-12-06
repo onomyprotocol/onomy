@@ -82,10 +82,17 @@ Before run the script please set env variable:
 ./start-orchestrator.sh
 ```
 
-## Setup auto-start 
+## Setup auto-start
 
-Add envs ETH_RPC_ADDRESS and ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY,  start-node.sh,  start-orchestrator.sh 
+Add envs ETH_RPC_ADDRESS and ETH_ORCHESTRATOR_VALIDATOR_PRIVATE_KEY,  start-node.sh,  start-orchestrator.sh
 to your crontab or /etc/init.d in order to start automatically after the OS restart.
+
+If you used the bin.sh installation then additionally you need to add
+```
+export PATH=$PATH:$ONOMY_HOME/bin
+```
+
+In your start scripts (after the ONOMY_HOME initialization)
 
 # Run inside the container
 
