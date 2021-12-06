@@ -46,5 +46,4 @@ Before run the script please set up "ulimit > 65535":
 
 ## Setup auto-start
 
-Add env ETH_RPC_ADDRESS, start-node.sh and start-orchestrator.sh
-to your ~/.bashrc in order to start automatically after the OS restart.
+Add start-node.sh to your ~/.bashrc in order to start automatically after the OS restart.
