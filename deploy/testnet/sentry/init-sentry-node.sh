@@ -23,9 +23,25 @@ ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 read -r -p "Enter a name for your node [onomy-sentry]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-sentry}
 
+ONOMY_SEEDS_IPS=
+while [[ $ONOMY_SEEDS_IPS = "" ]]; do
+   read -r -p "Enter seeds ips, ip1,ip2:" ONOMY_SEEDS_IPS
+done
+
 ONOMY_SEEDS=
-while [[ $ONOMY_SEEDS = "" ]]; do
-   read -r -p "Enter seeds peers, id@ip:port,id2@ip2:port : " ONOMY_SEEDS
+for seedIP in ${ONOMY_SEEDS_IPS//,/ } ; do
+  wget $seedIP:26657/status? -O $ONOMY_HOME/seed_status.json
+  seedID=$(jq -r .result.node_info.id $ONOMY_HOME/seed_status.json)
+
+  if [[ -z "${seedID}" ]]; then
+    echo "Something went wrong, can't fetch $seedIP info: "
+    cat $ONOMY_HOME/seed_status.json
+    exit
+  fi
+
+  rm $ONOMY_HOME/seed_status.json
+
+  ONOMY_SEEDS="$ONOMY_SEEDS$seedID@$seedIP:26656,"
 done
 
 ONOMY_VALIDATOR_ID=

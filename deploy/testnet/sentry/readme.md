@@ -16,6 +16,14 @@ You can use default or get in from the master node
 ./init-sentry-node.sh
 ```
 
+## Optionally expose monitoring
+
+```
+./expose-metrics.sh
+```
+
+This script will enable the prometheus metrics in your node config.
+
 ## Start the node
 
 Before run the script please set up "ulimit > 65535":

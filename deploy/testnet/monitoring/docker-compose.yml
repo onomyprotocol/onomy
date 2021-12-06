@@ -1,8 +1,8 @@
 version: "3.5"
 
 volumes:
-  prometheus_data: {}
-  grafana_data: {}
+  prometheus_data: { }
+  grafana_data: { }
 
 networks:
   cosmos-monitoring:
@@ -12,13 +12,13 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-       - type: volume
-         source: prometheus_data
-         target: /prometheus
-       - type: bind
-         source: ./prometheus
-         target: /etc/prometheus
-         read_only: true 
+      - type: volume
+        source: prometheus_data
+        target: /prometheus
+      - type: bind
+        source: ./prometheus
+        target: /etc/prometheus
+        read_only: true
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'

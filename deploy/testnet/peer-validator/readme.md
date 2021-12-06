@@ -28,7 +28,7 @@ Get the node ip:
 hostname -I | awk '{print $1}'
 ```
 
-## Optional with seeds
+## Optionally with seeds
 
 ### Start sentry nodes based on instructions from the [sentry](../sentry/readme.md)
 
@@ -39,6 +39,16 @@ You will need to provide the sentry IPs.
 ```
 ./set-sentry.sh
 ```
+
+## Optionally expose monitoring
+
+Open the [monitoring](../monitoring) folder and run
+
+```
+./expose-metrics.sh
+```
+
+This script will enable the prometheus metrics in your node config.
 
 ## Start the node
 
@@ -80,7 +90,7 @@ If the "amount" is updated you are ready to become a validator
 ./create-validator.sh
 ```
 
-Also you cat check all current validators now.
+Also you can check all current validators now.
 
 ```
 onomyd q staking validators

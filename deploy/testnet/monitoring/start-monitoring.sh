@@ -12,15 +12,14 @@ fsed() {
 
 if [[ ! -f "prometheus/prometheus.yml" ]]
 then
-  if [[ -z "${ONOMY_NODE_IP}" ]]; then
-    echo "The variable ONOMY-NODE-IP is required to initial start: "
-    exit
-  fi
+  ONOMY_NODE_IP=
+  while [[ $ONOMY_NODE_IP = "" ]]; do
+     read -r -p "Enter the ip of the node you want to include for the monitoring:" ONOMY_NODE_IP
+  done
+
   cp prometheus/template.prometheus.yml prometheus/prometheus.yml
   fsed "s#ONOMY_NODE_IP#$ONOMY_NODE_IP#g" prometheus/prometheus.yml
 fi
-
-
 
 echo "Starting monitoring"
 

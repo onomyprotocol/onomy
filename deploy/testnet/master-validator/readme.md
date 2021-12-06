@@ -28,7 +28,7 @@ Get the node ip:
 hostname -I | awk '{print $1}'
 ```
 
-## Optional seed/sentry
+## Optionally seed/sentry
 
 ### Start seed nodes based on instructions from the [seed](../seed/readme.md)
 
@@ -45,6 +45,14 @@ You will need to provide the sentry IPs.
 ```
 
 --------------------------------------------------------------
+
+## Optionally expose monitoring
+
+```
+./expose-metrics.sh
+```
+
+This script will enable the prometheus metrics in your node config.
 
 ## Start the node
 

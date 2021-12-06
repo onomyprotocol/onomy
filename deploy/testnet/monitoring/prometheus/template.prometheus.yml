@@ -1,6 +1,6 @@
 # my global config
 global:
-  scrape_interval:     5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  scrape_interval: 5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
   evaluation_interval: 5s # Evaluate rules every 15 seconds. The default is every 1 minute.
   # scrape_timeout is set to the global default (10s).
 
@@ -9,18 +9,18 @@ global:
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: [ 'localhost:9090' ]
 
   - job_name: 'cosmos'
     static_configs:
-      - targets: ["ONOMY_NODE_IP:26660"]
+      - targets: [ "ONOMY_NODE_IP:26660" ]
         labels:
           environment: testnet
           instance: 'sentry'
 
   - job_name: 'node'
     static_configs:
-      - targets: ["node-exporter:9100"]
+      - targets: [ "node-exporter:9100" ]
         labels:
           environment: testnet
           instance: 'sentry'
