@@ -2,6 +2,8 @@
 ONOMY_HOME=$HOME/.onomy
 GETH_SRC=$ONOMY_HOME/src/go-ethereum
 
+GETH_VERSION="v1.10.13"
+
 #Creating Directories
 mkdir $HOME/.onomy
 mkdir $ONOMY_HOME/src
@@ -25,7 +27,7 @@ echo "export GOPATH=$HOME/go" >> ~/.bashrc
 go version
 
 echo "-------------------installing geth-----------------------"
-git clone https://github.com/ethereum/go-ethereum $GETH_SRC
+git clone -b $GETH_VERSION https://github.com/ethereum/go-ethereum $GETH_SRC
 cd $GETH_SRC
 make geth
 cp build/bin/geth $ONOMY_HOME/bin/geth
