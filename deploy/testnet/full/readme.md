@@ -34,6 +34,12 @@ hostname -I | awk '{print $1}'
 ./expose-metrics.sh
 ```
 
+## Optionally allow cors requests
+
+```
+./allow-cors.sh
+```
+
 This script will enable the prometheus metrics in your node config.
 
 ## Start the node
