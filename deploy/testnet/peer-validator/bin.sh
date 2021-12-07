@@ -6,6 +6,7 @@ GETH_SRC=$ONOMY_HOME/src/go-ethereum
 
 GRAVITY_VERSION="v0.0.0-20210915184851-orch-nomarket"
 ONOMY_VERSION="v0.0.3"
+GETH_VERSION="v1.10.13"
 
 #Creating Directories
 mkdir $HOME/.onomy
@@ -48,7 +49,7 @@ cargo build --target=x86_64-unknown-linux-musl --release  --all
 cp $GRAVITY_SRC/orchestrator/target/x86_64-unknown-linux-musl/release/gbt $ONOMY_HOME/bin/gbt
 
 echo "-------------------installing geth-----------------------"
-git clone https://github.com/ethereum/go-ethereum $GETH_SRC
+git clone -b $GETH_VERSION https://github.com/ethereum/go-ethereum $GETH_SRC
 cd $GETH_SRC
 make geth
 cp build/bin/geth $ONOMY_HOME/bin/geth
