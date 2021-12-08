@@ -17,3 +17,10 @@ scrape_configs:
         labels:
           environment: testnet
           instance: 'validator'
+
+  - job_name: 'node'
+    static_configs:
+      - targets: [ "ONOMY_NODE_IP:9100" ]
+        labels:
+          environment: testnet
+          instance: 'validator'
