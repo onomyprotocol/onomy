@@ -25,5 +25,8 @@ These configurations can be found in the genesis file under the slashing section
 In order to unjail the validator, you may run the following command once 10 minutes have passed
 
 ```
-onomyd tx slashing unjail --chain-id=onomy-testnet --gas-prices=0.025
+onomyd tx slashing unjail --from <validator-name> --chain-id=onomy-testnet --keyring-backend test --gas-prices=0.025
 ```
+
+
+
