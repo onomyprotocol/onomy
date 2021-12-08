@@ -24,7 +24,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.enable-lifecycle'
     ports:
-      - 9090:9090
+      - 9091:9090
     networks:
       - cosmos-monitoring
     restart: always
@@ -45,10 +45,3 @@ services:
     networks:
       - cosmos-monitoring
     restart: always
-
-  node-exporter:
-    image: prom/node-exporter:latest
-    ports:
-      - 9100:9100
-    networks:
-      - cosmos-monitoring
