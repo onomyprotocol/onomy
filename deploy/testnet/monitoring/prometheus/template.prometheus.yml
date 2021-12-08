@@ -16,11 +16,4 @@ scrape_configs:
       - targets: [ "ONOMY_NODE_IP:26660" ]
         labels:
           environment: testnet
-          instance: 'sentry'
-
-  - job_name: 'node'
-    static_configs:
-      - targets: [ "node-exporter:9100" ]
-        labels:
-          environment: testnet
-          instance: 'sentry'
+          instance: 'validator'

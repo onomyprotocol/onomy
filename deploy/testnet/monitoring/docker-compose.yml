@@ -45,10 +45,3 @@ services:
     networks:
       - cosmos-monitoring
     restart: always
-
-  node-exporter:
-    image: prom/node-exporter:latest
-    ports:
-      - 9100:9100
-    networks:
-      - cosmos-monitoring
