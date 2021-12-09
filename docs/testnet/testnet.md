@@ -22,3 +22,5 @@ testnet1.onomy.io:26657
 - [How to Become a Validator](onomy-testnet-docs/setting-up-a-validator.md)
 - [How to Get NOM via the Testnet Faucet](onomy-testnet-docs/faucet.md)
 - [Testing the Onomy Network](onomy-testnet-docs/testing-gravity.md)
+- [What is delegation](onomy-testnet-docs/delegation.md)
+- [What is validator jailing](onomy-testnet-docs/unjailing.md)
