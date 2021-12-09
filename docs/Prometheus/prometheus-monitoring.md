@@ -2,20 +2,20 @@
 
 
 ## Table Of Contents
-1. [What is Prometheus](#desc11)
-2. [Architecture](#desc)
-3. [Prometheus server.](#desc1)
-4. [Prometheus targets](#desc2)
-5. [Alertmanager](#desc3)
+1. [What is Prometheus](#desc1)
+2. [Architecture](#desc2)
+3. [Prometheus server.](#desc3)
+4. [Prometheus targets](#desc4)
+5. [Alertmanager](#desc5)
 
-<a name="desc11"></a>
+<a name="desc1"></a>
 ## What is Prometheus
 Prometheus is an open-source systems monitoring and alerting toolkit originally built at SoundCloud. Since its inception in 2012, many companies and organizations have adopted Prometheus, and the project has a very active developer and user community. It is now a standalone open source project and maintained independently of any company. To emphasize this, and to clarify the project's governance structure, Prometheus joined the Cloud Native Computing Foundation in 2016 as the second hosted project, after Kubernetes.
 
 Prometheus collects and stores its metrics as time series data, i.e. metrics information is stored with the timestamp at which it was recorded, alongside optional key-value pairs called labels.
 
 
-<a name="desc"></a>
+<a name="desc2"></a>
 ## Architecture.
 This diagram illustrates the architecture of Prometheus and some of its ecosystem components:
 
@@ -24,7 +24,7 @@ This diagram illustrates the architecture of Prometheus and some of its ecosyste
 
 
 Prometheus scrapes metrics from instrumented jobs, either directly or via an intermediary push gateway for short-lived jobs. It stores all scraped samples locally and runs rules over this data to either aggregate and record new time series from existing data or generate alerts. Grafana or other API consumers can be used to visualize the collected data.
-<a name="desc1"></a>
+<a name="desc3"></a>
 ## Prometheus server.
 
 * This is the main core.
@@ -69,7 +69,7 @@ And also define set of rules in config.yml file .
 * As you can gather from http://localhost:9090/metrics, one metric that Prometheus exports about itself is named prometheus_target_interval_length_seconds (the actual amount of time between target scrapes). Enter the below into the expression console and then click "Execute":
  
 
-<a name="desc2"></a>
+<a name="desc4"></a>
 ## Prometheus targets
 Jobs/exporters - Exporters extract data of node,system. Prometheus pull the data from exporters and saved in DB.so then we can visualize the node's and system's data in graphical or numberical form via prometheus.
   
@@ -85,7 +85,7 @@ To install and run exporter for onomyd artifact in locally , where you node is r
 
 
 
-<a name="desc3"></a>
+<a name="desc5"></a>
 ## Alertmanager
  
 Alerting with Prometheus is separated into two parts. Alerting rules in Prometheus servers send alerts to an Alertmanager. The Alertmanager then manages those alerts, including silencing, inhibition, aggregation and sending out notifications via methods such as email, on-call notification systems, and chat platforms.
