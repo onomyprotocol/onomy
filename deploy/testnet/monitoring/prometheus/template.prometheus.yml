@@ -24,3 +24,12 @@ scrape_configs:
         labels:
           environment: testnet
           instance: 'validator'
+
+  - job_name: 'geth'
+    metrics_path: /debug/metrics/prometheus
+    scheme: http
+    static_configs:
+      - targets: [ "ONOMY_NODE_IP:6060" ]
+        labels:
+          environment: testnet
+          instance: 'validator'

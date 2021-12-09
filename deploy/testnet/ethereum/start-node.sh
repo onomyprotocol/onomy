@@ -13,7 +13,8 @@ if [ "$(ulimit -n)" -lt 65535 ]; then
     exit 1
 fi
 
-geth --rinkeby --http --http.addr 0.0.0.0 --http.api eth,net,web3,personal,txpool,admin --syncmode full &>> $GETH_LOG_FILE &
+geth --rinkeby --http --http.addr 0.0.0.0 --http.api eth,net,web3,personal,txpool,admin --syncmode full \
+ --pprof --pprof.addr 0.0.0.0 --pprof.port 6060 --metrics &>> $GETH_LOG_FILE &
 
 echo "Ethereum rinkeby is started, check the logs file $GETH_LOG_FILE"
 
