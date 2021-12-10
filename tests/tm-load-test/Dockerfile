@@ -30,7 +30,6 @@ RUN apk add --no-cache  jq moreutils
 # ------------------ run node ------------------
 
 WORKDIR /root/home
-RUN cp -r $ONOMY_DIR/deploy/testnet/master-validator master-validator
 
 RUN bash $ONOMY_DIR/tests/tm-load-test/init-master.sh
 WORKDIR $ONOMY_DIR/tests/tm-load-test
