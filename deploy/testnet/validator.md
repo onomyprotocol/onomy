@@ -14,7 +14,7 @@
 
 * Optionally with sentries
 
-    * Start sentry nodes based on instructions from the [sentry](../sentry/readme.md)
+    * Start sentry nodes based on instructions from the [sentry node setup](../sentry/readme.md)
 
         Get the node id:
         ```
@@ -29,13 +29,13 @@
         
     * Run script to set up the private connection of the validator and sentries
 
-    You will need to provide the sentry IPs.
+        Make sure to setup and start all the sentries before running this script as you will need to provide IPs of all the sentry nodes.
     
-    ```
-    ./set-sentry.sh
-    ```
+        ```
+        ./set-sentry.sh
+        ```
 
-* Expose onomy node monitoring
+* Optionally expose monitoring
 
 ```
 ./expose-metrics.sh
@@ -43,7 +43,7 @@
 
 * Start the node
 
-Before run the script please set up "ulimit > 65535" ([example-hrel8](set-ulimit-hrel8.md))
+Before running the script please set up "ulimit > 65535" ([Red Hat Enterprise Linux](set-ulimit-rhel8.md))
 
 ```
 ./start-node.sh
@@ -98,7 +98,7 @@ onomyd q bank balances {orchestrator-address}
 ./init-gbt.sh
 ```
 
-Check that your Ethereum address is in the list of curren valset
+Check that your Ethereum address is in the list of current valset
 
 ```
 onomyd q gravity current-valset
@@ -106,15 +106,17 @@ onomyd q gravity current-valset
 
 * Run orchestrator
 
-Before run the script please set env variable:
+    * Before running the script please set env variable:
 
-* ETH_RPC_ADDRESS - the RPC address of the Ethereum node
+        * ETH_RPC_ADDRESS - the RPC address of the Ethereum node
+        
+    * start-orchestrator
 
-```
-./start-orchestrator.sh
-```
+        ```
+        ./start-orchestrator.sh
+        ```
 
-* Run node exporter
+* Optionally run node exporter
 
 ```
 ./start-node-exporter.sh
@@ -128,5 +130,5 @@ Add to your crontab or /etc/init.d scripts:
 * `start-orchestrator.sh` (set envs or updated script with ETH_RPC_ADDRESS envs)
 * `start-node-exporter.sh`
 
-***If you used the bin.sh installation and what to use the scripts for the auto-start, additionally you need to
+***If you used the bin.sh installation and want to use the scripts for the auto-start, additionally you need to
 add ```export PATH=$PATH:$ONOMY_HOME/bin``` to your scripts after the ```ONOMY_HOME=$HOME/.onomy```***

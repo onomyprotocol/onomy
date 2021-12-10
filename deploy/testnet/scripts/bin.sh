@@ -32,6 +32,7 @@ cargo version
 echo "--------------installing golang---------------------------"
 curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output $HOME/go.tar.gz
 tar -C $HOME -xzf $HOME/go.tar.gz
+rm $HOME/go.tar.gz
 export PATH=$PATH:$HOME/go/bin
 export GOPATH=$HOME/go
 echo "export GOPATH=$HOME/go" >> ~/.bashrc
@@ -60,6 +61,7 @@ echo "-------------------installing node_exporter-----------------------"
 curl -LO "https://github.com/prometheus/node_exporter/releases/download/v$NODE_EXPORTER_VERSION/node_exporter-$NODE_EXPORTER_VERSION.linux-amd64.tar.gz"
 tar -xvf "node_exporter-$NODE_EXPORTER_VERSION.linux-amd64.tar.gz"
 mv "node_exporter-$NODE_EXPORTER_VERSION.linux-amd64/node_exporter" $ONOMY_HOME/bin/node_exporter
+rm -r "node_exporter-$NODE_EXPORTER_VERSION.linux-amd64"
 
 echo "-------------------adding binaries to path-----------------------"
 

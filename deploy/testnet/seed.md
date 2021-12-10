@@ -11,10 +11,10 @@
 ```
 ./init-seed-node.sh
 ```
-If other seeds were provided then the genesis.json was downloaded, if not then get the genesys file 
-and replace /root/.onomy/config/genesis.json.
+If other seeds were provided then the genesis.json was downloaded, 
+if not then download genesis file manually and replace it with $ONOMY_HOME/config/genesis.json
 
-* Expose monitoring
+* Optionally expose monitoring
 
 ```
 ./expose-metrics.sh
@@ -22,7 +22,7 @@ and replace /root/.onomy/config/genesis.json.
 
 * Start the node
 
-Before run the script please set up "ulimit > 65535" ([example-hrel8](set-ulimit-hrel8.md))
+Before running the script please set up "ulimit > 65535" ([Red Hat Enterprise Linux](set-ulimit-rhel8.md))
 
 ```
 ./start-node.sh
@@ -34,13 +34,7 @@ Before run the script please set up "ulimit > 65535" ([example-hrel8](set-ulimit
 echo "seed=$(onomyd tendermint show-node-id)@$(hostname -I | awk '{print $1}'):26656"   
 ```
 
-* Expose monitoring
-
-```
-./expose-metrics.sh
-```
-
-* Run node exporter
+* Optionally run node exporter
 
 ```
 ./start-node-exporter.sh
@@ -48,7 +42,7 @@ echo "seed=$(onomyd tendermint show-node-id)@$(hostname -I | awk '{print $1}'):2
 
 * Start the node
 
-Before run the script please set up "ulimit > 65535" ([example-hrel8](set-ulimit-hrel8.md))
+Before running the script please set up "ulimit > 65535" ([Red Hat Enterprise Linux](set-ulimit-rhel8.md))
 
 ```
 ./start-node.sh
@@ -61,5 +55,5 @@ Add to your crontab or /etc/init.d scripts:
 * `start-node.sh`
 * `start-node-exporter.sh`
 
-***If you used the bin.sh installation and what to use the scripts for the auto-start, additionally you need to
+***If you used the bin.sh installation and want to use the scripts for the auto-start, additionally you need to
 add ```export PATH=$PATH:$ONOMY_HOME/bin``` to your scripts after the ```ONOMY_HOME=$HOME/.onomy```***

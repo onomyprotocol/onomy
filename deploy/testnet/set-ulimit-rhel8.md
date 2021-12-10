@@ -1,6 +1,6 @@
-# Set correct ulimits for hrel8
+# Set correct ulimits for rhel8
 
-Run the following line to set correct ulimits.
+Run the following commands to set correct ulimits.
 
 ```
 echo 'fs.file-max = 65536' >> /etc/sysctl.conf
