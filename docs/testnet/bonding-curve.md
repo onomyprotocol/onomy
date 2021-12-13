@@ -31,7 +31,7 @@ The bonding curve has many benefits as a way to distribute _NOM_:
 
 The Onomy Network Staking Curve carries a tight relationship with the Bonding Curve. The staking curve acts as a principal motivator for participants who purchased _wNOM_ to bridge from Ethereum to the Onomy Network to capture the opportunity to earn staking rewards. _NOM_ holders can either choose to become validators themselves, or delegate their _NOM_ to a validator to earn staking rewards minus a validator fee.
 
-![Uploading image.png…]()
+![image](https://user-images.githubusercontent.com/76499838/145861495-9667f434-6c22-4361-a3b5-98abddcf1c9c.png)
 
 The staking rewards incentivize _wNOM_ on the bonding curve to bridge into _NOM,_ thereby driving value into the Onomy Ecosystem. Once bridged, bonding curve participants formalize their entry into Onomy and relinquish the ability to sell back to the bonding curve. Liquidity thereby comes from the ONEX and anticipated exchange listings.
 
@@ -42,3 +42,9 @@ The bonding curve is perpetual until all 100M w_NOM_ are issued. Thus, an arbitr
 _Nothing in this post shall constitute or be construed as an offer to sell or the solicitation of an offer to purchase any securities. Nothing in this post shall be construed as investment advice, strategy, or investment recommendations by Onomy or any of its affiliates. This post is for informational purposes only._
 
 _This communication contains forward-looking statements that are based on Onomy’s beliefs and assumptions based on information currently available to Onomy. In some cases, you can identify forward-looking statements by the following words: “will,” “expect,” “would,” “intend,” “believe,” "anticipate," or other comparable terminology.These statements involve risks, uncertainties, assumptions, and other factors that may cause actual results or performance to be materially different. Onomy cannot assure you that the forward-looking statements will prove to be accurate. These forward-looking statements speak only as of the date hereof. We disclaim any obligation to update these forward-looking statements._
+
+## Risk Disclosure
+
+_The Bonding Curve Automated Market Maker is a decentralized protocol that people can use to create liquidity and trade wNOM tokens. Your use of the Bonding Curve Contract and its Platform involves various risks, including, but not limited to, losses due to the fluctuation of prices of tokens in a trading pair or smart contract vulnerabilities. You are responsible for doing your own diligence on those interfaces to understand the fees and risks they present._
+
+_THE BONDING CURVE CONTRACT AND PLATFORM IS PROVIDED "AS IS", AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND. Although NOM LABS developed the code, it does not provide, own, or control the Bonding Curve Contract or Platform, which is run by smart contracts deployed on the Ethereum blockchain. No developer or entity involved in creating the Bonding Curve Contract or Platform will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of, the Bonding Curve Contract or Platform, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value._ 
