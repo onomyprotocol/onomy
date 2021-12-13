@@ -56,8 +56,7 @@ mkdir -p $ONOMY_HOME
 echo '{
   "node_name": "",
   "validator_name": "",
-  "chain_id": "",
-  "orchestrator_name": ""
+  "chain_id": ""
 }' > $ONOMY_HOME/node_info.json
 
 # ------------------ Init onomy ------------------

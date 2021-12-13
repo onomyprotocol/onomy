@@ -22,7 +22,6 @@ To join us as a or discuss the current testnet, kindly get in touch with us via 
 - [How to install Onomy](installation.md)
 - [How to Run a Full Node](full.md)
 - [How to Get ANOMs/NOMs](bonding-curve.md)
-- [How to test Ethereum bridge](testing-gravity.md)
 - [How to Become a Delegator](delegation.md)
 - [How to Become a Validator](validator.md)
 - [Monitoring](../../deploy/monitoring/readme.md)

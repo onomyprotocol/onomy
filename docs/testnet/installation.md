@@ -41,8 +41,6 @@ To download and install binaries follow these steps
 ```
 cd $HOME/.onomy/bin
 wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.3/onomyd
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.3/gbt
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.3/geth
 chmod +x *
 ```
 
