@@ -14,7 +14,7 @@ modules for the upcoming production Onomy incentivized testnet and mainnet.
 The documentation here will guide you through the steps needed to run full nodes, become a validator, obtain ANOM/NOM, and
 try out the Onomy Network.
 
-To join us as a or discuss the current testnet, kindly get in touch with us via [Discord](https://discord.gg/6DvnqymMDG)
+To join us as a or discuss the current testnet, kindly get in touch with us via [Discord](https://discord.gg/27r73SYAkQ)
 . More focused discussions are possible on our [official forum](https://forum.onomy.io/).
 
 ## Documents
