@@ -7,7 +7,7 @@ full node requires no external software.
 
 System requirements:
 
-- Any modern Linux distribution (RHEL 8 or Fedora 35 are preferred)
+- Any modern Linux distribution (RHEL 8 or Fedora 36 are preferred)
 - A quad-core CPU
 - 16 GiB RAM
 - 320gb of storage space
