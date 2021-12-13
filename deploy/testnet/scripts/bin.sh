@@ -3,7 +3,6 @@ ONOMY_HOME=$HOME/.onomy
 ONOMY_SRC=$ONOMY_HOME/src/onomy
 
 ONOMY_VERSION="v0.0.3"
-NODE_EXPORTER_VERSION="0.18.1"
 
 mkdir $HOME/.onomy
 mkdir $ONOMY_HOME/src
@@ -34,12 +33,6 @@ git clone -b $ONOMY_VERSION https://github.com/onomyprotocol/onomy.git $ONOMY_SR
 cd $ONOMY_SRC
 make build
 cp onomyd $ONOMY_HOME/bin/onomyd
-
-echo "-------------------installing node_exporter-----------------------"
-curl -LO "https://github.com/prometheus/node_exporter/releases/download/v$NODE_EXPORTER_VERSION/node_exporter-$NODE_EXPORTER_VERSION.linux-amd64.tar.gz"
-tar -xvf "node_exporter-$NODE_EXPORTER_VERSION.linux-amd64.tar.gz"
-mv "node_exporter-$NODE_EXPORTER_VERSION.linux-amd64/node_exporter" $ONOMY_HOME/bin/node_exporter
-rm -r "node_exporter-$NODE_EXPORTER_VERSION.linux-amd64"
 
 echo "-------------------adding binaries to path-----------------------"
 
