@@ -55,7 +55,6 @@ mkdir -p $ONOMY_HOME
 # make a file to store node information
 echo '{
   "node_name": "",
-  "validator_name": "",
   "chain_id": ""
 }' > $ONOMY_HOME/node_info.json
 

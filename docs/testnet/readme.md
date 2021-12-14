@@ -1,6 +1,6 @@
 # Onomy Testnet
 
-At [Onomy Protocol](https://onomy.io/), we are excited to launch our first public testnet for the Onomy Network (ONET)
+At [Onomy Protocol](https://onomy.io/), we are excited to launch our public testnet for the Onomy Network (ONET)
 blockchain.
 
 As a Cosmos Tendermint-based chain, the ONET works via a Proof of Stake consensus mechanism, where the ANOM and it's 10^18 NOM representation is bonded to
@@ -11,10 +11,10 @@ trading of NOM, Onomy's stablecoins, and other crypto assets.
 This iteration is also focused on proving out the Gravity bridge as well as deployment methodology and other custom
 modules for the upcoming production Onomy incentivized testnet and mainnet.
 
-The documentation here will guide you through the steps needed to run full nodes, become a validator, obtain ANOM/NOM, and
+The documentation here will guide you through the steps needed to run full nodes, obtain ANOM/NOM, and
 try out the Onomy Network.
 
-To join us as a or discuss the current testnet, kindly get in touch with us via [Discord](https://discord.gg/27r73SYAkQ)
+To join us or discuss the current testnet, kindly get in touch with us via [Discord](https://discord.gg/27r73SYAkQ)
 . More focused discussions are possible on our [official forum](https://forum.onomy.io/).
 
 ## Documents
@@ -24,4 +24,3 @@ To join us as a or discuss the current testnet, kindly get in touch with us via 
 - [How to Get ANOMs/NOMs](bonding-curve.md)
 - [How to Become a Delegator](delegation.md)
 - [How to Become a Validator](validator.md)
-- [Monitoring](../../deploy/monitoring/readme.md)

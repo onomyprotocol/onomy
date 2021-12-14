@@ -119,7 +119,6 @@ You should be good to go! You can check the status of the Onomy chain by running
 ```
 curl http://<your_ip>:26657/status
 ```
-
-if catching_up is false means your node is fully synced
- 
+Or by visiting the same URL from the browser.
+If catching_up is false means your node is fully synced.
 Optionally add the "onomyd start" as a linux service or add to a crontab
