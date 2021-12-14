@@ -40,7 +40,7 @@ To download and install binaries follow these steps
 
 ```
 cd $HOME/.onomy/bin
-wget https://github.com/onomyprotocol/onomy/releases/latest/download/onomyd
+wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.3/onomyd
 chmod +x *
 ```
 
@@ -58,7 +58,7 @@ script files.
 In order to install using RPM, use the following command:
 
 ```
-sudo yum install "https://github.com/onomyprotocol/onomy/releases/latest/download/onomy.x86_64.rpm"
+sudo yum install "https://github.com/onomyprotocol/onomy/releases/download/v0.0.3/onomy.x86_64.rpm"
 ```
 
 Running this command will take care of all the dependancies and it will install the required binaries
