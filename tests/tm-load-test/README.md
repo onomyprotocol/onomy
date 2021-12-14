@@ -3,7 +3,7 @@ In order to use the tools, you will need:
 
 * Go 1.13+
  ## Building
-To build the `onomy tm-load-test` binary run the command ``` make build-onomy-load-test``` in root directory.
+To build the `onomy tm-load-test` binary run the command ``` make build-load-test``` in root directory.
 
 ## Usage
 `onomy tm-load-test` can be executed in one of two modes: **standalone**, or

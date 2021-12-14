@@ -13,20 +13,13 @@ ARG ONOMY_DIR=/go/src/github.com/onomyprotocol/onomy/
 # clone the repo
 COPY . $ONOMY_DIR
 
-#install golang
-#RUN curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output go.tar.gz
-#RUN tar -C /usr/local -xzf go.tar.gz
-#ENV PATH="/usr/local/go/bin:$PATH"
-#ENV GOPATH=/go
-#ENV PATH=$PATH:$GOPATH/bin
-
 # build onomyd artifact
 WORKDIR $ONOMY_DIR
 RUN make install
 
 #----------------------building binary of tm-load-test custom client-------------------
 WORKDIR $ONOMY_DIR
-RUN make build-onomy-load-test
+RUN make build-load-test
 WORKDIR $ONOMY_DIR/build
 RUN cp onomy-load-test /usr/bin/onomy-load-test
 RUN onomy-load-test --help
@@ -37,11 +30,9 @@ RUN apk add --no-cache  jq moreutils
 # ------------------ run node ------------------
 
 WORKDIR /root/home
-RUN cp -r $ONOMY_DIR/deploy/testnet/master-validator master-validator
 
-RUN bash /root/home/master-validator/init.sh
-WORKDIR /root/home
-RUN  cp -r $ONOMY_DIR/tests/tm-load-test/run-load-test run-load-test  
+RUN bash $ONOMY_DIR/tests/tm-load-test/init-master.sh
+WORKDIR $ONOMY_DIR/tests/tm-load-test
 
 
  

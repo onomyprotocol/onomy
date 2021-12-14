@@ -27,15 +27,12 @@ ONOMY_VALIDATOR_NAME=validator1
 # The name of the onomy orchestrator/validator
 ONOMY_ORCHESTRATOR_NAME=orch
 # Onomy chain demons
-STAKE_DENOM="nom"
+STAKE_DENOM="anom"
 #NORMAL_DENOM="samoleans"
 NORMAL_DENOM="footoken"
-# The port of the onomy gRPC
-ONOMY_GRPC_PORT="9090"
 
 mkdir -p $ONOMY_HOME
-# The host of ethereum node
-ETH_HOST="0.0.0.0"
+
 echo '{
         "validator_name": "",
         "chain_id": "",
@@ -85,18 +82,6 @@ $ONOMY add-genesis-account "$($ONOMY keys show $ONOMY_VALIDATOR_NAME -a $ONOMY_K
 echo "Adding orchestrator addresses to genesis files"
 $ONOMY add-genesis-account "$($ONOMY keys show $ONOMY_ORCHESTRATOR_NAME -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
 
-echo "Adding faucet account addresses to genesis files"
-$ONOMY keys add --output=json faucet_account1 $ONOMY_KEYRING_FLAG | jq . >> $ONOMY_HOME/faucet_account1.json
-$ONOMY keys add --output=json faucet_account2 $ONOMY_KEYRING_FLAG | jq . >> $ONOMY_HOME/faucet_account2.json
-$ONOMY keys add --output=json faucet_account3 $ONOMY_KEYRING_FLAG | jq . >> $ONOMY_HOME/faucet_account3.json
-$ONOMY keys add --output=json faucet_account4 $ONOMY_KEYRING_FLAG | jq . >> $ONOMY_HOME/faucet_account4.json
-$ONOMY keys add --output=json faucet_account5 $ONOMY_KEYRING_FLAG | jq . >> $ONOMY_HOME/faucet_account5.json
-$ONOMY add-genesis-account "$($ONOMY keys show faucet_account1 -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
-$ONOMY add-genesis-account "$($ONOMY keys show faucet_account2 -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
-$ONOMY add-genesis-account "$($ONOMY keys show faucet_account3 -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
-$ONOMY add-genesis-account "$($ONOMY keys show faucet_account4 -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
-$ONOMY add-genesis-account "$($ONOMY keys show faucet_account5 -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
-
 echo "Generating ethereum keys"
 $ONOMY eth_keys add --output=json | jq . >> $ONOMY_HOME/eth_key.json
 echo "private: $(jq -r .private_key $ONOMY_HOME/eth_key.json)" > $ONOMY_HOME/validator-eth-keys
@@ -116,6 +101,7 @@ fsed "s#\"tcp://127.0.0.1:26656\"#\"tcp://$ONOMY_HOST:26656\"#g" $ONOMY_NODE_CON
 fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CONFIG
 fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
 fsed 's#external_address = ""#external_address = "tcp://'$ONOMY_HOST:26656'"#g' $ONOMY_NODE_CONFIG
+fsed 's#log_level = \"info\"#log_level = \"error\"#g' $ONOMY_NODE_CONFIG
 fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
 fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
 

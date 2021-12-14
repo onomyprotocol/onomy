@@ -18,13 +18,13 @@ Users can easily manage assets from connected networks via Onomy Access (multi-c
 
 # Testnet
 
-Join the Testnet #1! You can find the testnet documentation [here](docs/testnet/testnet.md) 
+Join the Testnet #1! You can find the testnet documentation [here](docs/testnet/readme.md) 
 
 # Development
 
 The development branch is **dev**. The branch might contain unstable changes.
 
-All the changes should path through the flow "**feature-branch**" -> "**Pull Request**" -> "**dev**".
+All the changes should pass through the flow "**feature-branch**" -> "**Pull Request**" -> "**dev**".
 
 ## Format code by the project rules
 

@@ -11,21 +11,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run test-case first
-        run:  bash tests/tm-load-test/setup-chain.sh 1 20 1000 250 
+        run:  bash tests/tm-load-test/run-test.sh 1 20 1000 250 
 
   time-15_rate-200_size-2500:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name:  Run test-case second
-        run: bash tests/tm-load-test/setup-chain.sh 1 15 200 2500 
+        run: bash tests/tm-load-test/run-test.sh 1 15 200 2500 
 
   time-10_rate-10_size-310:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Run test-case third
-        run: bash tests/tm-load-test/setup-chain.sh 1 10 10 310 
+        run: bash tests/tm-load-test/run-test.sh 1 10 10 310 
 
     
     
