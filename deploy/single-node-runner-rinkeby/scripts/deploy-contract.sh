@@ -38,7 +38,8 @@ contract-deployer \
 --eth-node="$ETH_RPC_ADDRESS" \
 --eth-privkey="$ETH_ORCHESTRATOR_PRIVATE_KEY" \
 --contract=/root/home/solidity/Gravity.json \
---test-mode=false | grep "Gravity deployed at Address" | grep -Eow '0x[0-9a-fA-F]{40}' >> $ONOMY_HOME/eth_contract_address
+--test-mode=false \
+--wnom-address="0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C" | grep "Gravity deployed at Address" | grep -Eow '0x[0-9a-fA-F]{40}' >> $ONOMY_HOME/eth_contract_address
 
 CONTRACT_ADDRESS=$(cat $ONOMY_HOME/eth_contract_address)
 
