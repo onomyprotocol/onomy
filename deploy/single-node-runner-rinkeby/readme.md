@@ -48,7 +48,7 @@ settings and genesys file of the chain.
 ***The contract used for the runner***.
 
 ```
-Gravity deployed at Address - 0x0F23c3f0C77582a5dB7fB3D61097B619982fb32f
+Gravity deployed at Address - 0x39cea5A03Bd5266D8e6D9A942b258923df99926D
 ```
 
 ## Run
@@ -126,7 +126,7 @@ The ETC20 coins used in that part are FAU. You can substitute "erc20-address" to
   gbt -a onomy client eth-to-cosmos \
           --ethereum-key="c40f62e75a11789dbaf6ba82233ce8a52c20efb434281ae6977bb0b3a69bf709" \
           --ethereum-rpc="$ETH_RPC_ADDRESS" \
-          --gravity-contract-address=0x0F23c3f0C77582a5dB7fB3D61097B619982fb32f \
+          --gravity-contract-address=0x39cea5A03Bd5266D8e6D9A942b258923df99926D \
           --token-contract-address=0xFab46E002BbF0b4509813474841E0716E6730136 \
           --amount=10 \
           --destination=onomy17vfz8e0ecvpj2emff5q96awcp78tq34tg8fjnm
@@ -140,7 +140,7 @@ The ETC20 coins used in that part are FAU. You can substitute "erc20-address" to
   gbt -a onomy client eth-to-cosmos \
         --ethereum-key="c40f62e75a11789dbaf6ba82233ce8a52c20efb434281ae6977bb0b3a69bf709" \
         --ethereum-rpc="$ETH_RPC_ADDRESS" \
-        --gravity-contract-address=0x0F23c3f0C77582a5dB7fB3D61097B619982fb32f \
+        --gravity-contract-address=0x39cea5A03Bd5266D8e6D9A942b258923df99926D \
         --token-contract-address=0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C \
         --amount=1 \
         --destination=onomy17vfz8e0ecvpj2emff5q96awcp78tq34tg8fjnm
