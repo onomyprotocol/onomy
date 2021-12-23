@@ -11,6 +11,8 @@ import (
 
 	sdkTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/onomyprotocol/onomy/testutil"
 )
 
 func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
@@ -35,10 +37,10 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 	defer wnomTestsBaseContainer.terminate(ctx, t)
 
 	// run ethereum node
-	err = retryWithTimeout(func() error {
+	err = testutil.RetryWithTimeout(func() error {
 		err := wnomTestsBaseContainer.runEthNode(ctx)
 		if err != nil {
-			t.Logf("run eth failed: %s, will be retried in %d", err.Error(), defaultRetryTimeout)
+			t.Logf("run eth failed: %s, will be retried in %d", err.Error(), testutil.DefaultRetryTimeout)
 		}
 		return err
 	}, bootstrappingTimeout)
@@ -47,22 +49,22 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 	}
 
 	// run onomy chain
-	onomyChain, err := newOnomyChain()
+	onomyChain, err := testutil.NewOnomyChain()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := onomyChain.start(bootstrappingTimeout); err != nil {
+	if err := onomyChain.Start(bootstrappingTimeout); err != nil {
 		t.Fatal(err)
 	}
 
 	t.Logf("onomy chain is up, validator: %+v", onomyChain.Validator)
 
 	// deploy gravity
-	err = retryWithTimeout(func() error {
+	err = testutil.RetryWithTimeout(func() error {
 		err := wnomTestsBaseContainer.deployGravity(ctx)
 		if err != nil {
-			t.Logf("deployGravity failed: %s, will be retried in %d", err.Error(), defaultRetryTimeout)
+			t.Logf("deployGravity failed: %s, will be retried in %d", err.Error(), testutil.DefaultRetryTimeout)
 		}
 		return err
 	}, bootstrappingTimeout)
@@ -80,7 +82,7 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 
 	// send wNOM tokens to onomy
 	erc20Amount := int64(10)
-	if err := wnomTestsBaseContainer.sendToCosmos(ctx, wnomERC20Address, erc20Amount, onomyDestinationAddress); err != nil {
+	if err := wnomTestsBaseContainer.sendToCosmos(ctx, testutil.WnomERC20Address, erc20Amount, onomyDestinationAddress); err != nil {
 		t.Fatal(err)
 	}
 	if err := wnomTestsBaseContainer.sendToCosmos(ctx, fauTokeAddress, erc20Amount, onomyDestinationAddress); err != nil {
@@ -89,15 +91,15 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 	t.Log("ERC20 tokens are sent to the gravity contract")
 
 	// waif for the wNOM on the validator balance
-	err = retryWithTimeout(func() error {
-		balance, err := onomyChain.getAccountBalance(onomyDestinationAddress)
+	err = testutil.RetryWithTimeout(func() error {
+		balance, err := onomyChain.GetAccountBalance(onomyDestinationAddress)
 		if err != nil {
 			return err
 		}
 
 		checks := 0
 		for _, coin := range balance {
-			if coin.Denom == anomDenom {
+			if coin.Denom == testutil.AnomDenom {
 				assert.Equal(t, coin.Amount, sdkTypes.NewIntWithDecimal(erc20Amount, 18))
 				checks++
 			}
@@ -110,8 +112,8 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 			return nil
 		}
 
-		err = fmt.Errorf("the node hasn't received the %s tokens yet, balance: %+v", wnomERC20Address, balance)
-		t.Logf("%v, will be retried in %d", err, defaultRetryTimeout)
+		err = fmt.Errorf("the %q hasn't received the %s tokens yet, balance: %+v", onomyDestinationAddress, testutil.WnomERC20Address, balance)
+		t.Logf("%v, will be retried in %d", err, testutil.DefaultRetryTimeout)
 
 		return err
 	}, bootstrappingTimeout)

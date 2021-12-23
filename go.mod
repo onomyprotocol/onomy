@@ -7,27 +7,28 @@ require (
 	github.com/Microsoft/hcsshim v0.9.0 // indirect
 	github.com/althea-net/cosmos-gravity-bridge/module v0.0.0-20210908132153-348250c44fe7
 	github.com/containerd/cgroups v1.0.2 // indirect
-	github.com/cosmos/cosmos-sdk v0.42.1
+	github.com/cosmos/cosmos-sdk v0.42.6
 	github.com/docker/docker v20.10.9+incompatible // indirect
-	github.com/ethereum/go-ethereum v1.10.3
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
+	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gorilla/mux v1.8.0
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
 	github.com/onomyprotocol/tm-load-test v0.9.1-0.20211101093435-b38e68e11c01
-	github.com/pkg/errors v0.9.1
-	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.2.1
 	github.com/stretchr/testify v1.7.0
+	github.com/tendermint/spm v0.1.2
 	github.com/tendermint/tendermint v0.34.14
 	github.com/tendermint/tm-db v0.6.4
 	github.com/testcontainers/testcontainers-go v0.11.1
 	golang.org/x/net v0.0.0-20211020060615-d418f374d309 // indirect
 	golang.org/x/sys v0.0.0-20211020174200-9d6173849985 // indirect
-	google.golang.org/genproto v0.0.0-20211021150943-2b146023228c // indirect
-	google.golang.org/grpc v1.41.0 // indirect
+	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
+	google.golang.org/grpc v1.43.0 // indirect
+	google.golang.org/protobuf v1.27.1
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 

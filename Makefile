@@ -75,18 +75,39 @@ test-integration:
 .PHONY: build-load-test
 build-load-test:
 	go build -tags tmload -o build/onomy-load-test ./tests/tm-load-test/onomy-load-test/
-###############################################################################################
 
 .PHONY: lint
 lint:
-	golangci-lint -c dev/tools/.golangci.yml run --build-tags "integration tmload"
+	golangci-lint -c .golangci.yml run
 	gofmt -d -s $(SCAN_FILES)
 
 .PHONY: format
 format:
 	gofumpt -lang=1.6 -extra -s -w $(SCAN_FILES)
 	gogroup -order std,other,prefix=$(IMPORT_PREFIX) -rewrite $(SCAN_FILES)
+
+###############################################################################
+###                                Protobuf                                 ###
+###############################################################################
+
+
+.PHONY: proto-gen-all
+proto-gen-all: proto-gen-go proto-gen-openapi
+
+.PHONY: proto-gen-openapi
+proto-gen-openapi:
+	starport generate openapi
 	go mod tidy
+
+.PHONY: proto-gen-go
+proto-gen-go:
+	starport generate proto-go
+	go mod tidy
+	make format
+
+.PHONY: proto-lint
+proto-lint:
+	buf lint proto --config buf.yaml
 
 ###############################################################################
 ###                      Docker wrapped commands                            ###
@@ -94,7 +115,7 @@ format:
 
 .PHONY: in-docker
 in-docker:
-	docker build -t onomy-dev-utils ./dev/tools -f dev/tools/Dockerfile.devtools
+	docker build -t onomy-dev-utils ./dev/tools -f dev/tools/devtools.Dockerfile
 	docker run -i --rm \
 		-v ${PWD}:/go/src/github.com/onomyprotocol/onomy:delegated \
 		--mount source=dev-tools-cache,destination=/cache/,consistency=delegated onomy-dev-utils bash -x -c "\
@@ -111,3 +132,7 @@ format-in-docker:
 .PHONY: all-in-docker
 all-in-docker:
 	make in-docker ARGS="make all"
+
+.PHONY: proto-gen-all-in-docker
+proto-gen-all-in-docker:
+	make in-docker ARGS="make proto-gen-all"
