@@ -20,7 +20,7 @@ ONOMY_ADDRESS_PREFIX="onomy"
 ONOMY_ORCHESTRATOR_MNEMONIC="$1"
 
 # onomy stake denom
-STAKE_DENOM=nom
+STAKE_DENOM=anom
 
 # The URL of the running mock eth node.
 ETH_ADDRESS="http://0.0.0.0:8545/"

@@ -1,7 +1,12 @@
 FROM fedora:33
-ENV GOPATH=/go
-ENV PATH=$PATH:/go/bin
-RUN dnf install -y git make gcc gcc-c++ which iproute iputils procps-ng vim-minimal tmux net-tools htop tar jq npm openssl-devel perl golang rust cargo
+RUN dnf install -y git make gcc gcc-c++ which iproute iputils procps-ng vim-minimal tmux net-tools htop tar jq npm openssl-devel perl rust cargo
+
+RUN curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output /root/go.tar.gz
+RUN tar -C /root -xzf /root/go.tar.gz
+RUN rm /root/go.tar.gz
+ENV PATH=$PATH:/root/go/bin
+ENV GOPATH=/root/go
+
 ADD https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.3-991384a7.tar.gz /geth/
 RUN cd /geth && tar -xvf * && mv /geth/**/geth /usr/bin/geth
 # this is the Gravity bridge release, update it along with your go.mod entry
@@ -17,4 +22,4 @@ RUN chmod +x /solidity/contract-deployer
 # this is a bit of a pain but it does speed things up a lot
 ADD onomy.tar.gz /
 # build steps for all codebases in this repo, must be below the add statement
-RUN pushd /onomy/ && PATH=$PATH:/usr/local/go/bin GOPROXY=https://proxy.golang.org PATH=$PATH:/usr/local/go/bin make install
+RUN pushd /onomy/ && make install
