@@ -52,7 +52,7 @@ fsed() {
 echo "Creating $ONOMY_NODE_NAME validator with chain-id=$CHAINID..."
 echo "Initializing genesis files"
 # Build genesis file incl account for passed address
-ONOMY_GENESIS_COINS="1000000000000$STAKE_DENOM,1000000000000$NORMAL_DENOM"
+ONOMY_GENESIS_COINS="1000000000000000000000000$STAKE_DENOM,1000000000000000000000000$NORMAL_DENOM"
 
 # Initialize the home directory and add some keys
 echo "Init test chain"
@@ -89,7 +89,7 @@ echo "public: $(jq -r .public_key $ONOMY_HOME/eth_key.json)" >> $ONOMY_HOME/vali
 echo "address: $(jq -r .address $ONOMY_HOME/eth_key.json)" >> $ONOMY_HOME/validator-eth-keys
 
 echo "Creating gentxs"
-$ONOMY gentx --ip $ONOMY_HOST $ONOMY_VALIDATOR_NAME 1000000000000$STAKE_DENOM "$(jq -r .address $ONOMY_HOME/eth_key.json)" "$(jq -r .address $ONOMY_HOME/orchestrator_key.json)" $ONOMY_KEYRING_FLAG $ONOMY_CHAINID_FLAG
+$ONOMY gentx --ip $ONOMY_HOST $ONOMY_VALIDATOR_NAME 1000000000000000000000000$STAKE_DENOM "$(jq -r .address $ONOMY_HOME/eth_key.json)" "$(jq -r .address $ONOMY_HOME/orchestrator_key.json)" $ONOMY_KEYRING_FLAG $ONOMY_CHAINID_FLAG
 
 echo "Collecting gentxs in $ONOMY_NODE_NAME"
 $ONOMY collect-gentxs
