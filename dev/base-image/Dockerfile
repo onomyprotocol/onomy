@@ -29,14 +29,14 @@ RUN apt-get -y install nodejs
 
 # ------------------ contract-deployer ------------------
 
-ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.2/Gravity.json /root/home/solidity/Gravity.json
-ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.2/TestERC20A.json /root/home/solidity/TestERC20A.json
-ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.2/contract-deployer /usr/bin/contract-deployer
+ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.3/Gravity.json /root/home/solidity/Gravity.json
+ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.3/TestERC20A.json /root/home/solidity/TestERC20A.json
+ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.3/contract-deployer /usr/bin/contract-deployer
 RUN chmod +x /usr/bin/contract-deployer
 
 # ------------------ orchestrator ------------------
 
-ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.2/gbt /usr/bin/gbt
+ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/v0.0.3/gbt /usr/bin/gbt
 RUN chmod +x /usr/bin/gbt
 
 # ------------------ ethereum go (geth) ------------------

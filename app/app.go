@@ -3,6 +3,7 @@ package app
 
 import (
 	"io"
+	"math/big"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -222,6 +223,9 @@ func New( // nolint:funlen // this is the generate init func.
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
+
+	// change default power reduction to 18 digits, since the onomy anom is 18 digits based.
+	sdk.PowerReduction = sdk.NewIntFromBigInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)) // nolint: gomnd
 
 	bApp := baseapp.NewBaseApp(Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)

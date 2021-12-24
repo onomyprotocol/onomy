@@ -31,19 +31,23 @@ const (
 	// WnomERC20Address is wnom eth address .
 	WnomERC20Address = "0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C"
 
-	// TestChainName is default test chain name.
-	TestChainName = "chain-1"
-	// TestChainFlag is default chain flag.
-	TestChainFlag = "--chain-id=" + TestChainName
-	// TestChainKeyRingFlag is default keyring flag.
-	TestChainKeyRingFlag = "--keyring-backend=test"
-	jsonOutFlag          = "--output=json"
-	// TestChainDenom is default chain denom.
-	TestChainDenom = AnomDenom
-	// TestChainValidatorGenesysAmount is default validator genesys amount.
-	TestChainValidatorGenesysAmount = "10000000000000" + TestChainDenom
+	// ChainName is default test chain name.
+	ChainName = "chain-1"
+	// ChainFlag is default chain flag.
+	ChainFlag = "--chain-id=" + ChainName
+	// KeyRingFlag is default keyring flag.
+	KeyRingFlag = "--keyring-backend=test"
+	jsonOutFlag = "--output=json"
+	// ChainDenom is default chain denom.
+	ChainDenom = AnomDenom
+	// MinGlobalSelfDelegation is the value for app_state.staking.params.min_global_self_delegation.
+	MinGlobalSelfDelegation = "250000000000000000000000" // 250k noms
+	// MinSelfDelegationFlag is the generic min-self-delegation for a validator.
+	MinSelfDelegationFlag = "--min-self-delegation=" + MinGlobalSelfDelegation
+	// ValidatorGenesysAmount is default validator genesys amount.
+	ValidatorGenesysAmount = "1000000000000000000000000" + ChainDenom // 1m noms
 	// TestChainValidatorStakeAmount is default validator genesys stake amount.
-	TestChainValidatorStakeAmount = "1000000000000" + TestChainDenom
+	TestChainValidatorStakeAmount = MinGlobalSelfDelegation + ChainDenom
 	// TestChainValidator1Name is default validator name.
 	TestChainValidator1Name = "validator1"
 	// TestChainValidator1EthAddress is default validator eth pub key.
@@ -71,7 +75,7 @@ func NewOnomyChain() (*OnomyChain, error) {
 	homeFlag := "--home=" + dir
 
 	// generate genesys
-	ExecuteChainCmd("init", TestChainName, TestChainFlag, homeFlag)
+	ExecuteChainCmd("init", ChainName, ChainFlag, homeFlag)
 
 	// enable swagger and rest API:
 	if err := replaceStringInFile(filepath.Join(dir, "config", "app.toml"), "enable = false", "enable = true"); err != nil {
@@ -82,7 +86,7 @@ func NewOnomyChain() (*OnomyChain, error) {
 		return nil, err
 	}
 
-	if err := replaceStringInFile(filepath.Join(dir, "config", "genesis.json"), "\"stake\"", "\""+TestChainDenom+"\""); err != nil {
+	if err := replaceStringInFile(filepath.Join(dir, "config", "genesis.json"), "\"stake\"", "\""+ChainDenom+"\""); err != nil {
 		return nil, err
 	}
 
@@ -92,22 +96,36 @@ func NewOnomyChain() (*OnomyChain, error) {
 		return nil, err
 	}
 
+	// set up min_global_self_delegation param
+	if err := replaceGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.staking.params.min_global_self_delegation",
+		json.RawMessage(fmt.Sprintf(`"%s"`, MinGlobalSelfDelegation))); err != nil {
+		return nil, err
+	}
+
 	if err := replaceStringInFile(filepath.Join(dir, "config", "config.toml"), "log_level = \"info\"", "log_level = \"error\""); err != nil {
 		return nil, err
 	}
 
 	// add new user
-	val1KeyString := ExecuteChainCmd("keys add", TestChainValidator1Name, TestChainKeyRingFlag, jsonOutFlag, homeFlag)
+	val1KeyString := ExecuteChainCmd("keys add", TestChainValidator1Name, KeyRingFlag, jsonOutFlag, homeFlag)
 	var val1KeyOutput keyring.KeyOutput
 	if err := json.Unmarshal([]byte(val1KeyString), &val1KeyOutput); err != nil {
 		return nil, err
 	}
 
 	// add user to genesys
-	ExecuteChainCmd("add-genesis-account", val1KeyOutput.Address, TestChainValidatorGenesysAmount, homeFlag)
+	ExecuteChainCmd("add-genesis-account", val1KeyOutput.Address, ValidatorGenesysAmount, homeFlag)
 
 	// gentx
-	ExecuteChainCmd("gentx", TestChainValidator1Name, TestChainValidatorStakeAmount, TestChainValidator1EthAddress, val1KeyOutput.Address, TestChainFlag, TestChainKeyRingFlag, homeFlag)
+	ExecuteChainCmd("gentx",
+		TestChainValidator1Name,
+		TestChainValidatorStakeAmount,
+		TestChainValidator1EthAddress,
+		val1KeyOutput.Address,
+		MinSelfDelegationFlag,
+		ChainFlag,
+		KeyRingFlag,
+		homeFlag)
 
 	// collect gentx
 	ExecuteChainCmd("collect-gentxs", homeFlag)

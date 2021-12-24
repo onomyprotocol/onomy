@@ -7,7 +7,7 @@ CHAIN_ID="gravity-test"
 
 NODES=$1
 
-ALLOCATION="10000000000ualtg,10000000000footoken"
+ALLOCATION="10000000000000000000000ualtg,10000000000000000000000footoken"
 
 # first we start a genesis.json with validator 1
 # validator 1 will also collect the gentx's once gnerated
@@ -64,7 +64,7 @@ ETHEREUM_KEY=$(grep address /validator-eth-keys | sed -n "$i"p | sed 's/.*://')
 # the /8 containing 7.7.7.7 is assigned to the DOD and never routable on the public internet
 # we're using it in private to prevent onomy from blacklisting it as unroutable
 # and allow local pex
-$BIN gentx $ARGS $ONOMY_HOME --moniker validator$i --chain-id=$CHAIN_ID --ip 7.7.7.$i validator$i 500000000ualtg $ETHEREUM_KEY $ORCHESTRATOR_KEY
+$BIN gentx $ARGS $ONOMY_HOME --moniker validator$i --chain-id=$CHAIN_ID --ip 7.7.7.$i validator$i 500000000000000000000ualtg $ETHEREUM_KEY $ORCHESTRATOR_KEY
 # obviously we don't need to copy validator1's gentx to itself
 if [ $i -gt 1 ]; then
 cp /validator$i/config/gentx/* /validator1/config/gentx/
