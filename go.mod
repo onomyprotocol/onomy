@@ -34,4 +34,4 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 
 replace github.com/althea-net/cosmos-gravity-bridge/module => github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20211125165615-060eb3403d3c
 
-replace github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.42.10-0.20211223174849-c96bdff3bf1e
+replace github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.42.10-0.20211228105949-ec698dc4d4b2
