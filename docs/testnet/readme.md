@@ -17,6 +17,11 @@ try out the Onomy Network.
 To join us or discuss the current testnet, kindly get in touch with us via [Discord](https://discord.gg/27r73SYAkQ)
 . More focused discussions are possible on our [official forum](https://forum.onomy.io/)..
 
+## Testnet resources
+
+* [Bonding curve](https://bonding-curve-testnet.onomy.io/)
+* [Chain explorer](https://explorer-testnet.onomy.io/)
+
 ## Documents
 
 - [How to install Onomy](installation.md)
