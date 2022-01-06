@@ -73,22 +73,22 @@ rm -rf $HOME/raw.json
 
 1. Make following changes in $ONOMY_HOME/config/config.toml:
 
-    - add *2a895f71c54bce6c70d1e111e732f32b5fb31827@64.9.136.120:26656,ec8e8d05332bd70655c679ab34f18d62b36055d5@145.40.81.21:26656* to seeds field. It should look somthing
-      like this
-      `seeds = "2a895f71c54bce6c70d1e111e732f32b5fb31827@64.9.136.120:26656,ec8e8d05332bd70655c679ab34f18d62b36055d5@145.40.81.21:26656"`
+   - add *dc6c6e2faa000f8126e537b622eb081faeac62d3@64.9.136.119:26656,48a0784919f1ed01a875962aafdef75c3d9cb878@64.9.136.120:26656,c63bfabfd5379f7485e45bfd548c1e39bbc22b97@145.40.81.21:26656* to seeds field. It should look somthing
+     like this
+     `seeds = "dc6c6e2faa000f8126e537b622eb081faeac62d3@64.9.136.119:26656,48a0784919f1ed01a875962aafdef75c3d9cb878@64.9.136.120:26656,c63bfabfd5379f7485e45bfd548c1e39bbc22b97@145.40.81.21:26656"`
 
-    - add *tcp://<your_ip>:26656* to external_address field
-      `external_address = "" to external_address = "tcp://<your_ip>:26656"`
-      Where the <your_ip> is the external IP of your node.
+   - add *tcp://<your_ip>:26656* to external_address field
+     `external_address = "" to external_address = "tcp://<your_ip>:26656"`
+     Where the <your_ip> is the external IP of your node.
 
-    - change "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
-    - change "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
-    - change addr_book_strict = true to addr_book_strict = false
+   - change "tcp://127.0.0.1:26657" to "tcp://0.0.0.0:26657"
+   - change "tcp://127.0.0.1:26656" to "tcp://0.0.0.0:26656"
+   - change addr_book_strict = true to addr_book_strict = false
 
 2. Optionally make following changes in $ONOMY_HOME/config/app.toml:
 
-    - Change enable = false to enable = true
-    - Change swagger = false to swagger = true
+   - Change enable = false to enable = true
+   - Change swagger = false to swagger = true
 
 ## Increasing the default open files limit
 

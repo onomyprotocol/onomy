@@ -6,8 +6,8 @@ you will be generating.
 
 ## Bootstrapping steps and commands
 
-Start by logging into your Linux server. The following commands are intended to be run on that machine. There
-are three options to install the binaries:
+Start by logging into your Linux server. The following commands are intended to be run on that machine. There are three
+options to install the binaries:
 
 1. [Compile binaries yourself using source code](#compileInstall)
 2. [Download them directly from github and install](#downloadInstall)
@@ -40,7 +40,7 @@ To download and install binaries follow these steps
 
 ```
 cd $HOME/.onomy/bin
-wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.3/onomyd
+wget https://github.com/onomyprotocol/onomy/releases/download/v0.0.4/onomyd
 chmod +x *
 ```
 
@@ -58,7 +58,7 @@ script files.
 In order to install using RPM, use the following command:
 
 ```
-sudo yum install "https://github.com/onomyprotocol/onomy/releases/download/v0.0.3/onomy.x86_64.rpm"
+sudo yum install "https://github.com/onomyprotocol/onomy/releases/download/v0.0.4/onomy.x86_64.rpm"
 ```
 
 Running this command will take care of all the dependancies and it will install the required binaries
