@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2022-01-02T21:28:17.308231776Z",
+  "genesis_time": "2022-01-10T15:41:20.434855409Z",
   "chain_id": "onomy-testnet",
   "initial_height": "1",
   "consensus_params": {
@@ -33,42 +33,42 @@
       "accounts": [
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "onomy1ff4gf7rqnykmfy42taxw7r843428z4tt8ptnhn",
+          "address": "onomy1lgeuy0sq90ryr5cycn8m7mga6xzm7672usp37w",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "onomy1alj32wn08j5sxl4z9ex66hzx22q006dunvlg3z",
+          "address": "onomy1ps7pv5fwxtnpc84hgpkys0yjt2t0860rgwryds",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "onomy1rvy7n5s8f9zrrjjr8jxvmccyx640pgrhwwermf",
+          "address": "onomy1stewwpjqk292njjrw0zmr00g04k6lhlrrxvlcm",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "onomy1chmqgqh2qucpwfh7la0z7gdejfuwcg8x5m5yhn",
+          "address": "onomy15wmh3kdgl44lxklv27400kcpql74dv8vck05xr",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "onomy16lqmjylnkzkxt08dqj693v0wundz08venmz3my",
+          "address": "onomy143vxht2jlsyc5clfw04e3rawzvcap8u8m60y84",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "onomy1dzwekhc8wy8k2l8sulzzh9ls5crxp7g3fapr8m",
+          "address": "onomy160ggx0l5w8mswcsnryxhcvvxygh2gd2gurnjnc",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
@@ -77,7 +77,7 @@
           "@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount",
           "base_vesting_account": {
             "base_account": {
-              "address": "onomy1l747209cf4fkudm3fzrd732ldzv93pvcpvcy9x",
+              "address": "onomy1fc6smwfdyhhjeftq6cvsmklarm7zhz4hxx42qt",
               "pub_key": null,
               "account_number": "0",
               "sequence": "0"
@@ -262,7 +262,7 @@
           "@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount",
           "base_vesting_account": {
             "base_account": {
-              "address": "onomy12m6z800n70dnyrg9qcyunc2r2c99mjt6nur9ml",
+              "address": "onomy1a4u7n0mewgps0wunyppltz59e8m0ukr9ug5h78",
               "pub_key": null,
               "account_number": "0",
               "sequence": "0"
@@ -357,7 +357,7 @@
           "@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount",
           "base_vesting_account": {
             "base_account": {
-              "address": "onomy1a3hhgh48vkmgj2alr2xztgeyjgdjyzq3gdp52t",
+              "address": "onomy1lyptjv8eqeggfs4s0h3yjx60fjq23xrlu39evu",
               "pub_key": null,
               "account_number": "0",
               "sequence": "0"
@@ -90385,7 +90385,7 @@
       },
       "balances": [
         {
-          "address": "onomy1rvy7n5s8f9zrrjjr8jxvmccyx640pgrhwwermf",
+          "address": "onomy1ps7pv5fwxtnpc84hgpkys0yjt2t0860rgwryds",
           "coins": [
             {
               "denom": "anom",
@@ -90394,7 +90394,16 @@
           ]
         },
         {
-          "address": "onomy1ff4gf7rqnykmfy42taxw7r843428z4tt8ptnhn",
+          "address": "onomy1fc6smwfdyhhjeftq6cvsmklarm7zhz4hxx42qt",
+          "coins": [
+            {
+              "denom": "anom",
+              "amount": "1000000000000000000000008"
+            }
+          ]
+        },
+        {
+          "address": "onomy1stewwpjqk292njjrw0zmr00g04k6lhlrrxvlcm",
           "coins": [
             {
               "denom": "anom",
@@ -90403,7 +90412,34 @@
           ]
         },
         {
-          "address": "onomy12m6z800n70dnyrg9qcyunc2r2c99mjt6nur9ml",
+          "address": "onomy15wmh3kdgl44lxklv27400kcpql74dv8vck05xr",
+          "coins": [
+            {
+              "denom": "anom",
+              "amount": "1000000000000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "onomy143vxht2jlsyc5clfw04e3rawzvcap8u8m60y84",
+          "coins": [
+            {
+              "denom": "anom",
+              "amount": "1000000000000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "onomy160ggx0l5w8mswcsnryxhcvvxygh2gd2gurnjnc",
+          "coins": [
+            {
+              "denom": "anom",
+              "amount": "1000000000000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "onomy1a4u7n0mewgps0wunyppltz59e8m0ukr9ug5h78",
           "coins": [
             {
               "denom": "anom",
@@ -90412,7 +90448,7 @@
           ]
         },
         {
-          "address": "onomy1dzwekhc8wy8k2l8sulzzh9ls5crxp7g3fapr8m",
+          "address": "onomy1lyptjv8eqeggfs4s0h3yjx60fjq23xrlu39evu",
           "coins": [
             {
               "denom": "anom",
@@ -90421,47 +90457,11 @@
           ]
         },
         {
-          "address": "onomy1chmqgqh2qucpwfh7la0z7gdejfuwcg8x5m5yhn",
+          "address": "onomy1lgeuy0sq90ryr5cycn8m7mga6xzm7672usp37w",
           "coins": [
             {
               "denom": "anom",
               "amount": "1000000000000000000000000"
-            }
-          ]
-        },
-        {
-          "address": "onomy16lqmjylnkzkxt08dqj693v0wundz08venmz3my",
-          "coins": [
-            {
-              "denom": "anom",
-              "amount": "1000000000000000000000000"
-            }
-          ]
-        },
-        {
-          "address": "onomy1a3hhgh48vkmgj2alr2xztgeyjgdjyzq3gdp52t",
-          "coins": [
-            {
-              "denom": "anom",
-              "amount": "1000000000000000000000000"
-            }
-          ]
-        },
-        {
-          "address": "onomy1alj32wn08j5sxl4z9ex66hzx22q006dunvlg3z",
-          "coins": [
-            {
-              "denom": "anom",
-              "amount": "1000000000000000000000000"
-            }
-          ]
-        },
-        {
-          "address": "onomy1l747209cf4fkudm3fzrd732ldzv93pvcpvcy9x",
-          "coins": [
-            {
-              "denom": "anom",
-              "amount": "1000000000000000000000008"
             }
           ]
         }
@@ -90549,11 +90549,11 @@
                   "max_change_rate": "0.010000000000000000"
                 },
                 "min_self_delegation": "250000000000000000000000",
-                "delegator_address": "onomy1ff4gf7rqnykmfy42taxw7r843428z4tt8ptnhn",
-                "validator_address": "onomyvaloper1ff4gf7rqnykmfy42taxw7r843428z4ttmxfyt9",
+                "delegator_address": "onomy1lgeuy0sq90ryr5cycn8m7mga6xzm7672usp37w",
+                "validator_address": "onomyvaloper1lgeuy0sq90ryr5cycn8m7mga6xzm7672qhrxzc",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "IIjTLCHqbQ6VD9lxPKjb2UvwQLTgBJBNgTj06Y7+258="
+                  "key": "nMr/+paQmJZ5eY286ZjejusvAZowfwOsMdiyM1n5EkU="
                 },
                 "value": {
                   "denom": "anom",
@@ -90562,12 +90562,12 @@
               },
               {
                 "@type": "/gravity.v1.MsgSetOrchestratorAddress",
-                "validator": "onomyvaloper1ff4gf7rqnykmfy42taxw7r843428z4ttmxfyt9",
-                "orchestrator": "onomy1alj32wn08j5sxl4z9ex66hzx22q006dunvlg3z",
+                "validator": "onomyvaloper1lgeuy0sq90ryr5cycn8m7mga6xzm7672qhrxzc",
+                "orchestrator": "onomy1ps7pv5fwxtnpc84hgpkys0yjt2t0860rgwryds",
                 "eth_address": "0x0aab171B71dF51e3821C2ccC5Df948b1483CF8db"
               }
             ],
-            "memo": "98630367b403255adbcd5e22923d654b48014e9e@0.0.0.0:26656",
+            "memo": "6eb924b5f1fe3fae3b2e21e1f6114b0ccd959ce8@0.0.0.0:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -90577,7 +90577,7 @@
               {
                 "public_key": {
                   "@type": "/cosmos.crypto.secp256k1.PubKey",
-                  "key": "Asy3sEkCLbeQavgWRjmJW96T7KqYO8geE2OqhRR2RQ/J"
+                  "key": "AlLMxbR0MOyiaU72sp9NIlWedrk6dfjfJmgqUg9VZLjQ"
                 },
                 "mode_info": {
                   "single": {
@@ -90595,7 +90595,7 @@
             }
           },
           "signatures": [
-            "Ui2/dt8+7myy8Oq9mupMbqzIoUEWQBBrPdWCUfziWOhkxJoKRIP0T/jyh9E48TpzIb+w/oyRt5ekumbjEEA8sQ=="
+            "oauJBxYZ4B2NFO2v51IKd6zWs5brb2txhUK1hhQ69URIHuXhcR/jAWQSShJOY+tQijN4V8f2U9f1qx5eYS3leg=="
           ]
         }
       ]
