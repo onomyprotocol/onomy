@@ -64,7 +64,7 @@ ETHEREUM_KEY=$(grep address /validator-eth-keys | sed -n "$i"p | sed 's/.*://')
 # the /8 containing 7.7.7.7 is assigned to the DOD and never routable on the public internet
 # we're using it in private to prevent onomy from blacklisting it as unroutable
 # and allow local pex
-$BIN gentx $ARGS $ONOMY_HOME --moniker validator$i --chain-id=$CHAIN_ID --ip 7.7.7.$i validator$i 500000000000000000000ualtg $ETHEREUM_KEY $ORCHESTRATOR_KEY
+$BIN gravity gentx $ARGS $ONOMY_HOME --moniker validator$i --chain-id=$CHAIN_ID --ip 7.7.7.$i validator$i 500000000000000000000ualtg $ETHEREUM_KEY $ORCHESTRATOR_KEY
 # obviously we don't need to copy validator1's gentx to itself
 if [ $i -gt 1 ]; then
 cp /validator$i/config/gentx/* /validator1/config/gentx/
@@ -72,7 +72,7 @@ fi
 done
 
 
-$BIN collect-gentxs $STARTING_VALIDATOR_HOME
+$BIN gravity collect-gentxs $STARTING_VALIDATOR_HOME
 GENTXS=$(ls /validator1/config/gentx | wc -l)
 cp /validator1/config/genesis.json /genesis.json
 echo "Collected $GENTXS gentx"
