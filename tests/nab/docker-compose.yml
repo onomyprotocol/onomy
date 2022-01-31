@@ -1,0 +1,89 @@
+version: "3.3"
+
+networks:
+  testnet:
+    name: testnet
+    driver: bridge
+
+services:
+  nab:
+    image: nab-base
+    container_name: nab_all_up_test_instance
+    privileged: true
+    environment:
+      - ETH_NODE=http://endpoint:8545
+    ports:
+      - 9090:9090
+      - 26657:26657
+      - 1317:1317
+    networks:
+      - testnet
+
+  near:
+    image: onomy/aurora-engine-local:latest
+    container_name: near-aurora-local
+    profiles: ["aurora"]
+    restart: always
+    volumes:
+      - ./aurora:/root/assets/aurora
+    ports:
+      - 3030:3030
+    environment:
+      - NEAR_ENV=localnet
+      - NODE_ENV=localnet
+    networks:
+      - testnet
+
+  database:
+    image: onomy/aurora-relayer-database:latest
+    container_name: near-aurora-relayer-database
+    profiles: ["aurora"]
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - testnet
+
+  indexer:
+    image: onomy/aurora-relayer-endpoint:latest
+    container_name: near-aurora-relayer-indexer
+    profiles: ["aurora"]
+    restart: always
+    init: true
+    depends_on:
+      - near
+      - database
+    environment:
+      - WAIT_HOSTS=database:5432
+      - WAIT_BEFORE=1
+      - NEAR_ENV=localnet
+      - NODE_ENV=localnet
+    volumes:
+      - ./aurora:/srv/aurora/relayer/config
+    extra_hosts:
+      - host.docker.internal:host-gateway # See: https://stackoverflow.com/a/43541732
+    entrypoint: ["sh", "-c", "util/indexer/indexer | node lib/indexer_backend.js"]
+    networks:
+      - testnet
+
+  endpoint:
+    image: onomy/aurora-relayer-endpoint:latest
+    container_name: near-aurora-relayer-endpoint
+    profiles: ["aurora"]
+    restart: always
+    init: true
+    depends_on:
+      - near
+      - database
+    environment:
+      - WAIT_HOSTS=database:5432
+      - WAIT_BEFORE=1
+      - NEAR_ENV=localnet
+      - NODE_ENV=localnet
+    ports:
+      - 8545:8545
+    volumes:
+      - ./aurora:/srv/aurora/relayer/config
+    entrypoint: ["node", "lib/index.js"]
+    networks:
+      - testnet

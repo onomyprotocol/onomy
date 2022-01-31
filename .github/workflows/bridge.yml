@@ -1,0 +1,60 @@
+name: Bridge tests
+
+on:
+  push:
+    branches: [master, main, dev]
+  pull_request:
+    branches: [master, main, dev]
+
+jobs:
+  gravity:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test:
+          - HAPPY_PATH
+          - VALIDATOR_OUT
+          - VALSET_STRESS
+          - BATCH_STRESS
+          - V2_HAPPY_PATH
+          - ORCHESTRATOR_KEYS
+          - VALSET_REWARDS
+          - EVIDENCE
+          - TXCANCEL
+    steps:
+      - uses: actions/checkout@v2
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+      - name: Run test
+        run: |
+          cd tests/gravity
+          /bin/bash all-up-test.sh {{ matrix.test }}
+
+  nab:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test:
+          - HAPPY_PATH
+          - VALIDATOR_OUT
+          - VALSET_STRESS
+          - BATCH_STRESS
+          - V2_HAPPY_PATH
+          - ORCHESTRATOR_KEYS
+          - VALSET_REWARDS
+          - EVIDENCE
+          - TXCANCEL
+    steps:
+      - uses: actions/checkout@v2
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+      - name: Run test
+        run: |
+          cd tests/nab
+          /bin/bash all-up-test.sh {{ matrix.test }}
+      - name: Docker logs
+        if: always()
+        run: |
+          cd tests/nab
+          docker ps -a
+          docker-compose logs

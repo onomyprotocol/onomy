@@ -13,4 +13,4 @@ pushd $REPOFOLDER
 # Build base container
 git archive --format=tar.gz -o $DOCKERFOLDER/onomy.tar.gz --prefix=onomy/ HEAD
 pushd $DOCKERFOLDER
-docker build -t gravity-base .
+docker build -t nab-base .
