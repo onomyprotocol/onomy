@@ -89,10 +89,10 @@ echo "public: $(jq -r .public_key $ONOMY_HOME/eth_key.json)" >> $ONOMY_HOME/vali
 echo "address: $(jq -r .address $ONOMY_HOME/eth_key.json)" >> $ONOMY_HOME/validator-eth-keys
 
 echo "Creating gentxs"
-$ONOMY gentx --ip $ONOMY_HOST $ONOMY_VALIDATOR_NAME 1000000000000000000000000$STAKE_DENOM "$(jq -r .address $ONOMY_HOME/eth_key.json)" "$(jq -r .address $ONOMY_HOME/orchestrator_key.json)" $ONOMY_KEYRING_FLAG $ONOMY_CHAINID_FLAG
+$ONOMY gravity gentx --ip $ONOMY_HOST $ONOMY_VALIDATOR_NAME 1000000000000000000000000$STAKE_DENOM "$(jq -r .address $ONOMY_HOME/eth_key.json)" "$(jq -r .address $ONOMY_HOME/orchestrator_key.json)" $ONOMY_KEYRING_FLAG $ONOMY_CHAINID_FLAG
 
 echo "Collecting gentxs in $ONOMY_NODE_NAME"
-$ONOMY collect-gentxs
+$ONOMY gravity collect-gentxs
 
 echo "Exposing ports and APIs of the $ONOMY_NODE_NAME"
 

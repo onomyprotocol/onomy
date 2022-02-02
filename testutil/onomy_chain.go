@@ -57,6 +57,9 @@ const (
 	OnomyGrpcHost = "127.0.0.1"
 	// OnomyGrpcPort is default port.
 	OnomyGrpcPort = "9090"
+
+	// GravityBridge is the prefix/name for the gravity bridge.
+	GravityBridge = "gravity"
 )
 
 // OnomyChain is test struct for the chain running.
@@ -116,8 +119,8 @@ func NewOnomyChain() (*OnomyChain, error) {
 	// add user to genesys
 	ExecuteChainCmd("add-genesis-account", val1KeyOutput.Address, ValidatorGenesysAmount, homeFlag)
 
-	// gentx
-	ExecuteChainCmd("gentx",
+	// gravity gentx
+	ExecuteChainCmd(fmt.Sprintf("%s gentx", GravityBridge),
 		TestChainValidator1Name,
 		TestChainValidatorStakeAmount,
 		TestChainValidator1EthAddress,
@@ -127,8 +130,8 @@ func NewOnomyChain() (*OnomyChain, error) {
 		KeyRingFlag,
 		homeFlag)
 
-	// collect gentx
-	ExecuteChainCmd("collect-gentxs", homeFlag)
+	// gravity collect gentx
+	ExecuteChainCmd(fmt.Sprintf("%s collect-gentxs", GravityBridge), homeFlag)
 
 	return &OnomyChain{
 		homeFlag:  homeFlag,

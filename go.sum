@@ -563,8 +563,9 @@ github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.3/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
-github.com/google/go-cmp v0.5.6 h1:BKbKCqvP6I+rmFHt06ZmyQtvB8xAkWdhFyr0ZUNZcxQ=
 github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/go-cmp v0.5.7 h1:81/ik6ipDQS2aGcBfIN5dHDB36BwrStyeAQquSYCV4o=
+github.com/google/go-cmp v0.5.7/go.mod h1:n+brtR0CgQNWTVd5ZUFpTBC8YFBDLK/h/bpaJ8/DtOE=
 github.com/google/go-containerregistry v0.5.1/go.mod h1:Ct15B4yir3PLOP5jsy0GNeYVaIZs/MK/Jz5any1wFW0=
 github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf/go.mod h1:HP5RmnzzSNb993RKQDq4+1A4ia9nllfqcQFTQJedwGI=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
@@ -861,6 +862,8 @@ github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
 github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20211125165615-060eb3403d3c h1:B9FWZAYfuIImYx/sQN/LbZmTKrdyNFVjJP02fVPKGGI=
 github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20211125165615-060eb3403d3c/go.mod h1:kf96o2kMPivom+2SGkkExANrG7uA8cOFxb1+Ns4/hc0=
+github.com/onomyprotocol/near-aurora-bridge/module v0.0.0-20220130125415-880c96c08165 h1:FRC24wWaxTlK+r/FOf8IcW/Lf2hH1nDBYoh5yuZp4pA=
+github.com/onomyprotocol/near-aurora-bridge/module v0.0.0-20220130125415-880c96c08165/go.mod h1:XbTdzZPBo6lZelY5USf/eRVH1LAM8qbyq8FXckgmYv8=
 github.com/onomyprotocol/onomy-sdk v0.42.10-0.20211228140704-1a3046991600 h1:jPOKcqqPXGgl5T+B8+yl1WWOapDkHjycxEy/Oi2QAPs=
 github.com/onomyprotocol/onomy-sdk v0.42.10-0.20211228140704-1a3046991600/go.mod h1:SrclJP9lMXxz2fCbngxb0brsPNuZXqoQQ9VHuQ3Tpf4=
 github.com/onomyprotocol/tm-load-test v0.9.1-0.20211101093435-b38e68e11c01 h1:+B99URBdjbxtLuKUCSdOpyZ+Q6OpXNvQPsjXGgSBPRo=
@@ -1660,8 +1663,8 @@ google.golang.org/genproto v0.0.0-20210310155132-4ce2db91004e/go.mod h1:FWY/as6D
 google.golang.org/genproto v0.0.0-20210319143718-93e7006c17a6/go.mod h1:FWY/as6DDZQgahTzZj3fqbO1CbirC29ZNUFHwi0/+no=
 google.golang.org/genproto v0.0.0-20210402141018-6c239bbf2bb1/go.mod h1:9lPAdzaEmUacj36I+k7YKbEc5CXzPIeORRgDAUOu28A=
 google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c/go.mod h1:UODoCrxHCcBojKKwX1terBiRUaqAsFqJiF615XL43r0=
-google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa h1:I0YcKz0I7OAhddo7ya8kMnvprhcWM045PmkBdMO9zN0=
-google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa/go.mod h1:5CzLGKJ67TSI2B9POpiiyGha0AjJvZIUgRMt1dSmuhc=
+google.golang.org/genproto v0.0.0-20220118154757-00ab72f36ad5 h1:zzNejm+EgrbLfDZ6lu9Uud2IVvHySPl8vQzf04laR5Q=
+google.golang.org/genproto v0.0.0-20220118154757-00ab72f36ad5/go.mod h1:5CzLGKJ67TSI2B9POpiiyGha0AjJvZIUgRMt1dSmuhc=
 google.golang.org/grpc v1.33.2 h1:EQyQC3sa8M+p6Ulc8yy9SWSS2GVwyRc83gAbG8lrl4o=
 google.golang.org/grpc v1.33.2/go.mod h1:JMHMWHQWaTccqQQlmk3MJZS+GWXOdAesneDmEnv2fbc=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
