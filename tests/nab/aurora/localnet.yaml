@@ -1,8 +1,0 @@
----
-port: 8545
-database: postgres://aurora:aurora@database/aurora
-network: local
-endpoint: http://near:3030
-engine: aurora.node0
-signer: aurora.node0
-signerKey: /srv/aurora/relayer/config/aurora.node0.json

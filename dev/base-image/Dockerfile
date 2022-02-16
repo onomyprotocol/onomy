@@ -43,13 +43,3 @@ RUN chmod +x /root/home/gravity/solidity/contract-deployer
 
 ADD https://github.com/onomyprotocol/cosmos-gravity-bridge/releases/download/$GRAVITY_BRIDGE_VERSION/gbt /usr/bin/gbt
 RUN chmod +x /usr/bin/gbt
-
-# ------------------ nab bridge/deployer ------------------
-ARG NAB_BRIDGE_VERSION="v0.0.1"
-ADD https://github.com/onomyprotocol/near-aurora-bridge/releases/download/$NAB_BRIDGE_VERSION/Gravity.json /root/home/nab/solidity/Gravity.json
-ADD https://github.com/onomyprotocol/near-aurora-bridge/releases/download/$NAB_BRIDGE_VERSION/TestERC20A.json /root/home/nab/solidity/TestERC20A.json
-ADD https://github.com/onomyprotocol/near-aurora-bridge/releases/download/$NAB_BRIDGE_VERSION/contract-deployer /root/home/nab/solidity/contract-deployer
-RUN chmod +x /root/home/nab/solidity/contract-deployer
-
-ADD https://github.com/onomyprotocol/near-aurora-bridge/releases/download/$NAB_BRIDGE_VERSION/nabt /usr/bin/nabt
-RUN chmod +x /usr/bin/nabt
