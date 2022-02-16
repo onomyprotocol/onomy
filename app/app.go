@@ -88,9 +88,6 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/onomyprotocol/near-aurora-bridge/module/x/nab"
-	nabkeeper "github.com/onomyprotocol/near-aurora-bridge/module/x/nab/keeper"
-	nabtypes "github.com/onomyprotocol/near-aurora-bridge/module/x/nab/types"
 	"github.com/onomyprotocol/onomy/docs"
 )
 
@@ -139,7 +136,6 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		gravity.AppModuleBasic{},
-		nab.AppModuleBasic{},
 	)
 
 	// module account permissions.
@@ -152,7 +148,6 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		gravitytypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
-		nabtypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -203,7 +198,6 @@ type OnomyApp struct {
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
 	GravityKeeper    gravitykeeper.Keeper
-	NabKeeper        nabkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -244,7 +238,6 @@ func New( // nolint:funlen // this is the generate init func.
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		gravitytypes.StoreKey,
-		nabtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -351,14 +344,6 @@ func New( // nolint:funlen // this is the generate init func.
 		app.BankKeeper,
 		app.SlashingKeeper,
 	)
-	app.NabKeeper = nabkeeper.NewKeeper(
-		appCodec,
-		keys[nabtypes.StoreKey],
-		app.GetSubspace(nabtypes.ModuleName),
-		stakingKeeper,
-		app.BankKeeper,
-		app.SlashingKeeper,
-	)
 
 	/****  Module Options ****/
 
@@ -390,7 +375,6 @@ func New( // nolint:funlen // this is the generate init func.
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
-		nab.NewAppModule(app.NabKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -402,7 +386,7 @@ func New( // nolint:funlen // this is the generate init func.
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		gravitytypes.ModuleName, nabtypes.ModuleName,
+		gravitytypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -425,7 +409,6 @@ func New( // nolint:funlen // this is the generate init func.
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		gravitytypes.ModuleName,
-		nabtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -612,7 +595,6 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(gravitytypes.ModuleName)
-	paramsKeeper.Subspace(nabtypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 
 	return paramsKeeper

@@ -12,13 +12,11 @@ import (
 	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	nabcmd "github.com/onomyprotocol/near-aurora-bridge/module/cmd/nab/cmd"
 	"github.com/onomyprotocol/onomy/app"
 )
 
 const (
 	gravityName = "gravity"
-	nabName     = "nab"
 )
 
 // NewRootCmd initiates the cli for onomy chain.
@@ -55,12 +53,6 @@ func NewRootCmd() (*cobra.Command, cosmoscmd.EncodingConfig) {
 	rootCmd.AddCommand(WrapBridgeCommands(app.DefaultNodeHome, gravityName, []*cobra.Command{
 		gravitycmd.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		gravitycmd.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-	}))
-
-	// nab cmd wrapper
-	rootCmd.AddCommand(WrapBridgeCommands(app.DefaultNodeHome, nabName, []*cobra.Command{
-		nabcmd.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		nabcmd.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 	}))
 
 	return rootCmd, encodingConfig

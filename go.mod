@@ -14,7 +14,6 @@ require (
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
-	github.com/onomyprotocol/near-aurora-bridge/module v0.0.0-20220130125415-880c96c08165
 	github.com/onomyprotocol/tm-load-test v0.9.1-0.20211101093435-b38e68e11c01
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.2.1
