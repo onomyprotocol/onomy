@@ -1,7 +1,6 @@
-vue/node_modules
-vue/dist
+/node_modules/
 release/
 /vendor/
 /.idea/
 *.iml
-/tests/dockerfile/onomy.tar.gz
+*.tar.gz

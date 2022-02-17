@@ -2,9 +2,9 @@ name: Bridge tests
 
 on:
   push:
-    branches: [master, main, dev]
+    branches: [ master, main, dev ]
   pull_request:
-    branches: [master, main, dev]
+    branches: [ master, main, dev ]
 
 jobs:
   gravity:
@@ -13,18 +13,29 @@ jobs:
       fail-fast: false
       matrix:
         test:
-          - HAPPY_PATH
-          - VALIDATOR_OUT
-          - VALSET_STRESS
-          - BATCH_STRESS
-          - V2_HAPPY_PATH
-          - ORCHESTRATOR_KEYS
-          - VALSET_REWARDS
-          - EVIDENCE
-          - TXCANCEL
+          - name: HAPPY_PATH
+          - name: VALIDATOR_OUT
+          - name: VALSET_STRESS
+          - name: BATCH_STRESS
+          - name: V2_HAPPY_PATH
+          - name: RELAY_MARKET
+            secret_arg: ALCHEMY_KEY
+          - name: ORCHESTRATOR_KEYS
+          - name: VALSET_REWARDS
+          - name: EVIDENCE
+          - name: TXCANCEL
+          - name: INVALID_EVENTS
+          - name: UNHALT_BRIDGE
+          - name: PAUSE_BRIDGE
+          - name: DEPOSIT_OVERFLOW
+          - name: ETHEREUM_BLACKLIST
+          - name: AIRDROP_PROPOSAL
+          - name: SIGNATURE_SLASHING
+          - name: SLASHING_DELEGATION
+          - name: IBC_METADATA
     steps:
       - uses: actions/checkout@v2
       - name: Run test
         run: |
           cd tests/gravity
-          /bin/bash all-up-test.sh {{ matrix.test }}
+          /bin/bash all-up-test.sh ${{ matrix.test.name }} ${{ secrets[matrix.test.secret_arg] }}

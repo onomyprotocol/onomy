@@ -7,34 +7,44 @@ CHAIN_ID="gravity-test"
 
 NODES=$1
 
-ALLOCATION="10000000000000000000000anom,10000000000000000000000footoken"
+ALLOCATION="10000000000000000000000anom,10000000000footoken,10000000000ibc/nometadatatoken"
 
 # first we start a genesis.json with validator 1
 # validator 1 will also collect the gentx's once gnerated
 STARTING_VALIDATOR=1
 STARTING_VALIDATOR_HOME="--home /validator$STARTING_VALIDATOR"
-# todo add git hash to chain name
 $BIN init $STARTING_VALIDATOR_HOME --chain-id=$CHAIN_ID validator1
-
 
 ## Modify generated genesis.json to our liking by editing fields using jq
 ## we could keep a hardcoded genesis file around but that would prevent us from
 ## testing the generated one with the default values provided by the module.
 
 # add in denom metadata for both native tokens
-jq '.app_state.bank.denom_metadata += [{"base": "footoken", display: "mfootoken", "description": "A non-staking test token", "denom_units": [{"denom": "footoken", "exponent": 0}, {"denom": "mfootoken", "exponent": 6}]}, {"base": "anom", display: "altg", "description": "A staking test token", "denom_units": [{"denom": "anom", "exponent": 0}, {"denom": "altg", "exponent": 6}]}]' /validator$STARTING_VALIDATOR/config/genesis.json > /edited-genesis.json
+jq '.app_state.bank.denom_metadata += [{"name": "Foo Token", "symbol": "FOO", "base": "footoken", display: "mfootoken", "description": "A non-staking test token", "denom_units": [{"denom": "footoken", "exponent": 0}, {"denom": "mfootoken", "exponent": 6}]},{"name": "NOM", "symbol": "NOM", "base": "anom", display: "nom", "description": "Nom token", "denom_units": [{"denom": "anom", "exponent": 0}, {"denom": "nom", "exponent": 18}]}]' /validator$STARTING_VALIDATOR/config/genesis.json > /metadata-genesis.json
+
+# a 60 second voting period to allow us to pass governance proposals in the tests
+jq '.app_state.gov.voting_params.voting_period = "60s"' /metadata-genesis.json > /community-pool-genesis.json
+
+# Add some funds to the community pool to test Airdrops, note that the gravity address here is the first 20 bytes
+# of the sha256 hash of 'distribution' to create the address of the module
+# To get from code: app.AccountKeeper.GetModuleAddress(distrtypes.ModuleName).String() // onomy1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8a7s2c6
+jq '.app_state.distribution.fee_pool.community_pool = [{"denom": "anom", "amount": "10000000000.0"}]' /community-pool-genesis.json > /community-pool2-genesis.json
+jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.ModuleAccount", "base_account": { "account_number": "0", "address": "onomy1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8a7s2c6","pub_key": null,"sequence": "0"},"name": "distribution","permissions": ["basic"]}]' /community-pool2-genesis.json > /community-pool3-genesis.json
+jq '.app_state.bank.balances += [{"address": "onomy1jv65s3grqf6v6jl3dp4t6c9t9rk99cd8a7s2c6", "coins": [{"amount": "10000000000", "denom": "anom"}]}]' /community-pool3-genesis.json > /community-pool4-genesis.json
+jq '.app_state.bank.supply += [{"denom": "anom", "amount": "10000000000"}]' /community-pool4-genesis.json > /edited-genesis.json
+
 # rename base denom to anom
 sed -i 's/stake/anom/g' /edited-genesis.json
-
 mv /edited-genesis.json /genesis.json
 
+echo "The test genesis is ready:"
+cat /genesis.json
 
 # Sets up an arbitrary number of validators on a single machine by manipulating
 # the --home parameter on onomyd
 for i in $(seq 1 $NODES);
 do
 ONOMY_HOME="--home /validator$i"
-GENTX_HOME="--home-client /validator$i"
 ARGS="$ONOMY_HOME --keyring-backend test"
 
 # Generate a validator key, orchestrator key, and eth key for each validator
