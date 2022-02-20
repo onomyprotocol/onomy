@@ -1,4 +1,4 @@
-FROM onomy/tests-base:latest
+FROM onomy/dev-base:latest
 
 # ------------------ onomy chain ------------------
 

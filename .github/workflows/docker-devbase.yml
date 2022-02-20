@@ -1,4 +1,4 @@
-name: Docker TestBase Build & Push
+name: Docker dev base Build & Push
 
 on:
   push:
@@ -27,4 +27,4 @@ jobs:
           context: dev/base-image
           file: dev/base-image/Dockerfile
           push: true
-          tags: onomy/tests-base:latest
+          tags: onomy/dev-base:latest
