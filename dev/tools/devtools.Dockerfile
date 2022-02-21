@@ -24,7 +24,7 @@ RUN GO111MODULE=on go get github.com/vasi-stripe/gogroup/cmd/gogroup@v0.0.0-2020
 RUN GO111MODULE=on go get mvdan.cc/gofumpt@v0.0.0-20200927160801-5bfeb2e70dd6
 RUN GO111MODULE=on go get github.com/bufbuild/buf/cmd/buf@v0.56.0
 
-RUN curl https://get.starport.network/starport@v0.17.2! | bash
+RUN curl https://get.starport.network/starport@v0.19.3! | bash
 
 RUN rm -rf /root/.cache/go-build/ /go/pkg/*
 COPY entrypoint.sh /entrypoint.sh

@@ -12,6 +12,9 @@ geth --identity "OnomyTestnet" --nodiscover \
 --networkid 15 \
 --mine \
 --http \
+--http.addr="0.0.0.0" \
+--http.vhosts="*" \
+--http.corsdomain="*" \
 --miner.threads=1 \
 --nousb \
 --verbosity=5 \

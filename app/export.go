@@ -1,3 +1,4 @@
+// Package app contains configuration of the network.
 package app
 
 import (

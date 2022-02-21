@@ -72,7 +72,7 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log("gravity contract deployed")
+	t.Log("gravity contract is deployed")
 
 	// start orchestrator
 	if err := wnomTestsBaseContainer.startOrchestrator(ctx, onomyChain.Validator.Mnemonic); err != nil {
@@ -109,6 +109,7 @@ func TestIntegrationWnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 			}
 		}
 		if checks == 2 {
+			t.Log(fmt.Sprintf("%q reveived test tokens", onomyDestinationAddress))
 			return nil
 		}
 
