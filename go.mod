@@ -6,7 +6,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.44.5
 	github.com/cosmos/ibc-go/v2 v2.0.2
 	github.com/google/go-cmp v0.5.7 // indirect
-	github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20220217053531-75bf3e7dabe0
+	github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20220222080117-376240a9cfcb
 	github.com/onomyprotocol/tm-load-test v0.9.1-0.20211101093435-b38e68e11c01
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.2.1
