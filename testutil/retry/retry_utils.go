@@ -1,4 +1,5 @@
-package testutil
+// Package retry contains utils methods .
+package retry
 
 import (
 	"net"
@@ -10,14 +11,14 @@ const DefaultRetryTimeout = time.Second
 
 // AwaitForPort awaits for the port within the timeout.
 func AwaitForPort(host, port string, timeout time.Duration) error {
-	return RetryWithTimeout(func() error {
+	return WithTimeout(func() error {
 		_, err := net.Dial("tcp", net.JoinHostPort(host, port))
 		return err
 	}, timeout)
 }
 
-// RetryWithTimeout retries the operation within the timout.
-func RetryWithTimeout(operation func() error, timeout time.Duration) error {
+// WithTimeout retries the operation within the timout.
+func WithTimeout(operation func() error, timeout time.Duration) error {
 	startTime := time.Now().UnixNano()
 	for {
 		err := operation()
