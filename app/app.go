@@ -93,6 +93,9 @@ import (
 	gravitykeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
 	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
 	"github.com/onomyprotocol/onomy/docs"
+	daomodule "github.com/onomyprotocol/onomy/x/dao"
+	daomodulekeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
+	daomoduletypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 const (
@@ -143,6 +146,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		gravity.AppModuleBasic{},
+		daomodule.AppModuleBasic{},
 	)
 
 	// module account permissions.
@@ -223,6 +227,8 @@ type OnomyApp struct {
 
 	GravityKeeper gravitykeeper.Keeper
 
+	DaoKeeper daomodulekeeper.Keeper
+
 	// mm is the module manager
 	mm *module.Manager
 
@@ -257,7 +263,7 @@ func New( // nolint:funlen // app new cosmos func
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		gravitytypes.StoreKey,
+		gravitytypes.StoreKey, daomoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -350,6 +356,13 @@ func New( // nolint:funlen // app new cosmos func
 		&app.AccountKeeper,
 	)
 
+	app.DaoKeeper = *daomodulekeeper.NewKeeper(
+		appCodec,
+		keys[daomoduletypes.StoreKey],
+		keys[daomoduletypes.MemStoreKey],
+		app.GetSubspace(daomoduletypes.ModuleName),
+	)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
@@ -405,6 +418,7 @@ func New( // nolint:funlen // app new cosmos func
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
+		daomodule.NewAppModule(appCodec, app.DaoKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -439,6 +453,7 @@ func New( // nolint:funlen // app new cosmos func
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		gravitytypes.ModuleName,
+		daomoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -461,6 +476,7 @@ func New( // nolint:funlen // app new cosmos func
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
+		daomodule.NewAppModule(appCodec, app.DaoKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 	app.sm.RegisterStoreDecoders()
 

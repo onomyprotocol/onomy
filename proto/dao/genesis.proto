@@ -1,0 +1,12 @@
+syntax = "proto3";
+package onomyprotocol.dao.dao;
+
+import "gogoproto/gogo.proto";
+import "dao/params.proto";
+
+option go_package = "github.com/onomyprotocol/onomy/x/dao/types";
+
+// GenesisState defines the dao module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+}
