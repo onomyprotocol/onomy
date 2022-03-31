@@ -22,13 +22,13 @@ func GetQueryCmd(_ string) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdQueryTreasury())
+	cmd.AddCommand(CmdShowTreasury())
 
 	return cmd
 }
 
-// CmdQueryTreasury returns CmdQueryTreasury cobra.Command.
-func CmdQueryTreasury() *cobra.Command {
+// CmdShowTreasury returns CmdShowTreasury cobra.Command.
+func CmdShowTreasury() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-treasury",
 		Short: "Shows treasury balance.",

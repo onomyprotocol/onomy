@@ -28,7 +28,7 @@ var (
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// FundTreasuryProposal details a proposal for dao treasury funding.
+// FundTreasuryProposal details a dao fund treasury proposal.
 type FundTreasuryProposal struct {
 	Sender      string                                   `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
 	Title       string                                   `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
@@ -73,7 +73,7 @@ func (m *FundTreasuryProposal) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_FundTreasuryProposal proto.InternalMessageInfo
 
-// FundTreasuryProposal details a proposal for dao treasury funding.
+// FundTreasuryProposal details a dao exchange with treasury proposal.
 type ExchangeWithTreasuryProposal struct {
 	Sender      string                                   `protobuf:"bytes,1,opt,name=sender,proto3" json:"sender,omitempty"`
 	Title       string                                   `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
