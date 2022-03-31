@@ -28,6 +28,7 @@ var (
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// GenesisState defines the dao module's genesis state.
 type GenesisState struct {
 	TreasuryBalance github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,1,rep,name=treasury_balance,json=treasuryBalance,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"treasury_balance" yaml:"treasury_balance"`
 }
