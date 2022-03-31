@@ -93,9 +93,10 @@ import (
 	gravitykeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
 	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
 	"github.com/onomyprotocol/onomy/docs"
-	daomodule "github.com/onomyprotocol/onomy/x/dao"
-	daomodulekeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
-	daomoduletypes "github.com/onomyprotocol/onomy/x/dao/types"
+	"github.com/onomyprotocol/onomy/x/dao"
+	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
+	daokeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
+	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 const (
@@ -115,6 +116,8 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.CancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
+		daoclient.FundTreasuryProposalHandler,
+		daoclient.ExchangeWithTreasuryProposalProposalHandler,
 	)
 
 	return govProposalHandlers
@@ -146,7 +149,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		gravity.AppModuleBasic{},
-		daomodule.AppModuleBasic{},
+		dao.AppModuleBasic{},
 	)
 
 	// module account permissions.
@@ -227,7 +230,7 @@ type OnomyApp struct {
 
 	GravityKeeper gravitykeeper.Keeper
 
-	DaoKeeper daomodulekeeper.Keeper
+	DaoKeeper daokeeper.Keeper
 
 	// mm is the module manager
 	mm *module.Manager
@@ -263,7 +266,7 @@ func New( // nolint:funlen // app new cosmos func
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		gravitytypes.StoreKey, daomoduletypes.StoreKey,
+		gravitytypes.StoreKey, daotypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -356,11 +359,10 @@ func New( // nolint:funlen // app new cosmos func
 		&app.AccountKeeper,
 	)
 
-	app.DaoKeeper = *daomodulekeeper.NewKeeper(
+	app.DaoKeeper = *daokeeper.NewKeeper(
 		appCodec,
-		keys[daomoduletypes.StoreKey],
-		keys[daomoduletypes.MemStoreKey],
-		app.GetSubspace(daomoduletypes.ModuleName),
+		keys[daotypes.StoreKey],
+		keys[daotypes.MemStoreKey],
 	)
 
 	// register the staking hooks
@@ -380,7 +382,8 @@ func New( // nolint:funlen // app new cosmos func
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(gravitytypes.RouterKey, gravitykeeper.NewGravityProposalHandler(app.GravityKeeper))
+		AddRoute(gravitytypes.RouterKey, gravitykeeper.NewGravityProposalHandler(app.GravityKeeper)).
+		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(app.DaoKeeper))
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
@@ -418,7 +421,7 @@ func New( // nolint:funlen // app new cosmos func
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
-		daomodule.NewAppModule(appCodec, app.DaoKeeper, app.AccountKeeper, app.BankKeeper),
+		dao.NewAppModule(appCodec, app.DaoKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -453,7 +456,7 @@ func New( // nolint:funlen // app new cosmos func
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		gravitytypes.ModuleName,
-		daomoduletypes.ModuleName,
+		daotypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -476,7 +479,7 @@ func New( // nolint:funlen // app new cosmos func
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
-		daomodule.NewAppModule(appCodec, app.DaoKeeper, app.AccountKeeper, app.BankKeeper),
+		dao.NewAppModule(appCodec, app.DaoKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 	app.sm.RegisterStoreDecoders()
 

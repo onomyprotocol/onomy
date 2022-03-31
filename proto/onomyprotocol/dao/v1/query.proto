@@ -1,0 +1,30 @@
+syntax = "proto3";
+package onomyprotocol.dao.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/onomyprotocol/onomy/x/dao/types";
+option (gogoproto.goproto_stringer_all) = true;
+option (gogoproto.goproto_getters_all) = false;
+
+// Query defines the gRPC querier service.
+service Query {
+  // Treasury queries the dao treasury.
+  rpc Treasury(QueryTreasuryRequest) returns (QueryTreasuryResponse) {
+    option (google.api.http).get = "/onomyprotocol/dao/v1/treasury";
+  }
+}
+
+// QueryTreasuryRequest is request type for the Query/Treasury RPC method.
+message QueryTreasuryRequest {}
+
+// QueryTreasuryResponse is response type for the Query/Treasury RPC method.
+message QueryTreasuryResponse {
+  repeated cosmos.base.v1beta1.Coin treasury_balance = 1 [
+    (gogoproto.moretags)   = "yaml:\"treasury_balance\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
