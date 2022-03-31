@@ -1,6 +1,6 @@
 package types
 
-// DefaultGenesis returns the default Capability genesis state.
+// DefaultGenesis returns the default dao genesis state.
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{}
 }
