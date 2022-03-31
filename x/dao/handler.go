@@ -5,20 +5,35 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/onomyprotocol/onomy/x/dao/keeper"
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 // NewHandler ...
-func NewHandler(k keeper.Keeper) sdk.Handler {
+func NewHandler() sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
-		ctx = ctx.WithEventManager(sdk.NewEventManager()) // nolint:wastedassign // will be used soon
-
-		switch msg := msg.(type) { // nolint:gocritic // will be updated soon
+		switch msg := msg.(type) { // nolint:gocritic //the module doesn't support messages handling
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+		}
+	}
+}
+
+// NewProposalHandler defines the dao proposal handler.
+func NewProposalHandler(k keeper.Keeper) govtypes.Handler {
+	return func(ctx sdk.Context, content govtypes.Content) error {
+		switch c := content.(type) {
+		case *types.FundTreasuryProposal:
+			return k.FundTreasuryProposal(ctx, c)
+
+		case *types.ExchangeWithTreasuryProposal:
+			return k.ExchangeWithTreasuryProposal(ctx, c)
+
+		default:
+			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized ibc proposal content type: %T", c)
 		}
 	}
 }

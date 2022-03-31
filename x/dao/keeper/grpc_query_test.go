@@ -10,13 +10,11 @@ import (
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
-func TestParamsQuery(t *testing.T) {
+func TestTreasury(t *testing.T) {
 	keeper, ctx := testkeeper.DaoKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	params := types.DefaultParams()
-	keeper.SetParams(ctx, params)
 
-	response, err := keeper.Params(wctx, &types.QueryParamsRequest{})
+	response, err := keeper.Treasury(wctx, &types.QueryTreasuryRequest{})
 	require.NoError(t, err)
-	require.Equal(t, &types.QueryParamsResponse{Params: params}, response)
+	require.Equal(t, &types.QueryTreasuryResponse{}, response)
 }

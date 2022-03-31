@@ -1,8 +1,0 @@
-syntax = "proto3";
-package onomyprotocol.dao.dao;
-
-option go_package = "github.com/onomyprotocol/onomy/x/dao/types";
-
-// Msg defines the Msg service.
-service Msg {
-}
