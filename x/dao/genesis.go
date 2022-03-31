@@ -7,13 +7,13 @@ import (
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
-// InitGenesis initializes the capability module's state from a provided genesis
+// InitGenesis initializes the dao module's state from a provided genesis
 // state.
-func InitGenesis(_ sdk.Context, _ keeper.Keeper, _ types.GenesisState) {
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
+	k.InitGenesis(ctx, genState)
 }
 
-// ExportGenesis returns the capability module's exported genesis.
-func ExportGenesis(_ sdk.Context, _ keeper.Keeper) *types.GenesisState {
-	genesis := types.DefaultGenesis()
-	return genesis
+// ExportGenesis returns the dao module's exported genesis.
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+	return k.ExportGenesis(ctx)
 }
