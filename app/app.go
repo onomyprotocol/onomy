@@ -162,6 +162,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		gravitytypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
+		daotypes.ModuleName:            {authtypes.Minter},
 	}
 
 	// module accounts that are allowed to receive tokens.
@@ -363,6 +364,8 @@ func New( // nolint:funlen // app new cosmos func
 		appCodec,
 		keys[daotypes.StoreKey],
 		keys[daotypes.MemStoreKey],
+		&app.BankKeeper,
+		&app.AccountKeeper,
 	)
 
 	// register the staking hooks
@@ -421,7 +424,7 @@ func New( // nolint:funlen // app new cosmos func
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
-		dao.NewAppModule(appCodec, app.DaoKeeper, app.AccountKeeper, app.BankKeeper),
+		dao.NewAppModule(appCodec, app.DaoKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -479,7 +482,7 @@ func New( // nolint:funlen // app new cosmos func
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
-		dao.NewAppModule(appCodec, app.DaoKeeper, app.AccountKeeper, app.BankKeeper),
+		dao.NewAppModule(appCodec, app.DaoKeeper),
 	)
 	app.sm.RegisterStoreDecoders()
 
