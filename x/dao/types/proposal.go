@@ -17,7 +17,10 @@ const (
 )
 
 // Assert FundTreasuryProposal implements govtypes.Content at compile-time.
-var _ govtypes.Content = &FundTreasuryProposal{}
+var (
+	_ govtypes.Content = &FundTreasuryProposal{}
+	_ govtypes.Content = &ExchangeWithTreasuryProposal{}
+)
 
 func init() { // nolint:gochecknoinits // cosmos sdk style
 	govtypes.RegisterProposalType(ProposalTypeFundTreasuryProposal)

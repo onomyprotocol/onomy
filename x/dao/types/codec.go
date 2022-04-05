@@ -1,16 +1,26 @@
 package types
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 // RegisterCodec registers the legacy amino codec.
 func RegisterCodec(cdc *codec.LegacyAmino) {
+	cdc.RegisterConcrete(&FundTreasuryProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeFundTreasuryProposal), nil)
+	cdc.RegisterConcrete(&ExchangeWithTreasuryProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeExchangeWithTreasuryProposal), nil)
 }
 
 // RegisterInterfaces registers the cdctypes interface.
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
+	registry.RegisterImplementations(
+		(*govtypes.Content)(nil),
+		&FundTreasuryProposal{},
+		&ExchangeWithTreasuryProposal{},
+	)
 }
 
 var (

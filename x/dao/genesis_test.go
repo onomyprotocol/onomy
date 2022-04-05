@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/onomyprotocol/onomy/testutil/simapp"
 	"github.com/onomyprotocol/onomy/x/dao"
@@ -35,7 +36,8 @@ func TestInitGenesis(t *testing.T) {
 	}
 	for _, tt := range tests {
 		tt := tt
-		app, ctx := simapp.Setup()
+		app := simapp.Setup(false)
+		ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 		t.Run(tt.name, func(t *testing.T) {
 			dao.InitGenesis(ctx, app.DaoKeeper, tt.args.genState)
 			exportedModuleBalance := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress(types.ModuleName))
@@ -68,7 +70,8 @@ func TestInitAndExportGenesis(t *testing.T) {
 	}
 	for _, tt := range tests {
 		tt := tt
-		app, ctx := simapp.Setup()
+		app := simapp.Setup(false)
+		ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 		t.Run(tt.name, func(t *testing.T) {
 			dao.InitGenesis(ctx, app.DaoKeeper, tt.args.genState)
 			exportedGenesis := dao.ExportGenesis(ctx, app.DaoKeeper)

@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/onomyprotocol/onomy/testutil/simapp"
 	"github.com/onomyprotocol/onomy/x/dao/types"
@@ -38,7 +39,8 @@ func TestKeeper_Treasury(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			app, ctx := simapp.Setup()
+			app := simapp.Setup(false)
+			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 			wctx := sdk.WrapSDKContext(ctx)
 			app.DaoKeeper.InitGenesis(ctx, types.GenesisState{
 				TreasuryBalance: tt.args.treasuryBalance,

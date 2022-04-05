@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/onomyprotocol/onomy/app"
@@ -31,29 +31,40 @@ func NewDefaultGenesisState(cdc codec.JSONCodec) GenesisState {
 }
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
-func Setup() (*app.OnomyApp, sdk.Context) {
-	onomyApp, genesisState := setup(5) // nolint:gomnd // test invCheckPeriod
-	// init chain must be called to stop deliverState from being nil
-	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-	if err != nil {
-		panic(err)
+func Setup(isCheckTx bool) *app.OnomyApp {
+	onomyApp, genesisState := setup(!isCheckTx, 5) // nolint:gomnd //test constant
+	if !isCheckTx {
+		// init chain must be called to stop deliverState from being nil
+		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
+		if err != nil {
+			panic(err)
+		}
+
+		// Initialize the chain
+		onomyApp.InitChain(
+			abci.RequestInitChain{
+				Validators:      []abci.ValidatorUpdate{},
+				ConsensusParams: simapp.DefaultConsensusParams,
+				AppStateBytes:   stateBytes,
+			},
+		)
 	}
 
-	// Initialize the chain
-	onomyApp.InitChain(
-		abci.RequestInitChain{
-			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: simapp.DefaultConsensusParams,
-			AppStateBytes:   stateBytes,
-		},
-	)
-
-	return onomyApp, onomyApp.BaseApp.NewContext(false, tmproto.Header{})
+	return onomyApp
 }
 
-func setup(invCheckPeriod uint) (*app.OnomyApp, GenesisState) {
+// GenAccount generates random account.
+func GenAccount() sdk.AccAddress {
+	pk := ed25519.GenPrivKey().PubKey()
+	return sdk.AccAddress(pk.Address())
+}
+
+func setup(withGenesis bool, invCheckPeriod uint) (*app.OnomyApp, GenesisState) {
 	db := dbm.NewMemDB()
 	encCdc := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
 	onomyApp := app.New(log.NewNopLogger(), db, nil, true, map[int64]bool{}, app.DefaultNodeHome, invCheckPeriod, encCdc, simapp.EmptyAppOptions{})
-	return onomyApp.(*app.OnomyApp), NewDefaultGenesisState(encCdc.Marshaler)
+	if withGenesis {
+		return onomyApp.(*app.OnomyApp), NewDefaultGenesisState(encCdc.Marshaler)
+	}
+	return onomyApp.(*app.OnomyApp), GenesisState{}
 }
