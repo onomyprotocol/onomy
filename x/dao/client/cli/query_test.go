@@ -30,7 +30,8 @@ func TestCLI_ShowTreasury(t *testing.T) {
 	} {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			testNetwork := network.SetupNetwork(t)
+			testNetwork := network.New(t)
+			defer testNetwork.Cleanup()
 
 			if tt.prep != nil {
 				tt.prep(testNetwork)

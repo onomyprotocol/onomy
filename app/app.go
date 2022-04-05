@@ -658,13 +658,9 @@ func (app *OnomyApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
-// GetMaccPerms returns a copy of the module account permissions.
-func GetMaccPerms() map[string][]string {
-	dupMaccPerms := make(map[string][]string)
-	for k, v := range maccPerms {
-		dupMaccPerms[k] = v
-	}
-	return dupMaccPerms
+// SetOrderEndBlockers sets the order of set end-blocker calls.
+func (app *OnomyApp) SetOrderEndBlockers(moduleNames ...string) {
+	app.mm.SetOrderEndBlockers(moduleNames...)
 }
 
 // initParamsKeeper init params keeper and its subspaces.

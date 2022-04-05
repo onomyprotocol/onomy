@@ -14,9 +14,9 @@ import (
 
 var (
 	// FundTreasuryProposalHandler is the cli handler used for the gov cli integration.
-	FundTreasuryProposalHandler = govclient.NewProposalHandler(cli.GetCmdFundTreasuryProposalHandler, emptyRestHandler) // nolint:gochecknoglobals // cosmos-sdk style
+	FundTreasuryProposalHandler = govclient.NewProposalHandler(cli.CmdFundTreasuryProposal, emptyRestHandler) // nolint:gochecknoglobals // cosmos-sdk style
 	// ExchangeWithTreasuryProposalProposalHandler is the cli handler used for the gov cli integration.
-	ExchangeWithTreasuryProposalProposalHandler = govclient.NewProposalHandler(cli.GetCmdExchangeWithTreasuryProposalHandler, emptyRestHandler) // nolint:gochecknoglobals // cosmos-sdk style
+	ExchangeWithTreasuryProposalProposalHandler = govclient.NewProposalHandler(cli.CmdExchangeWithTreasuryProposal, emptyRestHandler) // nolint:gochecknoglobals // cosmos-sdk style
 )
 
 func emptyRestHandler(client.Context) govrest.ProposalRESTHandler {
