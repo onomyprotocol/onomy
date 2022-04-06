@@ -27,5 +27,31 @@ func (k Keeper) FundTreasuryProposal(ctx sdk.Context, request *types.FundTreasur
 
 // ExchangeWithTreasuryProposal submits the ExchangeWithTreasuryProposal.
 func (k Keeper) ExchangeWithTreasuryProposal(ctx sdk.Context, request *types.ExchangeWithTreasuryProposal) error {
-	return nil
+	senderAddr, err := sdk.AccAddressFromBech32(request.Sender)
+	if err != nil {
+		return err
+	}
+
+	coinsAsk := sdk.NewCoins()
+	coinsBid := sdk.NewCoins()
+	for i := range request.CoinsPairs {
+		coinsAsk = coinsAsk.Add(request.CoinsPairs[i].CoinAsk)
+		coinsBid = coinsBid.Add(request.CoinsPairs[i].CoinBid)
+	}
+
+	senderBalance := k.bankKeeper.GetAllBalances(ctx, senderAddr)
+	if _, isNegative := senderBalance.SafeSub(coinsBid); isNegative {
+		return sdkerrors.Wrapf(types.ErrInsufficientBalance, "sender balance is less than bid coins amount")
+	}
+
+	treasuryBalance := k.bankKeeper.GetAllBalances(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName))
+	if _, isNegative := treasuryBalance.SafeSub(coinsAsk); isNegative {
+		return sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than ask coins amount")
+	}
+
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, senderAddr, types.ModuleName, coinsBid); err != nil {
+		return err
+	}
+
+	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, senderAddr, coinsAsk)
 }

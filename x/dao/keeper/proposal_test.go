@@ -109,3 +109,183 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 		})
 	}
 }
+
+func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
+	const (
+		denom1 = "denom1"
+		denom2 = "denom2"
+		denom3 = "denom3"
+		denom4 = "denom4"
+	)
+
+	account := simapp.GenAccount()
+
+	type args struct {
+		treasuryBalance sdk.Coins
+		accountBalance  sdk.Coins
+		sender          string
+		coinsPairs      []types.CoinsExchangePair
+	}
+
+	tests := []struct {
+		name                string
+		args                args
+		wantAccountBalance  sdk.Coins
+		wantTreasuryBalance sdk.Coins
+		wantErr             error
+	}{
+		{
+			name: "positive_exchange_full",
+			args: args{
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 8)),
+				accountBalance:  sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
+				sender:          account.String(),
+				coinsPairs: []types.CoinsExchangePair{
+					{
+						CoinAsk: sdk.NewInt64Coin(denom1, 8),
+						CoinBid: sdk.NewInt64Coin(denom2, 10),
+					},
+				},
+			},
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
+			wantAccountBalance:  sdk.NewCoins(sdk.NewInt64Coin(denom1, 8)),
+		},
+		{
+			name: "positive_exchange_multiple_pairs",
+			args: args{
+				treasuryBalance: sdk.NewCoins(
+					sdk.NewInt64Coin(denom1, 50),
+					sdk.NewInt64Coin(denom2, 50),
+					sdk.NewInt64Coin(denom3, 50),
+					sdk.NewInt64Coin(denom4, 50),
+				),
+				accountBalance: sdk.NewCoins(
+					sdk.NewInt64Coin(denom1, 100),
+					sdk.NewInt64Coin(denom2, 100),
+					sdk.NewInt64Coin(denom3, 100),
+				),
+				sender: account.String(),
+				coinsPairs: []types.CoinsExchangePair{
+					{
+						CoinAsk: sdk.NewInt64Coin(denom1, 8),
+						CoinBid: sdk.NewInt64Coin(denom2, 10),
+					},
+					{
+						CoinAsk: sdk.NewInt64Coin(denom1, 4),
+						CoinBid: sdk.NewInt64Coin(denom2, 2),
+					},
+					{
+						CoinAsk: sdk.NewInt64Coin(denom3, 5),
+						CoinBid: sdk.NewInt64Coin(denom1, 5),
+					},
+				},
+			},
+			wantTreasuryBalance: sdk.NewCoins(
+				// 50 - 8 - 4 + 5
+				sdk.NewInt64Coin(denom1, 43),
+				// 50 + 10 + 2
+				sdk.NewInt64Coin(denom2, 62),
+				// 50 - 5
+				sdk.NewInt64Coin(denom3, 45),
+				sdk.NewInt64Coin(denom4, 50),
+			),
+			wantAccountBalance: sdk.NewCoins(
+				// 100 + 8 + 4 - 5
+				sdk.NewInt64Coin(denom1, 107),
+				// 100 - 10 - 2
+				sdk.NewInt64Coin(denom2, 88),
+				// 100 + 5
+				sdk.NewInt64Coin(denom3, 105),
+			),
+		},
+		{
+			name: "negative_insufficient_sender_balance",
+			args: args{
+				treasuryBalance: sdk.NewCoins(
+					sdk.NewInt64Coin(denom1, 50),
+					sdk.NewInt64Coin(denom2, 50),
+				),
+				accountBalance: sdk.NewCoins(
+					sdk.NewInt64Coin(denom1, 4),
+					sdk.NewInt64Coin(denom2, 12),
+				),
+				sender: account.String(),
+				coinsPairs: []types.CoinsExchangePair{
+					{
+						CoinAsk: sdk.NewInt64Coin(denom1, 8),
+						CoinBid: sdk.NewInt64Coin(denom2, 10),
+					},
+					{
+						CoinAsk: sdk.NewInt64Coin(denom1, 4),
+						CoinBid: sdk.NewInt64Coin(denom2, 2),
+					},
+					{
+						CoinAsk: sdk.NewInt64Coin(denom3, 5),
+						CoinBid: sdk.NewInt64Coin(denom1, 5),
+					},
+				},
+			},
+			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "sender balance is less than bid coins amount"),
+		},
+		{
+			name: "negative_insufficient_treasury_balance",
+			args: args{
+				treasuryBalance: sdk.NewCoins(
+					sdk.NewInt64Coin(denom1, 50),
+					sdk.NewInt64Coin(denom3, 2),
+				),
+				accountBalance: sdk.NewCoins(
+					sdk.NewInt64Coin(denom1, 100),
+					sdk.NewInt64Coin(denom2, 100),
+				),
+				sender: account.String(),
+				coinsPairs: []types.CoinsExchangePair{
+					{
+						CoinAsk: sdk.NewInt64Coin(denom1, 8),
+						CoinBid: sdk.NewInt64Coin(denom2, 10),
+					},
+					{
+						CoinAsk: sdk.NewInt64Coin(denom1, 4),
+						CoinBid: sdk.NewInt64Coin(denom2, 2),
+					},
+					{
+						CoinAsk: sdk.NewInt64Coin(denom3, 5),
+						CoinBid: sdk.NewInt64Coin(denom1, 5),
+					},
+				},
+			},
+			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than ask coins amount"),
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			app := simapp.Setup(false)
+			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+			wctx := sdk.WrapSDKContext(ctx)
+
+			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.treasuryBalance))
+			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.accountBalance))
+			senderAddr, err := sdk.AccAddressFromBech32(tt.args.sender)
+			require.NoError(t, err)
+			require.NoError(t, app.BankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, senderAddr, tt.args.accountBalance))
+
+			err = app.DaoKeeper.ExchangeWithTreasuryProposal(ctx, &types.ExchangeWithTreasuryProposal{
+				Sender:     tt.args.sender,
+				CoinsPairs: tt.args.coinsPairs,
+			})
+
+			if tt.wantErr != nil {
+				require.Equal(t, tt.wantErr.Error(), err.Error())
+				return
+			}
+
+			got, err := app.DaoKeeper.Treasury(wctx, &types.QueryTreasuryRequest{})
+			require.NoError(t, err)
+			require.Equal(t, tt.wantTreasuryBalance, got.TreasuryBalance)
+
+			senderBalance := app.BankKeeper.GetAllBalances(ctx, senderAddr)
+			require.Equal(t, tt.wantAccountBalance, senderBalance)
+		})
+	}
+}

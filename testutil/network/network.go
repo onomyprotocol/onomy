@@ -2,6 +2,7 @@
 package network
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -30,8 +31,18 @@ type TestNetwork struct {
 	*network.Network
 }
 
+// ConfigOption is an option pattern function used fot the test network customisations.
+type ConfigOption func(*network.Config)
+
+// WithGenesisOverride returns genesis override ConfigOption.
+func WithGenesisOverride(override func(map[string]json.RawMessage) map[string]json.RawMessage) ConfigOption {
+	return func(c *network.Config) {
+		c.GenesisState = override(c.GenesisState)
+	}
+}
+
 // New setups the test network.
-func New(t *testing.T) *TestNetwork {
+func New(t *testing.T, opts ...ConfigOption) *TestNetwork {
 	t.Helper()
 
 	cfg := network.DefaultConfig()
@@ -45,6 +56,10 @@ func New(t *testing.T) *TestNetwork {
 		// because it requires the eth address to be linked with the validator account
 		onomyApp.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
 		return onomyApp
+	}
+
+	for _, opt := range opts {
+		opt(&cfg)
 	}
 
 	onomyNetwork := network.New(t, cfg)
