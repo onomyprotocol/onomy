@@ -88,8 +88,8 @@ func (m FundTreasuryProposal) String() string {
 }
 
 // NewExchangeWithTreasuryProposal creates a new fund treasury proposal.
-func NewExchangeWithTreasuryProposal(sender sdk.AccAddress, title, description string, amountAsk, amountBid sdk.Coins) *ExchangeWithTreasuryProposal {
-	return &ExchangeWithTreasuryProposal{sender.String(), title, description, amountAsk, amountBid}
+func NewExchangeWithTreasuryProposal(sender sdk.AccAddress, title, description string, coinsPairs []CoinsExchangePair) *ExchangeWithTreasuryProposal {
+	return &ExchangeWithTreasuryProposal{sender.String(), title, description, coinsPairs}
 }
 
 // GetTitle returns the title of a fund treasury proposal.
@@ -120,20 +120,14 @@ func (m *ExchangeWithTreasuryProposal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address: %s", err)
 	}
 
-	if !m.AmountAsk.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.AmountAsk.String())
+	if len(m.CoinsPairs) == 0 {
+		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "coins pairs can't be empty")
 	}
 
-	if !m.AmountAsk.IsAllPositive() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.AmountAsk.String())
-	}
-
-	if !m.AmountBid.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.AmountBid.String())
-	}
-
-	if !m.AmountBid.IsAllPositive() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.AmountBid.String())
+	for i := range m.CoinsPairs {
+		if err := m.CoinsPairs[i].ValidateBasic(); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -149,8 +143,24 @@ func (m ExchangeWithTreasuryProposal) String() string {
   Sender: %s
   Title: %s
   Description: %s
-  AmountAsk: %s
-  AmountBid: %s	
-`, m.Sender, m.Title, m.Description, m.AmountAsk, m.AmountBid))
+  Coin Pairs: %s
+`, m.Sender, m.Title, m.Description, m.CoinsPairs))
 	return b.String()
+}
+
+// ValidateBasic validates CoinsExchangePair basic options.
+func (m *CoinsExchangePair) ValidateBasic() error {
+	if m == nil {
+		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "coins pairs can't be nil")
+	}
+
+	if m.CoinAsk.IsZero() || !m.CoinAsk.IsValid() {
+		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "invalid coin ask")
+	}
+
+	if m.CoinAsk.IsZero() || !m.CoinBid.IsValid() {
+		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "invalid coin bid")
+	}
+
+	return nil
 }

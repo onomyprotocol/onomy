@@ -32,14 +32,21 @@ message ExchangeWithTreasuryProposal {
   string sender = 1;
   string title = 2;
   string description = 3;
-  repeated cosmos.base.v1beta1.Coin amountAsk = 4 [
-    (gogoproto.moretags) = "yaml:\"amount_ask\"",
-    (gogoproto.nullable) = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  repeated CoinsExchangePair coins_pairs = 4 [
+    (gogoproto.moretags) = "yaml:\"coins_pairs\"",
+    (gogoproto.nullable) = false
   ];
-  repeated cosmos.base.v1beta1.Coin amountBid = 5 [
-    (gogoproto.moretags) = "yaml:\"amount_bid\"",
+}
+
+message CoinsExchangePair {
+  cosmos.base.v1beta1.Coin coin_ask = 1 [
+    (gogoproto.moretags) = "yaml:\"coin_ask\"",
     (gogoproto.nullable) = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
+  ];
+  cosmos.base.v1beta1.Coin coin_bid = 2 [
+    (gogoproto.moretags) = "yaml:\"coin_bid\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
   ];
 }

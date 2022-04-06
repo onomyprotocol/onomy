@@ -1,13 +1,15 @@
 package cli_test
 
 import (
+	"fmt"
 	"testing"
 
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
+	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"google.golang.org/grpc/status"
 
-	clitestutil "github.com/onomyprotocol/onomy/testutil/cli"
 	"github.com/onomyprotocol/onomy/testutil/network"
 	"github.com/onomyprotocol/onomy/x/dao/client/cli"
 	"github.com/onomyprotocol/onomy/x/dao/types"
@@ -37,8 +39,9 @@ func TestCLI_ShowTreasury(t *testing.T) {
 				tt.prep(testNetwork)
 			}
 
-			tt.args = append(tt.args, clitestutil.QueryArgs()...)
+			tt.args = append(tt.args, fmt.Sprintf("--%s=json", tmcli.OutputFlag))
 			ctx := testNetwork.Validator1Ctx()
+
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowTreasury(), tt.args)
 			if tt.err != nil {
 				stat, ok := status.FromError(tt.err)
