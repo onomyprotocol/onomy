@@ -32,6 +32,9 @@ func NewProposalHandler(k keeper.Keeper) govtypes.Handler {
 		case *types.ExchangeWithTreasuryProposal:
 			return k.ExchangeWithTreasuryProposal(ctx, c)
 
+		case *types.FundAccountProposal:
+			return k.FundAccountProposal(ctx, c)
+
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized ibc proposal content type: %T", c)
 		}

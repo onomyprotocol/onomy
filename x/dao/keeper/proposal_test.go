@@ -26,7 +26,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 		amount         sdk.Coins
 	}
 
-	tests := []struct {
+	tests := []struct { //nolint:dupl // test template
 		name                string
 		args                args
 		wantTreasuryBalance sdk.Coins
@@ -286,6 +286,98 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 
 			senderBalance := app.BankKeeper.GetAllBalances(ctx, senderAddr)
 			require.Equal(t, tt.wantAccountBalance, senderBalance)
+		})
+	}
+}
+
+func TestKeeper_FundAccountProposal(t *testing.T) {
+	const (
+		denom1 = "denom1"
+		denom2 = "denom2"
+	)
+
+	account := simapp.GenAccount()
+
+	type args struct {
+		treasuryBalance sdk.Coins
+		recipient       string
+		amount          sdk.Coins
+	}
+
+	tests := []struct { // nolint:dupl // test template
+		name               string
+		args               args
+		wantAccountBalance sdk.Coins
+		wantErr            error
+	}{
+		{
+			name: "positive_one_coin_full",
+			args: args{
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
+				recipient:       account.String(),
+				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
+			},
+			wantAccountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
+		},
+		{
+			name: "positive_one_coin_partial",
+			args: args{
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
+				recipient:       account.String(),
+				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 5)),
+			},
+			wantAccountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 5)),
+		},
+		{
+			name: "positive_two_coins_partial",
+			args: args{
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10), sdk.NewInt64Coin(denom2, 8)),
+				recipient:       account.String(),
+				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 5), sdk.NewInt64Coin(denom2, 8)),
+			},
+			wantAccountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 5), sdk.NewInt64Coin(denom2, 8)),
+		},
+		{
+			name: "negative_insufficient_balance",
+			args: args{
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
+				recipient:       account.String(),
+				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 11)),
+			},
+			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than amount to send"),
+		},
+		{
+			name: "negative_not_existing_token",
+			args: args{
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
+				recipient:       account.String(),
+				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
+			},
+			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than amount to send"),
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			app := simapp.Setup(false)
+			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.treasuryBalance))
+			err := app.DaoKeeper.FundAccountProposal(ctx, &types.FundAccountProposal{
+				Recipient: tt.args.recipient,
+				Amount:    tt.args.amount,
+			})
+
+			if tt.wantErr != nil {
+				require.Equal(t, tt.wantErr.Error(), err.Error())
+				return
+			}
+
+			require.NoError(t, err)
+
+			recipientAddr, err := sdk.AccAddressFromBech32(tt.args.recipient)
+			require.NoError(t, err)
+			got := app.BankKeeper.GetAllBalances(ctx, recipientAddr)
+			require.Equal(t, tt.wantAccountBalance, got)
 		})
 	}
 }
