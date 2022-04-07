@@ -12,6 +12,7 @@ import (
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&FundTreasuryProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeFundTreasuryProposal), nil)
 	cdc.RegisterConcrete(&ExchangeWithTreasuryProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeExchangeWithTreasuryProposal), nil)
+	cdc.RegisterConcrete(&FundAccountProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeFundAccountProposal), nil)
 }
 
 // RegisterInterfaces registers the cdctypes interface.
@@ -20,6 +21,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		(*govtypes.Content)(nil),
 		&FundTreasuryProposal{},
 		&ExchangeWithTreasuryProposal{},
+		&FundAccountProposal{},
 	)
 }
 

@@ -14,12 +14,14 @@ const (
 	ProposalTypeFundTreasuryProposal = "FundTreasuryProposal"
 	// ProposalTypeExchangeWithTreasuryProposal defines the type for a ExchangeWithTreasuryProposal.
 	ProposalTypeExchangeWithTreasuryProposal = "ExchangeWithTreasuryProposal"
+	// ProposalTypeFundAccountProposal defines the type for a FundAccountProposal.
+	ProposalTypeFundAccountProposal = "FundAccountProposal"
 )
 
-// Assert FundTreasuryProposal implements govtypes.Content at compile-time.
 var (
 	_ govtypes.Content = &FundTreasuryProposal{}
 	_ govtypes.Content = &ExchangeWithTreasuryProposal{}
+	_ govtypes.Content = &FundAccountProposal{}
 )
 
 func init() { // nolint:gochecknoinits // cosmos sdk style
@@ -28,6 +30,9 @@ func init() { // nolint:gochecknoinits // cosmos sdk style
 
 	govtypes.RegisterProposalType(ProposalTypeExchangeWithTreasuryProposal)
 	govtypes.RegisterProposalTypeCodec(&ExchangeWithTreasuryProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeExchangeWithTreasuryProposal))
+
+	govtypes.RegisterProposalType(ProposalTypeFundAccountProposal)
+	govtypes.RegisterProposalTypeCodec(&FundAccountProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeFundAccountProposal))
 }
 
 // NewFundTreasuryProposal creates a new fund treasury proposal.
@@ -78,7 +83,7 @@ func (m *FundTreasuryProposal) GetProposer() string { return m.Sender }
 // String implements the Stringer interface.
 func (m FundTreasuryProposal) String() string {
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf(`Fund treasury Proposal:
+	b.WriteString(fmt.Sprintf(`Fund treasury proposal:
   Sender: %s
   Title: %s
   Description: %s
@@ -139,7 +144,7 @@ func (m *ExchangeWithTreasuryProposal) GetProposer() string { return m.Sender }
 // String implements the Stringer interface.
 func (m ExchangeWithTreasuryProposal) String() string {
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf(`Exchange with treasury Proposal:
+	b.WriteString(fmt.Sprintf(`Exchange with treasury proposal:
   Sender: %s
   Title: %s
   Description: %s
@@ -163,4 +168,58 @@ func (m *CoinsExchangePair) ValidateBasic() error {
 	}
 
 	return nil
+}
+
+// NewFundAccountProposal creates a new fund account proposal.
+func NewFundAccountProposal(recipient sdk.AccAddress, title, description string, amount sdk.Coins) *FundAccountProposal {
+	return &FundAccountProposal{recipient.String(), title, description, amount}
+}
+
+// GetTitle returns the title of a fund account proposal.
+func (m *FundAccountProposal) GetTitle() string { return m.Title }
+
+// GetDescription returns the description of a fund account proposal.
+func (m *FundAccountProposal) GetDescription() string { return m.Description }
+
+// ProposalRoute returns the routing key of a fund account proposal.
+func (m *FundAccountProposal) ProposalRoute() string { return RouterKey }
+
+// ProposalType returns the type of the fund account proposal.
+func (m *FundAccountProposal) ProposalType() string { return ProposalTypeFundAccountProposal }
+
+// ValidateBasic runs basic stateless validity checks.
+func (m *FundAccountProposal) ValidateBasic() error {
+	err := govtypes.ValidateAbstract(m)
+	if err != nil {
+		return err
+	}
+	sender, err := sdk.AccAddressFromBech32(m.Recipient)
+	if err != nil {
+		return err
+	}
+	if err := sdk.VerifyAddressFormat(sender); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address: %s", err)
+	}
+
+	if !m.Amount.IsValid() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
+	}
+
+	if !m.Amount.IsAllPositive() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
+	}
+
+	return nil
+}
+
+// String implements the Stringer interface.
+func (m FundAccountProposal) String() string {
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf(`Fund account proposal:
+  Recipient: %s
+  Title: %s
+  Description: %s
+  Amount: %s
+`, m.Recipient, m.Title, m.Description, m.Amount))
+	return b.String()
 }
