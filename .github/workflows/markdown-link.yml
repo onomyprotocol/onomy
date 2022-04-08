@@ -1,9 +1,9 @@
 name: Check Markdown links
 on:
   push:
-    branches: [master, main, dev]
+    branches: [master, main, dev, dao]
   pull_request:
-    branches: [master, main, dev]
+    branches: [master, main, dev, dao]
 jobs:
   markdown-link-check:
     runs-on: ubuntu-latest
