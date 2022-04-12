@@ -29,6 +29,7 @@ func TestInitGenesis(t *testing.T) {
 			name: "init_and_check_bank",
 			args: args{
 				genState: types.GenesisState{
+					Params:          types.DefaultParams(),
 					TreasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 1), sdk.NewInt64Coin(denom2, 2)),
 				},
 			},
@@ -42,6 +43,7 @@ func TestInitGenesis(t *testing.T) {
 			dao.InitGenesis(ctx, app.DaoKeeper, tt.args.genState)
 			exportedModuleBalance := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress(types.ModuleName))
 			require.Equal(t, tt.args.genState.TreasuryBalance, exportedModuleBalance)
+			require.Equal(t, tt.args.genState.Params, app.DaoKeeper.GetParams(ctx))
 		})
 	}
 }
@@ -64,6 +66,7 @@ func TestInitAndExportGenesis(t *testing.T) {
 			args: args{
 				genState: types.GenesisState{
 					TreasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 1), sdk.NewInt64Coin(denom2, 2)),
+					Params:          types.DefaultParams(),
 				},
 			},
 		},
