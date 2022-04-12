@@ -364,6 +364,7 @@ func New( // nolint:funlen // app new cosmos func
 		appCodec,
 		keys[daotypes.StoreKey],
 		keys[daotypes.MemStoreKey],
+		app.GetSubspace(daotypes.ModuleName),
 		&app.BankKeeper,
 		&app.AccountKeeper,
 	)
@@ -678,6 +679,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(gravitytypes.ModuleName)
+	paramsKeeper.Subspace(daotypes.ModuleName)
 
 	return paramsKeeper
 }

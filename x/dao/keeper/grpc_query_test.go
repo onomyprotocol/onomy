@@ -42,9 +42,11 @@ func TestKeeper_Treasury(t *testing.T) {
 			app := simapp.Setup(false)
 			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 			wctx := sdk.WrapSDKContext(ctx)
-			app.DaoKeeper.InitGenesis(ctx, types.GenesisState{
+			err := app.DaoKeeper.InitGenesis(ctx, types.GenesisState{
+				Params:          types.DefaultParams(),
 				TreasuryBalance: tt.args.treasuryBalance,
 			})
+			require.NoError(t, err)
 
 			got, err := app.DaoKeeper.Treasury(wctx, &types.QueryTreasuryRequest{})
 			require.NoError(t, err)
