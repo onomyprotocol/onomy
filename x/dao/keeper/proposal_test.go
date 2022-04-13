@@ -83,7 +83,6 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := simapp.Setup(false)
 			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
-			wctx := sdk.WrapSDKContext(ctx)
 			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.accountBalance))
 
 			senderAddr, err := sdk.AccAddressFromBech32(tt.args.sender)
@@ -102,10 +101,8 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 
 			require.NoError(t, err)
 
-			got, err := app.DaoKeeper.Treasury(wctx, &types.QueryTreasuryRequest{})
-			require.NoError(t, err)
-
-			require.Equal(t, tt.wantTreasuryBalance, got.TreasuryBalance)
+			got := app.DaoKeeper.Treasury(ctx)
+			require.Equal(t, tt.wantTreasuryBalance, got)
 		})
 	}
 }
@@ -262,7 +259,6 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := simapp.Setup(false)
 			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
-			wctx := sdk.WrapSDKContext(ctx)
 
 			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.treasuryBalance))
 			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.accountBalance))
@@ -280,9 +276,8 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 				return
 			}
 
-			got, err := app.DaoKeeper.Treasury(wctx, &types.QueryTreasuryRequest{})
-			require.NoError(t, err)
-			require.Equal(t, tt.wantTreasuryBalance, got.TreasuryBalance)
+			got := app.DaoKeeper.Treasury(ctx)
+			require.Equal(t, tt.wantTreasuryBalance, got)
 
 			senderBalance := app.BankKeeper.GetAllBalances(ctx, senderAddr)
 			require.Equal(t, tt.wantAccountBalance, senderBalance)
