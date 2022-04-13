@@ -24,16 +24,14 @@ func TestKeeper_Treasury(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *types.QueryTreasuryResponse
+		want sdk.Coins
 	}{
 		{
 			name: "get_from_genesis",
 			args: args{
 				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 1), sdk.NewInt64Coin(denom2, 2)),
 			},
-			want: &types.QueryTreasuryResponse{
-				TreasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 1), sdk.NewInt64Coin(denom2, 2)),
-			},
+			want: sdk.NewCoins(sdk.NewInt64Coin(denom1, 1), sdk.NewInt64Coin(denom2, 2)),
 		},
 	}
 	for _, tt := range tests {
@@ -41,15 +39,14 @@ func TestKeeper_Treasury(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := simapp.Setup(false)
 			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
-			wctx := sdk.WrapSDKContext(ctx)
+
 			err := app.DaoKeeper.InitGenesis(ctx, types.GenesisState{
 				Params:          types.DefaultParams(),
 				TreasuryBalance: tt.args.treasuryBalance,
 			})
 			require.NoError(t, err)
 
-			got, err := app.DaoKeeper.Treasury(wctx, &types.QueryTreasuryRequest{})
-			require.NoError(t, err)
+			got := app.DaoKeeper.Treasury(ctx)
 			require.Equal(t, tt.want, got)
 		})
 	}
