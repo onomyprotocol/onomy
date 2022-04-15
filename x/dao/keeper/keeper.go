@@ -6,7 +6,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
@@ -18,9 +17,10 @@ type (
 		cdc           codec.BinaryCodec
 		storeKey      sdk.StoreKey
 		memKey        sdk.StoreKey
-		ps            paramtypes.Subspace
+		ps            types.ParamSubspace
 		bankKeeper    types.BankKeeper
 		accountKeeper types.AccountKeeper
+		stakingKeeper types.StakingKeeper
 	}
 )
 
@@ -29,13 +29,19 @@ func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeKey,
 	memKey sdk.StoreKey,
-	ps paramtypes.Subspace,
+	ps types.ParamSubspace,
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
+	stakingKeeper types.StakingKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
 		ps = ps.WithKeyTable(types.ParamKeyTable())
+	}
+
+	// ensure dao module account is set
+	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
+		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
 	}
 
 	return &Keeper{
@@ -45,6 +51,7 @@ func NewKeeper(
 		ps:            ps,
 		bankKeeper:    bankKeeper,
 		accountKeeper: accountKeeper,
+		stakingKeeper: stakingKeeper,
 	}
 }
 

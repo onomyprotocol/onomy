@@ -37,16 +37,16 @@ func TestKeeper_Treasury(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			app := simapp.Setup(false)
-			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+			simApp := simapp.Setup()
+			ctx := simApp.OnomyApp().BaseApp.NewContext(false, tmproto.Header{})
 
-			err := app.DaoKeeper.InitGenesis(ctx, types.GenesisState{
+			err := simApp.OnomyApp().DaoKeeper.InitGenesis(ctx, types.GenesisState{
 				Params:          types.DefaultParams(),
 				TreasuryBalance: tt.args.treasuryBalance,
 			})
 			require.NoError(t, err)
 
-			got := app.DaoKeeper.Treasury(ctx)
+			got := simApp.OnomyApp().DaoKeeper.Treasury(ctx)
 			require.Equal(t, tt.want, got)
 		})
 	}

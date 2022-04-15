@@ -6,7 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/onomyprotocol/onomy/testutil/simapp"
 	"github.com/onomyprotocol/onomy/x/dao/types"
@@ -81,15 +80,15 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			app := simapp.Setup(false)
-			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
-			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.accountBalance))
+			simApp := simapp.Setup()
+			ctx := simApp.NewContext()
+			require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.accountBalance))
 
 			senderAddr, err := sdk.AccAddressFromBech32(tt.args.sender)
 			require.NoError(t, err)
-			require.NoError(t, app.BankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, senderAddr, tt.args.accountBalance))
+			require.NoError(t, simApp.OnomyApp().BankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, senderAddr, tt.args.accountBalance))
 
-			err = app.DaoKeeper.FundTreasuryProposal(ctx, &types.FundTreasuryProposal{
+			err = simApp.OnomyApp().DaoKeeper.FundTreasuryProposal(ctx, &types.FundTreasuryProposal{
 				Sender: tt.args.sender,
 				Amount: tt.args.amount,
 			})
@@ -101,7 +100,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 
 			require.NoError(t, err)
 
-			got := app.DaoKeeper.Treasury(ctx)
+			got := simApp.OnomyApp().DaoKeeper.Treasury(ctx)
 			require.Equal(t, tt.wantTreasuryBalance, got)
 		})
 	}
@@ -257,16 +256,16 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			app := simapp.Setup(false)
-			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+			simApp := simapp.Setup()
+			ctx := simApp.NewContext()
 
-			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.treasuryBalance))
-			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.accountBalance))
+			require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.treasuryBalance))
+			require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.accountBalance))
 			senderAddr, err := sdk.AccAddressFromBech32(tt.args.sender)
 			require.NoError(t, err)
-			require.NoError(t, app.BankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, senderAddr, tt.args.accountBalance))
+			require.NoError(t, simApp.OnomyApp().BankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, senderAddr, tt.args.accountBalance))
 
-			err = app.DaoKeeper.ExchangeWithTreasuryProposal(ctx, &types.ExchangeWithTreasuryProposal{
+			err = simApp.OnomyApp().DaoKeeper.ExchangeWithTreasuryProposal(ctx, &types.ExchangeWithTreasuryProposal{
 				Sender:     tt.args.sender,
 				CoinsPairs: tt.args.coinsPairs,
 			})
@@ -276,10 +275,10 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 				return
 			}
 
-			got := app.DaoKeeper.Treasury(ctx)
+			got := simApp.OnomyApp().DaoKeeper.Treasury(ctx)
 			require.Equal(t, tt.wantTreasuryBalance, got)
 
-			senderBalance := app.BankKeeper.GetAllBalances(ctx, senderAddr)
+			senderBalance := simApp.OnomyApp().BankKeeper.GetAllBalances(ctx, senderAddr)
 			require.Equal(t, tt.wantAccountBalance, senderBalance)
 		})
 	}
@@ -354,10 +353,10 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			app := simapp.Setup(false)
-			ctx := app.BaseApp.NewContext(false, tmproto.Header{})
-			require.NoError(t, app.BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.treasuryBalance))
-			err := app.DaoKeeper.FundAccountProposal(ctx, &types.FundAccountProposal{
+			simApp := simapp.Setup()
+			ctx := simApp.NewContext()
+			require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.treasuryBalance))
+			err := simApp.OnomyApp().DaoKeeper.FundAccountProposal(ctx, &types.FundAccountProposal{
 				Recipient: tt.args.recipient,
 				Amount:    tt.args.amount,
 			})
@@ -371,7 +370,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 
 			recipientAddr, err := sdk.AccAddressFromBech32(tt.args.recipient)
 			require.NoError(t, err)
-			got := app.BankKeeper.GetAllBalances(ctx, recipientAddr)
+			got := simApp.OnomyApp().BankKeeper.GetAllBalances(ctx, recipientAddr)
 			require.Equal(t, tt.wantAccountBalance, got)
 		})
 	}
