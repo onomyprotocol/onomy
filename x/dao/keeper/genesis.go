@@ -16,12 +16,8 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) error 
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
 func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
-	params := k.GetParams(ctx)
-
-	daoAddress := k.accountKeeper.GetModuleAddress(types.ModuleName)
-	daoBalance := k.bankKeeper.GetAllBalances(ctx, daoAddress)
 	return &types.GenesisState{
-		Params:          params,
-		TreasuryBalance: daoBalance,
+		Params:          k.getParams(ctx),
+		TreasuryBalance: k.treasury(ctx),
 	}
 }
