@@ -31,18 +31,18 @@ type TestNetwork struct {
 	*network.Network
 }
 
-// ConfigOption is an option pattern function used fot the test network customisations.
-type ConfigOption func(*network.Config)
+// Option is an option pattern function used fot the test network customisations.
+type Option func(*network.Config)
 
-// WithGenesisOverride returns genesis override ConfigOption.
-func WithGenesisOverride(override func(map[string]json.RawMessage) map[string]json.RawMessage) ConfigOption {
+// WithGenesisOverride returns genesis override Option.
+func WithGenesisOverride(override func(map[string]json.RawMessage) map[string]json.RawMessage) Option {
 	return func(c *network.Config) {
 		c.GenesisState = override(c.GenesisState)
 	}
 }
 
 // New setups the test network.
-func New(t *testing.T, opts ...ConfigOption) *TestNetwork {
+func New(t *testing.T, opts ...Option) *TestNetwork {
 	t.Helper()
 
 	cfg := network.DefaultConfig()
@@ -51,7 +51,7 @@ func New(t *testing.T, opts ...ConfigOption) *TestNetwork {
 	encCfg := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
 	cfg.GenesisState = app.ModuleBasics.DefaultGenesis(encCfg.Marshaler)
 	cfg.AppConstructor = func(val network.Validator) servertypes.Application {
-		onomyApp := simapp.Setup(true)
+		onomyApp := simapp.Setup().OnomyApp()
 		// the override is required in order not to face the issue with the gravity end blocker validation
 		// because it requires the eth address to be linked with the validator account
 		onomyApp.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)

@@ -5,7 +5,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/onomyprotocol/onomy/testutil/simapp"
 	"github.com/onomyprotocol/onomy/x/dao"
@@ -37,13 +36,13 @@ func TestInitGenesis(t *testing.T) {
 	}
 	for _, tt := range tests {
 		tt := tt
-		app := simapp.Setup(false)
-		ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+		simApp := simapp.Setup()
+		ctx := simApp.NewContext()
 		t.Run(tt.name, func(t *testing.T) {
-			dao.InitGenesis(ctx, app.DaoKeeper, tt.args.genState)
-			exportedModuleBalance := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress(types.ModuleName))
+			dao.InitGenesis(ctx, simApp.OnomyApp().DaoKeeper, tt.args.genState)
+			exportedModuleBalance := simApp.OnomyApp().BankKeeper.GetAllBalances(ctx, simApp.OnomyApp().AccountKeeper.GetModuleAddress(types.ModuleName))
 			require.Equal(t, tt.args.genState.TreasuryBalance, exportedModuleBalance)
-			require.Equal(t, tt.args.genState.Params, app.DaoKeeper.GetParams(ctx))
+			require.Equal(t, tt.args.genState.Params, simApp.OnomyApp().DaoKeeper.GetParams(ctx))
 		})
 	}
 }
@@ -73,11 +72,11 @@ func TestInitAndExportGenesis(t *testing.T) {
 	}
 	for _, tt := range tests {
 		tt := tt
-		app := simapp.Setup(false)
-		ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+		simApp := simapp.Setup()
+		ctx := simApp.NewContext()
 		t.Run(tt.name, func(t *testing.T) {
-			dao.InitGenesis(ctx, app.DaoKeeper, tt.args.genState)
-			exportedGenesis := dao.ExportGenesis(ctx, app.DaoKeeper)
+			dao.InitGenesis(ctx, simApp.OnomyApp().DaoKeeper, tt.args.genState)
+			exportedGenesis := dao.ExportGenesis(ctx, simApp.OnomyApp().DaoKeeper)
 			require.Equal(t, &tt.args.genState, exportedGenesis)
 		})
 	}
