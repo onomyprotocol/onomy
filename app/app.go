@@ -367,6 +367,7 @@ func New( // nolint:funlen // app new cosmos func
 		app.GetSubspace(daotypes.ModuleName),
 		&app.BankKeeper,
 		&app.AccountKeeper,
+		&app.StakingKeeper,
 	)
 
 	// register the staking hooks
@@ -437,7 +438,7 @@ func New( // nolint:funlen // app new cosmos func
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, feegrant.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, gravitytypes.ModuleName,
+		crisistypes.ModuleName, govtypes.ModuleName, daotypes.ModuleName, stakingtypes.ModuleName, gravitytypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
