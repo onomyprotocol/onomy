@@ -1044,8 +1044,8 @@ github.com/olekukonko/tablewriter v0.0.1/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXW
 github.com/olekukonko/tablewriter v0.0.2-0.20190409134802-7e037d187b0c/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
-github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20220222080117-376240a9cfcb h1:orSMGVei3y3BAjDUS6LB9JyYg9PgyMz1Rl0D7cGtkoM=
-github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20220222080117-376240a9cfcb/go.mod h1:SsQC4mAHehtt2NcgKFjHDWnczTx+ssL/uglXnBRYyic=
+github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20220406071611-4c9e938a37c9 h1:z9xmQ5bSL01Z040UD109Cx0g0ng8dJh/JB1bjbXpqHo=
+github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20220406071611-4c9e938a37c9/go.mod h1:SsQC4mAHehtt2NcgKFjHDWnczTx+ssL/uglXnBRYyic=
 github.com/onomyprotocol/onomy-sdk v0.44.6-0.20220216164537-c8fad86bac9d h1:vCSifXXfY3ZHa+r2fQJ4BYlHyYrGp/qwKOHpzcjurhY=
 github.com/onomyprotocol/onomy-sdk v0.44.6-0.20220216164537-c8fad86bac9d/go.mod h1:maUA6m2TBxOJZkbwl0eRtEBgTX37kcaiOWU5t1HEGaY=
 github.com/onomyprotocol/tm-load-test v0.9.1-0.20211101093435-b38e68e11c01 h1:+B99URBdjbxtLuKUCSdOpyZ+Q6OpXNvQPsjXGgSBPRo=
