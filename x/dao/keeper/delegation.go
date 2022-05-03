@@ -14,6 +14,11 @@ func (k Keeper) ReBalanceDelegation(ctx sdk.Context) error {
 	return k.reBalanceDaoStaking(ctx, vals, targetDelegations)
 }
 
+// GetDaoDelegationSupply returns total amount of the treasury bonded coins.
+func (k Keeper) GetDaoDelegationSupply(ctx sdk.Context) sdk.Dec {
+	return k.getDaoDelegationSupply(ctx)
+}
+
 // getTargetDelegationState builds a map of the validators and the stake amount they should have now.
 // if the validator is not in the map, the DAO stake is zero.
 func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Validator) map[string]sdk.Dec {
@@ -40,8 +45,7 @@ func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Va
 	daoDelegationSupply := k.getDaoDelegationSupply(ctx)
 	daoBondDenomSupply := k.treasuryBondDenomAmount(ctx).ToDec().Add(daoDelegationSupply)
 
-	stakingTokenPoolRate := k.StakingTokenPoolRate(ctx)
-	daoBondDenomToDelegate := daoBondDenomSupply.Mul(sdk.OneDec().Sub(stakingTokenPoolRate))
+	daoBondDenomToDelegate := daoBondDenomSupply.Sub(daoBondDenomSupply.Mul(k.StakingTokenPoolRate(ctx)))
 
 	targetDelegationState := make(map[string]sdk.Dec) // the key is OperatorAddress
 	for valAddr, selfDelegationAmt := range valsSelfBonds {
@@ -97,17 +101,11 @@ func (k Keeper) reBalanceDaoStaking(ctx sdk.Context, vals []stakingtypes.Validat
 		delegations[valAddr.String()] = delegationDelta
 	}
 
-	err := undelegateValidators(ctx, vals, undelegations, k, daoAddr)
-	if err != nil {
+	if err := undelegateValidators(ctx, vals, undelegations, k, daoAddr); err != nil {
 		return err
 	}
 
-	err2 := k.delegateValidators(ctx, vals, delegations, daoAddr)
-	if err2 != nil {
-		return err2
-	}
-
-	return nil
+	return k.delegateValidators(ctx, vals, delegations, daoAddr)
 }
 
 // undelegateValidators undelegates the requested amount from the validators in the undelegations.
