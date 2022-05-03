@@ -74,13 +74,13 @@ func TestCLI_ExchangeWithTreasuryProposal(t *testing.T) {
 		{
 			name:            "positive",
 			treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(stakeToken, 5000000000000000000)),
-			args:            fmt.Sprintf("5000000000000000000%s/1000000000000000000%s --title=Title --description=Description --deposit=1000000000000000000%s", stakeToken, normalToken, stakeToken),
+			args:            fmt.Sprintf("500000000%s/100000000%s --title=Title --description=Description --deposit=1000000000000000000%s", stakeToken, normalToken, stakeToken),
 		},
 		{
 			name:            "negative_wrong_coins_format",
 			treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(stakeToken, 5000000000000000000)),
-			args:            fmt.Sprintf("5000000000000000000%s --title=Title --description=Description --deposit=1000000000000000000%s", normalToken, stakeToken),
-			err:             fmt.Errorf("coins pair 5000000000000000000%s is invalid", normalToken),
+			args:            fmt.Sprintf("500000000%s --title=Title --description=Description --deposit=1000000000000000000%s", normalToken, stakeToken),
+			err:             fmt.Errorf("coins pair 500000000%s is invalid", normalToken),
 		},
 	} { // nolint:dupl // test template
 		tt := tt
@@ -128,12 +128,12 @@ func TestCLI_FundAccountProposal(t *testing.T) {
 		{
 			name:            "positive",
 			treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(normalToken, 5000000000000000000)),
-			args:            fmt.Sprintf("%s 5000000000000000000%s --title=Title --description=Description --deposit=1000000000000000000%s", account.String(), normalToken, stakeToken),
+			args:            fmt.Sprintf("%s 500000000%s --title=Title --description=Description --deposit=1000000000000000000%s", account.String(), normalToken, stakeToken),
 		},
 		{
 			name:            "negative_insufficient_balance",
 			treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(normalToken, 1000000000000000000)),
-			args:            fmt.Sprintf("%s 5000000000000000000%s --title=Title --description=Description --deposit=1000000000000000000%s", account.String(), "newcoin", stakeToken),
+			args:            fmt.Sprintf("%s 500000000%s --title=Title --description=Description --deposit=1000000000000000000%s", account.String(), "newcoin", stakeToken),
 			code:            govtypes.ErrInvalidProposalContent.ABCICode(),
 		},
 	} { // nolint:dupl // test template
