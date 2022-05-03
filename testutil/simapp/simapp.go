@@ -148,9 +148,20 @@ func (s *SimApp) BeginNextBlock() {
 	s.beginNextBlock()
 }
 
+// EndBlockAndCommit ens the current block and commit the state.
+func (s *SimApp) EndBlockAndCommit(ctx sdk.Context) {
+	s.onomyApp.EndBlocker(ctx, abci.RequestEndBlock{Height: ctx.BlockHeight()})
+	s.onomyApp.Commit()
+}
+
 // NewContext returns empty sdk context for the SimApp.
 func (s *SimApp) NewContext() sdk.Context {
 	return s.newContext()
+}
+
+// CurrentContext returns current context for the SimApp.
+func (s *SimApp) CurrentContext() sdk.Context {
+	return s.currentContext()
 }
 
 // NewNextContext creates next block sdk context for the SimApp.
@@ -205,6 +216,10 @@ func (s *SimApp) CreateValidator(
 
 func (s *SimApp) beginNextBlock() {
 	s.onomyApp.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{Height: s.onomyApp.LastBlockHeight() + 1}})
+}
+
+func (s *SimApp) currentContext() sdk.Context {
+	return s.onomyApp.BaseApp.NewContext(true, tmproto.Header{Height: s.onomyApp.LastBlockHeight()})
 }
 
 func (s *SimApp) newContext() sdk.Context {

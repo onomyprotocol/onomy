@@ -14,13 +14,14 @@ import (
 type (
 	// Keeper is a dao keeper struct.
 	Keeper struct {
-		cdc           codec.BinaryCodec
-		storeKey      sdk.StoreKey
-		memKey        sdk.StoreKey
-		ps            types.ParamSubspace
-		bankKeeper    types.BankKeeper
-		accountKeeper types.AccountKeeper
-		stakingKeeper types.StakingKeeper
+		cdc                codec.BinaryCodec
+		storeKey           sdk.StoreKey
+		memKey             sdk.StoreKey
+		ps                 types.ParamSubspace
+		bankKeeper         types.BankKeeper
+		accountKeeper      types.AccountKeeper
+		stakingKeeper      types.StakingKeeper
+		distributionKeeper types.DistributionKeeper
 	}
 )
 
@@ -33,6 +34,7 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
 	stakingKeeper types.StakingKeeper,
+	distributionKeeper types.DistributionKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -45,13 +47,14 @@ func NewKeeper(
 	}
 
 	return &Keeper{
-		cdc:           cdc,
-		storeKey:      storeKey,
-		memKey:        memKey,
-		ps:            ps,
-		bankKeeper:    bankKeeper,
-		accountKeeper: accountKeeper,
-		stakingKeeper: stakingKeeper,
+		cdc:                cdc,
+		storeKey:           storeKey,
+		memKey:             memKey,
+		ps:                 ps,
+		bankKeeper:         bankKeeper,
+		accountKeeper:      accountKeeper,
+		stakingKeeper:      stakingKeeper,
+		distributionKeeper: distributionKeeper,
 	}
 }
 

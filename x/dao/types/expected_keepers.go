@@ -30,6 +30,11 @@ type BankKeeper interface {
 	UndelegateCoinsFromModuleToAccount(sdk.Context, string, sdk.AccAddress, sdk.Coins) error
 }
 
+// DistributionKeeper expected distribution keeper.
+type DistributionKeeper interface {
+	WithdrawDelegationRewards(sdk.Context, sdk.AccAddress, sdk.ValAddress) (sdk.Coins, error)
+}
+
 // StakingKeeper expected staking keeper.
 type StakingKeeper interface {
 	BondDenom(sdk.Context) string

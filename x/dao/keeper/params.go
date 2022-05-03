@@ -28,6 +28,12 @@ func (k Keeper) StakingMaxCommissionRate(ctx sdk.Context) (res sdk.Dec) {
 	return
 }
 
+// WithdrawRewardPeriod - the blocks period to dao staking reward.
+func (k Keeper) WithdrawRewardPeriod(ctx sdk.Context) (res int64) {
+	k.ps.Get(ctx, types.KeyWithdrawRewardPeriod, &res)
+	return
+}
+
 func (k Keeper) getParams(ctx sdk.Context) (params types.Params) {
 	k.ps.GetParamSet(ctx, &params)
 	return params
