@@ -25,7 +25,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 		amount         sdk.Coins
 	}
 
-	tests := []struct { //nolint:dupl // test template
+	tests := []struct {
 		name                string
 		args                args
 		wantTreasuryBalance sdk.Coins
@@ -97,8 +97,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 				require.Equal(t, tt.wantErr.Error(), err.Error())
 				return
 			}
-
-			require.NoError(t, err)
+			require.NoError(t, err, err)
 
 			got := simApp.OnomyApp().DaoKeeper.Treasury(ctx)
 			require.Equal(t, tt.wantTreasuryBalance, got)
@@ -133,7 +132,7 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 		{
 			name: "positive_exchange_full",
 			args: args{
-				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 8)),
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10000)),
 				accountBalance:  sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
 				sender:          account.String(),
 				coinsPairs: []types.CoinsExchangePair{
@@ -143,17 +142,17 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 					},
 				},
 			},
-			wantTreasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom2, 10), sdk.NewInt64Coin(denom1, 9992)),
 			wantAccountBalance:  sdk.NewCoins(sdk.NewInt64Coin(denom1, 8)),
 		},
 		{
 			name: "positive_exchange_multiple_pairs",
 			args: args{
 				treasuryBalance: sdk.NewCoins(
-					sdk.NewInt64Coin(denom1, 50),
-					sdk.NewInt64Coin(denom2, 50),
-					sdk.NewInt64Coin(denom3, 50),
-					sdk.NewInt64Coin(denom4, 50),
+					sdk.NewInt64Coin(denom1, 50000),
+					sdk.NewInt64Coin(denom2, 50000),
+					sdk.NewInt64Coin(denom3, 50000),
+					sdk.NewInt64Coin(denom4, 50000),
 				),
 				accountBalance: sdk.NewCoins(
 					sdk.NewInt64Coin(denom1, 100),
@@ -177,13 +176,13 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 				},
 			},
 			wantTreasuryBalance: sdk.NewCoins(
-				// 50 - 8 - 4 + 5
-				sdk.NewInt64Coin(denom1, 43),
-				// 50 + 10 + 2
-				sdk.NewInt64Coin(denom2, 62),
-				// 50 - 5
-				sdk.NewInt64Coin(denom3, 45),
-				sdk.NewInt64Coin(denom4, 50),
+				// 50000 - 8 - 4 + 5
+				sdk.NewInt64Coin(denom1, 49993),
+				// 50000 + 10 + 2
+				sdk.NewInt64Coin(denom2, 50012),
+				// 50000 - 5
+				sdk.NewInt64Coin(denom3, 49995),
+				sdk.NewInt64Coin(denom4, 50000),
 			),
 			wantAccountBalance: sdk.NewCoins(
 				// 100 + 8 + 4 - 5
@@ -252,6 +251,21 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 			},
 			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than ask coins amount"),
 		},
+		{
+			name: "negative_prohibited_proposal_amount",
+			args: args{
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 100)),
+				accountBalance:  sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
+				sender:          account.String(),
+				coinsPairs: []types.CoinsExchangePair{
+					{
+						CoinAsk: sdk.NewInt64Coin(denom1, 8),
+						CoinBid: sdk.NewInt64Coin(denom2, 10),
+					},
+				},
+			},
+			wantErr: sdkerrors.Wrapf(types.ErrProhibitedCoinsAmount, "requested denom1:8 amount is more than max allowed denom1:5 "),
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -259,6 +273,7 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 			simApp := simapp.Setup()
 			ctx := simApp.NewContext()
 
+			simApp.OnomyApp().DaoKeeper.SetParams(ctx, types.DefaultParams())
 			require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.treasuryBalance))
 			require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.accountBalance))
 			senderAddr, err := sdk.AccAddressFromBech32(tt.args.sender)
@@ -274,6 +289,7 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 				require.Equal(t, tt.wantErr.Error(), err.Error())
 				return
 			}
+			require.NoError(t, err, err)
 
 			got := simApp.OnomyApp().DaoKeeper.Treasury(ctx)
 			require.Equal(t, tt.wantTreasuryBalance, got)
@@ -298,7 +314,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 		amount          sdk.Coins
 	}
 
-	tests := []struct { // nolint:dupl // test template
+	tests := []struct {
 		name               string
 		args               args
 		wantAccountBalance sdk.Coins
@@ -307,7 +323,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 		{
 			name: "positive_one_coin_full",
 			args: args{
-				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10000)),
 				recipient:       account.String(),
 				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
 			},
@@ -316,7 +332,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 		{
 			name: "positive_one_coin_partial",
 			args: args{
-				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10000)),
 				recipient:       account.String(),
 				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 5)),
 			},
@@ -325,7 +341,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 		{
 			name: "positive_two_coins_partial",
 			args: args{
-				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10), sdk.NewInt64Coin(denom2, 8)),
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10000), sdk.NewInt64Coin(denom2, 80000)),
 				recipient:       account.String(),
 				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 5), sdk.NewInt64Coin(denom2, 8)),
 			},
@@ -349,12 +365,23 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 			},
 			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than amount to send"),
 		},
+		{
+			name: "negative_prohibited_proposal_amount",
+			args: args{
+				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 50)),
+				recipient:       account.String(),
+				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 5)),
+			},
+			wantErr: sdkerrors.Wrapf(types.ErrProhibitedCoinsAmount, "requested denom1:5 amount is more than max allowed denom1:2 "),
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			simApp := simapp.Setup()
 			ctx := simApp.NewContext()
+			simApp.OnomyApp().DaoKeeper.SetParams(ctx, types.DefaultParams())
+
 			require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, tt.args.treasuryBalance))
 			err := simApp.OnomyApp().DaoKeeper.FundAccountProposal(ctx, &types.FundAccountProposal{
 				Recipient: tt.args.recipient,
@@ -365,8 +392,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 				require.Equal(t, tt.wantErr.Error(), err.Error())
 				return
 			}
-
-			require.NoError(t, err)
+			require.NoError(t, err, err)
 
 			recipientAddr, err := sdk.AccAddressFromBech32(tt.args.recipient)
 			require.NoError(t, err)
