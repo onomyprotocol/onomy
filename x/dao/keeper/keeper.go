@@ -20,8 +20,9 @@ type (
 		ps                 types.ParamSubspace
 		bankKeeper         types.BankKeeper
 		accountKeeper      types.AccountKeeper
-		stakingKeeper      types.StakingKeeper
 		distributionKeeper types.DistributionKeeper
+		govKeeper          types.GovKeeper
+		stakingKeeper      types.StakingKeeper
 	}
 )
 
@@ -33,8 +34,9 @@ func NewKeeper(
 	ps types.ParamSubspace,
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
-	stakingKeeper types.StakingKeeper,
 	distributionKeeper types.DistributionKeeper,
+	govKeeper types.GovKeeper,
+	stakingKeeper types.StakingKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -53,8 +55,9 @@ func NewKeeper(
 		ps:                 ps,
 		bankKeeper:         bankKeeper,
 		accountKeeper:      accountKeeper,
-		stakingKeeper:      stakingKeeper,
 		distributionKeeper: distributionKeeper,
+		govKeeper:          govKeeper,
+		stakingKeeper:      stakingKeeper,
 	}
 }
 

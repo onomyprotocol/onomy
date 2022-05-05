@@ -368,8 +368,9 @@ func New( // nolint:funlen // app new cosmos func
 		app.GetSubspace(daotypes.ModuleName),
 		&app.BankKeeper,
 		&app.AccountKeeper,
-		&app.StakingKeeper,
 		&app.DistrKeeper,
+		&app.GovKeeper,
+		&app.StakingKeeper,
 	)
 
 	// register the staking hooks

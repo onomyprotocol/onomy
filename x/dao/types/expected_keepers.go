@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
@@ -33,6 +34,13 @@ type BankKeeper interface {
 // DistributionKeeper expected distribution keeper.
 type DistributionKeeper interface {
 	WithdrawDelegationRewards(sdk.Context, sdk.AccAddress, sdk.ValAddress) (sdk.Coins, error)
+}
+
+// GovKeeper expected gov keeper.
+type GovKeeper interface {
+	AddVote(sdk.Context, uint64, sdk.AccAddress, govtypes.WeightedVoteOptions) error
+	GetVote(sdk.Context, uint64, sdk.AccAddress) (govtypes.Vote, bool)
+	IterateProposals(sdk.Context, func(proposal govtypes.Proposal) bool)
 }
 
 // StakingKeeper expected staking keeper.
