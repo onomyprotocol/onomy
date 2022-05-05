@@ -2,6 +2,7 @@ package dao_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -9,7 +10,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/onomyprotocol/onomy/testutil/simapp"
@@ -108,7 +108,7 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			simApp := createSimAppWithValidators(t, tt.args.vals, tt.args.treasuryBalance)
+			simApp, _ := createSimAppWithValidators(t, tt.args.vals, tt.args.treasuryBalance)
 
 			simApp.BeginNextBlock()
 			ctx := simApp.NewContext()
@@ -119,17 +119,18 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 
 			daoKeeper := simApp.OnomyApp().DaoKeeper
 			gotTreasuryBalance := daoKeeper.Treasury(ctx)
-			assert.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
+			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
 
 			// the remaining pool is expected
 			// (staked + current) * pool rate = current
-			assert.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
+			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
 				gotTreasuryBalance[0].Amount.ToDec())
 
 			// TBD:
 			// add tests with the unbonding -> bonding validator
 			// add test with the redelegation
 			// add tests with decimals rounding
+			// add tests with normal delegation (the dao delegation should keep the same)
 		})
 	}
 }
@@ -211,7 +212,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			const withdrawRewardPeriod = 6 // the simApp.BeginNextBlock() in assertion will be executed with that block number
-			simApp := createSimAppWithValidators(t, tt.args.vals, tt.args.treasuryBalance)
+			simApp, _ := createSimAppWithValidators(t, tt.args.vals, tt.args.treasuryBalance)
 			simApp.BeginNextBlock()
 			ctx := simApp.NewNextContext()
 			// update dao params to withdraw reward
@@ -243,53 +244,135 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 			assertValidators(t, simApp, ctx, tt.want.vals)
 
 			gotTreasuryBalance := daoKeeper.Treasury(ctx)
-			assert.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
+			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
 
 			// the remaining pool is expected
 			// (staked + current) * pool rate = current
-			assert.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
+			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
 				gotTreasuryBalance[0].Amount.ToDec())
 		})
 	}
 }
 
-func assertValidators(t *testing.T, simApp *simapp.SimApp, ctx sdk.Context, vals map[string]valAssertion) {
-	t.Helper()
+func TestEndBlocker_Vote(t *testing.T) {
+	type valWithProposalsReq struct {
+		valReq
+		deposit sdk.Coin
+	}
 
-	accountKeeper := simApp.OnomyApp().AccountKeeper
-	stakingKeeper := simApp.OnomyApp().StakingKeeper
-	daoAddress := accountKeeper.GetModuleAddress(types.ModuleName)
-	updatedValidators := stakingKeeper.GetAllValidators(ctx)
-	assert.Equal(t, len(vals), len(updatedValidators))
+	type args struct {
+		vals map[string]valWithProposalsReq
+	}
 
-	for _, val := range updatedValidators {
-		delegations := stakingKeeper.GetValidatorDelegations(ctx, val.GetOperator())
-		assert.LessOrEqual(t, 1, len(delegations))
+	type wantAssertion struct {
+		wantDaoProposal map[string]bool // [moniker]should dao vote
+	}
 
-		valAssert, ok := vals[val.GetMoniker()]
-		assert.True(t, ok)
-		assert.Equal(t, valAssert.bondStatus, val.Status, val.GetMoniker())
+	tests := []struct {
+		name string
+		args args
+		want wantAssertion
+	}{
+		{
+			name: "positive_two_active_proposals",
+			args: args{
+				vals: map[string]valWithProposalsReq{
+					"val1": {
+						valReq: valReq{
+							selfBondCoin: tenBondCoins,
+							commission:   lowCommission,
+						},
+						deposit: tenBondCoins,
+					},
+					"val2": {
+						valReq: valReq{
+							selfBondCoin: tenBondCoins,
+							commission:   lowCommission,
+						},
+						deposit: tenBondCoins,
+					},
+				},
+			},
+			want: wantAssertion{
+				wantDaoProposal: map[string]bool{
+					"val1": true,
+					"val2": true,
+				},
+			},
+		},
+		{
+			name: "positive_one_active_proposals",
+			args: args{
+				vals: map[string]valWithProposalsReq{
+					"val1": {
+						valReq: valReq{
+							selfBondCoin: tenBondCoins,
+							commission:   lowCommission,
+						},
+						deposit: tenBondCoins,
+					},
+					"val2": {
+						valReq: valReq{
+							selfBondCoin: tenBondCoins,
+							commission:   lowCommission,
+						},
+						deposit: nanoBondCoins, // low deposit so the dao shouldn't vote
+					},
+				},
+			},
+			want: wantAssertion{
+				wantDaoProposal: map[string]bool{
+					"val1": true,
+					"val2": false,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			const proposalNamePattern = "proposal-%s"
 
-		for _, delegation := range delegations {
-			switch delegation.DelegatorAddress {
-			case daoAddress.String():
-				{
-					assert.Equal(t, valAssert.daoBondAmount, delegation.Shares)
-				}
-			case sdk.AccAddress(val.GetOperator()).String():
-				{
-					assert.Equal(t, valAssert.selfBondAmount, delegation.Shares)
-				}
-			default:
-				{
-					t.Errorf("unexpected delegation %+v, of val %q, address: %q", delegation, val.GetMoniker(), val.GetOperator().String())
-				}
+			vals := make(map[string]valReq, len(tt.args.vals))
+			for moniker := range tt.args.vals {
+				vals[moniker] = tt.args.vals[moniker].valReq
 			}
-		}
+			simApp, privs := createSimAppWithValidators(t, vals, sdk.NewInt64Coin(sdk.DefaultBondDenom, 0))
+
+			// create the text proposals
+			for moniker := range tt.args.vals {
+				priv := privs[moniker]
+				simApp.CreateTextProposal(t, fmt.Sprintf(proposalNamePattern, moniker), "description", tt.args.vals[moniker].deposit, priv)
+			}
+
+			simApp.BeginNextBlock()
+			ctx := simApp.NewContext()
+			dao.EndBlocker(ctx, simApp.OnomyApp().DaoKeeper)
+
+			// assertions
+			govKeeper := simApp.OnomyApp().GovKeeper
+			accountKeeper := simApp.OnomyApp().AccountKeeper
+			daoAddress := accountKeeper.GetModuleAddress(types.ModuleName)
+
+			votes := govKeeper.GetAllVotes(ctx)
+			for moniker, want := range tt.want.wantDaoProposal {
+				found := false
+				for _, vote := range votes {
+					// all votes should from the dao only
+					require.Equal(t, daoAddress.String(), vote.Voter)
+					proposal, _ := govKeeper.GetProposal(ctx, vote.ProposalId)
+					if fmt.Sprintf(proposalNamePattern, moniker) == proposal.GetContent().GetTitle() {
+						found = true
+						break
+					}
+				}
+				require.Equal(t, want, found)
+			}
+		})
 	}
 }
 
-func createSimAppWithValidators(t *testing.T, vals map[string]valReq, treasuryBalance sdk.Coin) *simapp.SimApp {
+func createSimAppWithValidators(t *testing.T, vals map[string]valReq, treasuryBalance sdk.Coin) (*simapp.SimApp, map[string]*secp256k1.PrivKey) {
 	t.Helper()
 
 	// prepare account genesis params
@@ -325,5 +408,41 @@ func createSimAppWithValidators(t *testing.T, vals map[string]valReq, treasuryBa
 		description := stakingtypes.Description{Moniker: moniker}
 		simApp.CreateValidator(t, val.selfBondCoin, description, val.commission, sdk.OneInt(), privateKeys[moniker])
 	}
-	return simApp
+	return simApp, privateKeys
+}
+
+func assertValidators(t *testing.T, simApp *simapp.SimApp, ctx sdk.Context, vals map[string]valAssertion) {
+	t.Helper()
+
+	accountKeeper := simApp.OnomyApp().AccountKeeper
+	stakingKeeper := simApp.OnomyApp().StakingKeeper
+	daoAddress := accountKeeper.GetModuleAddress(types.ModuleName)
+	updatedValidators := stakingKeeper.GetAllValidators(ctx)
+	require.Equal(t, len(vals), len(updatedValidators))
+
+	for _, val := range updatedValidators {
+		delegations := stakingKeeper.GetValidatorDelegations(ctx, val.GetOperator())
+		require.LessOrEqual(t, 1, len(delegations))
+
+		valAssert, ok := vals[val.GetMoniker()]
+		require.True(t, ok)
+		require.Equal(t, valAssert.bondStatus, val.Status, val.GetMoniker())
+
+		for _, delegation := range delegations {
+			switch delegation.DelegatorAddress {
+			case daoAddress.String():
+				{
+					require.Equal(t, valAssert.daoBondAmount, delegation.Shares)
+				}
+			case sdk.AccAddress(val.GetOperator()).String():
+				{
+					require.Equal(t, valAssert.selfBondAmount, delegation.Shares)
+				}
+			default:
+				{
+					t.Errorf("unexpected delegation %+v, of val %q, address: %q", delegation, val.GetMoniker(), val.GetOperator().String())
+				}
+			}
+		}
+	}
 }

@@ -15,6 +15,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	gethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/require"
@@ -200,18 +201,30 @@ func (s *SimApp) CreateValidator(
 		messages = append(messages, setOrchestratorAddressMsg)
 	}
 
-	account := s.onomyApp.AccountKeeper.GetAccount(s.newContext(), address)
-	accountNum := account.GetAccountNumber()
-	accountSeq := account.GetSequence()
+	s.sendTxInNewBlock(t, priv, messages...)
+}
 
-	s.beginNextBlock()
+// CreateTextProposal creates new Text proposal.
+func (s *SimApp) CreateTextProposal(
+	t *testing.T,
+	title, description string,
+	deposit sdk.Coin,
+	priv cryptotypes.PrivKey,
+) {
+	t.Helper()
 
-	header := tmproto.Header{Height: s.onomyApp.LastBlockHeight() + 1}
-	txGen := cosmoscmd.MakeEncodingConfig(app.ModuleBasics).TxConfig
-
-	_, _, err = signCheckDeliver(t, txGen, s.onomyApp.BaseApp, header, messages, "", []uint64{accountNum}, []uint64{accountSeq}, true, true, priv)
-
+	address := sdk.AccAddress(priv.PubKey().Address())
+	content := govtypes.ContentFromProposalType(title, description, govtypes.ProposalTypeText)
+	msg, err := govtypes.NewMsgSubmitProposal(content, sdk.NewCoins(deposit), address)
 	require.NoError(t, err)
+
+	s.sendTxInNewBlock(t, priv, msg)
+}
+
+// GenAccount generates random account.
+func GenAccount() sdk.AccAddress {
+	pk := ed25519.GenPrivKey().PubKey()
+	return sdk.AccAddress(pk.Address())
 }
 
 func (s *SimApp) beginNextBlock() {
@@ -226,10 +239,21 @@ func (s *SimApp) newContext() sdk.Context {
 	return s.onomyApp.BaseApp.NewContext(true, tmproto.Header{})
 }
 
-// GenAccount generates random account.
-func GenAccount() sdk.AccAddress {
-	pk := ed25519.GenPrivKey().PubKey()
-	return sdk.AccAddress(pk.Address())
+func (s *SimApp) sendTxInNewBlock(t *testing.T, priv cryptotypes.PrivKey, messages ...sdk.Msg) {
+	t.Helper()
+
+	address := sdk.AccAddress(priv.PubKey().Address())
+	account := s.onomyApp.AccountKeeper.GetAccount(s.newContext(), address)
+	accountNum := account.GetAccountNumber()
+	accountSeq := account.GetSequence()
+
+	s.beginNextBlock()
+
+	header := tmproto.Header{Height: s.onomyApp.LastBlockHeight() + 1}
+	txGen := cosmoscmd.MakeEncodingConfig(app.ModuleBasics).TxConfig
+
+	_, _, err := signCheckDeliver(t, txGen, s.onomyApp.BaseApp, header, messages, "", []uint64{accountNum}, []uint64{accountSeq}, true, true, priv)
+	require.NoError(t, err)
 }
 
 func setup(invCheckPeriod uint) (*app.OnomyApp, GenesisState) {

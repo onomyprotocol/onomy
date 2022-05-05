@@ -27,5 +27,9 @@ func endBlocker(ctx sdk.Context, k keeper.Keeper) error {
 		}
 	}
 
-	return k.ReBalanceDelegation(ctx)
+	if err := k.ReBalanceDelegation(ctx); err != nil {
+		return err
+	}
+
+	return k.VoteAbstain(ctx)
 }
