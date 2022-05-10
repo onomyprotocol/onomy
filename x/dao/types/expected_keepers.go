@@ -28,11 +28,11 @@ type BankKeeper interface {
 	SendCoinsFromModuleToAccount(sdk.Context, string, sdk.AccAddress, sdk.Coins) error
 	SendCoinsFromModuleToModule(ctx sdk.Context, senderPool, recipientPool string, amt sdk.Coins) error
 	MintCoins(sdk.Context, string, sdk.Coins) error
-	UndelegateCoinsFromModuleToAccount(sdk.Context, string, sdk.AccAddress, sdk.Coins) error
 }
 
 // DistributionKeeper expected distribution keeper.
 type DistributionKeeper interface {
+	HasDelegatorStartingInfo(sdk.Context, sdk.ValAddress, sdk.AccAddress) bool
 	WithdrawDelegationRewards(sdk.Context, sdk.AccAddress, sdk.ValAddress) (sdk.Coins, error)
 }
 
@@ -47,8 +47,7 @@ type GovKeeper interface {
 type StakingKeeper interface {
 	BondDenom(sdk.Context) string
 	Delegate(sdk.Context, sdk.AccAddress, sdk.Int, stakingtypes.BondStatus, stakingtypes.Validator, bool) (sdk.Dec, error)
-	Delegation(sdk.Context, sdk.AccAddress, sdk.ValAddress) stakingtypes.DelegationI
+	GetDelegation(sdk.Context, sdk.AccAddress, sdk.ValAddress) (stakingtypes.Delegation, bool)
 	GetAllValidators(sdk.Context) []stakingtypes.Validator
-	GetAllDelegatorDelegations(sdk.Context, sdk.AccAddress) []stakingtypes.Delegation
-	Unbond(sdk.Context, sdk.AccAddress, sdk.ValAddress, sdk.Dec) (sdk.Int, error)
+	UnbondAndUndelegateCoins(sdk.Context, sdk.AccAddress, sdk.ValAddress, sdk.Dec) (sdk.Int, error)
 }

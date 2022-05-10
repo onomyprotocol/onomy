@@ -24,7 +24,7 @@ func (k Keeper) GetDaoDelegationSupply(ctx sdk.Context) sdk.Dec {
 func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Validator) map[string]sdk.Dec {
 	maxStakingCommissionRate := k.StakingMaxCommissionRate(ctx)
 	valsSelfBonds := make(map[string]sdk.Dec) // the key is OperatorAddress
-	valsSelfBondsSupply := sdk.NewDec(0)
+	valsSelfBondsSupply := sdk.ZeroDec()
 	for _, val := range vals {
 		if !val.IsBonded() {
 			continue
@@ -33,13 +33,15 @@ func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Va
 			continue
 		}
 
-		valOperator := val.GetOperator()
-		valAddr := sdk.AccAddress(valOperator)
-		selfDelegation := k.stakingKeeper.Delegation(ctx, valAddr, valOperator)
-		if selfDelegation != nil && !selfDelegation.GetShares().IsZero() {
-			valsSelfBonds[valOperator.String()] = selfDelegation.GetShares()
-			valsSelfBondsSupply = valsSelfBondsSupply.Add(selfDelegation.GetShares())
+		valOper := val.GetOperator()
+		valAddr := sdk.AccAddress(valOper)
+		selfDelegation, found := k.stakingKeeper.GetDelegation(ctx, valAddr, valOper)
+		if !found || selfDelegation.GetShares().IsZero() {
+			continue
 		}
+		selfDelegationAmount := val.TokensFromShares(selfDelegation.GetShares())
+		valsSelfBonds[valOper.String()] = selfDelegationAmount
+		valsSelfBondsSupply = valsSelfBondsSupply.Add(selfDelegationAmount)
 	}
 
 	daoDelegationSupply := k.getDaoDelegationSupply(ctx)
@@ -61,10 +63,16 @@ func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Va
 // getDaoDelegationSupply returns total amount of the treasury bonded coins.
 func (k Keeper) getDaoDelegationSupply(ctx sdk.Context) sdk.Dec {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
-	delegations := k.stakingKeeper.GetAllDelegatorDelegations(ctx, daoAddr)
-	totalStakingSupply := sdk.NewDec(0)
-	for _, delegation := range delegations {
-		totalStakingSupply = totalStakingSupply.Add(delegation.GetShares())
+	vals := k.stakingKeeper.GetAllValidators(ctx)
+
+	totalStakingSupply := sdk.ZeroDec()
+	for _, val := range vals {
+		delegation, found := k.stakingKeeper.GetDelegation(ctx, daoAddr, val.GetOperator())
+		if !found || delegation.GetShares().IsZero() {
+			continue
+		}
+		delegationAmount := val.TokensFromShares(delegation.GetShares())
+		totalStakingSupply = totalStakingSupply.Add(delegationAmount)
 	}
 
 	return totalStakingSupply
@@ -78,14 +86,14 @@ func (k Keeper) reBalanceDaoStaking(ctx sdk.Context, vals []stakingtypes.Validat
 	for _, val := range vals {
 		valAddr := val.GetOperator()
 		targetDaoDelegation, ok := targetDaoStaking[valAddr.String()]
-		delegation := k.stakingKeeper.Delegation(ctx, daoAddr, valAddr)
-		delegatedByDao := sdk.NewDec(0)
-		if delegation != nil {
-			delegatedByDao = delegation.GetShares()
+		delegatedByDao := sdk.ZeroDec()
+		delegation, found := k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
+		if found {
+			delegatedByDao = val.TokensFromShares(delegation.GetShares())
 		}
 		// for the validators not in the target list the target amount is zero
 		if !ok {
-			targetDaoDelegation = sdk.NewDec(0)
+			targetDaoDelegation = sdk.ZeroDec()
 		}
 
 		delegationDelta := targetDaoDelegation.TruncateInt().Sub(delegatedByDao.TruncateInt())
@@ -110,22 +118,14 @@ func (k Keeper) reBalanceDaoStaking(ctx sdk.Context, vals []stakingtypes.Validat
 
 // undelegateValidators undelegates the requested amount from the validators in the undelegations.
 func undelegateValidators(ctx sdk.Context, vals []stakingtypes.Validator, undelegations map[string]sdk.Dec, k Keeper, daoAddr sdk.AccAddress) error {
-	bondDenom := k.stakingKeeper.BondDenom(ctx)
 	for _, val := range vals {
-		undelegationAmt, ok := undelegations[val.GetOperator().String()]
+		valOper := val.GetOperator()
+		undelegationAmt, ok := undelegations[valOper.String()]
 		if !ok {
 			continue
 		}
-
-		returnAmt, err := k.stakingKeeper.Unbond(ctx, daoAddr, val.GetOperator(), undelegationAmt)
-		if err != nil {
-			return err
-		}
-		if val.IsBonded() {
-			k.bondedTokensToNotBonded(ctx, returnAmt)
-		}
-
-		if err = k.bankKeeper.UndelegateCoinsFromModuleToAccount(ctx, stakingtypes.NotBondedPoolName, daoAddr, sdk.Coins{sdk.NewCoin(bondDenom, returnAmt)}); err != nil {
+		undelegationShares := val.TokensFromShares(undelegationAmt)
+		if _, err := k.stakingKeeper.UnbondAndUndelegateCoins(ctx, daoAddr, valOper, undelegationShares); err != nil {
 			return err
 		}
 	}
@@ -144,12 +144,4 @@ func (k Keeper) delegateValidators(ctx sdk.Context, vals []stakingtypes.Validato
 		}
 	}
 	return nil
-}
-
-// bondedTokensToNotBonded transfers coins from the bonded to the not bonded pool within.
-func (k Keeper) bondedTokensToNotBonded(ctx sdk.Context, tokens sdk.Int) {
-	coins := sdk.NewCoins(sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), tokens))
-	if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, stakingtypes.BondedPoolName, stakingtypes.NotBondedPoolName, coins); err != nil {
-		panic(err)
-	}
 }

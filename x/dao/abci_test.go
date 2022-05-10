@@ -18,13 +18,16 @@ import (
 )
 
 var (
-	fiftyPercents  = sdk.NewDec(1).QuoInt64(2)                                                                       //nolint:gochecknoglobals
-	tenPercents    = sdk.NewDec(1).Quo(sdk.NewDec(10))                                                               //nolint:gochecknoglobals
-	genesisCoins   = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)) //nolint:gochecknoglobals
-	nanoBondCoins  = sdk.NewInt64Coin(sdk.DefaultBondDenom, 1000000000)                                              // not enough for validator to be bonded
-	tenBondCoins   = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(10, sdk.DefaultPowerReduction))  //nolint:gochecknoglobals
-	lowCommission  = stakingtypes.NewCommissionRates(tenPercents, tenPercents, tenPercents)                          //nolint:gochecknoglobals
-	highCommission = stakingtypes.NewCommissionRates(fiftyPercents, fiftyPercents, fiftyPercents)                    //nolint:gochecknoglobals
+	fiftyPercents                     = sdk.NewDec(1).QuoInt64(2)                                                                       //nolint:gochecknoglobals
+	tenPercents                       = sdk.NewDec(1).Quo(sdk.NewDec(10))                                                               //nolint:gochecknoglobals
+	genesisCoins                      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)) //nolint:gochecknoglobals
+	nanoBondCoins                     = sdk.NewInt64Coin(sdk.DefaultBondDenom, 1000000000)                                              // not enough for validator to be bonded
+	twoBondCoins                      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(2, sdk.DefaultPowerReduction))   //nolint:gochecknoglobals
+	tenBondCoins                      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(10, sdk.DefaultPowerReduction))  //nolint:gochecknoglobals
+	hundredBondCoins                  = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)) //nolint:gochecknoglobals
+	lowCommission                     = stakingtypes.NewCommissionRates(tenPercents, tenPercents, tenPercents)                          //nolint:gochecknoglobals
+	highCommission                    = stakingtypes.NewCommissionRates(fiftyPercents, fiftyPercents, fiftyPercents)                    //nolint:gochecknoglobals
+	hundredBondWithoutStakingPoolRate = hundredBondCoins.Amount.ToDec().Mul(sdk.OneDec().Sub(types.DefaultStakingTokenPoolRate))        //nolint:gochecknoglobals
 )
 
 type valReq struct {
@@ -60,7 +63,7 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 			args: args{
 				vals: map[string]valReq{
 					"val1": { // bonded
-						selfBondCoin: tenBondCoins,
+						selfBondCoin: twoBondCoins,
 						commission:   lowCommission,
 					},
 					"val2": { // bonded
@@ -76,19 +79,24 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 						commission:   highCommission,
 					},
 				},
-				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)),
+				treasuryBalance: hundredBondCoins,
 			},
 			want: wantAssertion{
 				vals: map[string]valAssertion{
 					"val1": {
 						bondStatus:     stakingtypes.Bonded,
-						selfBondAmount: tenBondCoins.Amount.ToDec(),
-						daoBondAmount:  sdk.TokensFromConsensusPower(95, sdk.DefaultPowerReduction).ToDec().QuoInt64(2),
+						selfBondAmount: twoBondCoins.Amount.ToDec(),
+						// full * self bond / total bond
+						daoBondAmount: twoBondCoins.Amount.ToDec().
+							Quo(twoBondCoins.Amount.Add(tenBondCoins.Amount).ToDec()).
+							Mul(hundredBondWithoutStakingPoolRate),
 					},
 					"val2": {
 						bondStatus:     stakingtypes.Bonded,
 						selfBondAmount: tenBondCoins.Amount.ToDec(),
-						daoBondAmount:  sdk.TokensFromConsensusPower(95, sdk.DefaultPowerReduction).ToDec().QuoInt64(2),
+						daoBondAmount: tenBondCoins.Amount.ToDec().
+							Quo(twoBondCoins.Amount.Add(tenBondCoins.Amount).ToDec()).
+							Mul(hundredBondWithoutStakingPoolRate),
 					},
 					"val3": {
 						bondStatus:     stakingtypes.Unbonded,
@@ -126,11 +134,16 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
 				gotTreasuryBalance[0].Amount.ToDec())
 
+			// the check the overall balance remains the same
+			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
+
 			// TBD:
 			// add tests with the unbonding -> bonding validator
 			// add test with the redelegation
 			// add tests with decimals rounding
 			// add tests with normal delegation (the dao delegation should keep the same)
+			// add tests with the changed validator shares rate
+			// add begin and end block for 10 times and check that the state remains the same
 		})
 	}
 }
@@ -174,7 +187,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 						reward:       validatorReward,
 					},
 				},
-				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)),
+				treasuryBalance: hundredBondCoins,
 			},
 			want: wantAssertion{
 				vals: map[string]valAssertion{
@@ -183,7 +196,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 						selfBondAmount: tenBondCoins.Amount.ToDec(),
 						daoBondAmount:
 						// initial dao staking
-						sdk.TokensFromConsensusPower(95, sdk.DefaultPowerReduction).ToDec().QuoInt64(2).
+						hundredBondWithoutStakingPoolRate.QuoInt64(2).
 							// the reward
 							Add(expectedDaoFullReward.Amount.ToDec().QuoInt64(2).Mul(sdk.OneDec().Sub(types.DefaultStakingTokenPoolRate))).TruncateDec(),
 					},
@@ -192,7 +205,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 						selfBondAmount: tenBondCoins.Amount.ToDec(),
 						daoBondAmount:
 						// initial dao staking
-						sdk.TokensFromConsensusPower(95, sdk.DefaultPowerReduction).ToDec().QuoInt64(2).
+						hundredBondWithoutStakingPoolRate.QuoInt64(2).
 							// the reward
 							Add(expectedDaoFullReward.Amount.ToDec().QuoInt64(2).Mul(sdk.OneDec().Sub(types.DefaultStakingTokenPoolRate))).TruncateDec(),
 					},
@@ -225,7 +238,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 				moniker := moniker
 				simApp.OnomyApp().StakingKeeper.IterateValidators(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
 					if moniker == validator.GetMoniker() {
-						// workaround to fix the distribution invariant
+						// mind and send coins as a validator reward
 						require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(tt.args.vals[moniker].reward)))
 						require.NoError(t, simApp.OnomyApp().BankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, distrtypes.ModuleName, sdk.NewCoins(tt.args.vals[moniker].reward)))
 
@@ -250,6 +263,11 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 			// (staked + current) * pool rate = current
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
 				gotTreasuryBalance[0].Amount.ToDec())
+
+			// the check the overall balance is increased
+			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).
+				// substitute the reward from the total dao
+				Sub(expectedDaoFullReward.Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
 		})
 	}
 }
@@ -301,7 +319,7 @@ func TestEndBlocker_Vote(t *testing.T) {
 			},
 		},
 		{
-			name: "positive_one_active_proposals",
+			name: "positive_one_active_proposal",
 			args: args{
 				vals: map[string]valWithProposalsReq{
 					"val1": {
@@ -372,6 +390,134 @@ func TestEndBlocker_Vote(t *testing.T) {
 	}
 }
 
+func TestEndBlocker_Slashing_Protection(t *testing.T) {
+	// 50% slashing fraction
+	fraction := sdk.NewDecWithPrec(5, 1)
+
+	type valWithSlashingReq struct {
+		valReq
+		shouldSlash bool
+	}
+
+	type args struct {
+		vals            map[string]valWithSlashingReq
+		treasuryBalance sdk.Coin
+	}
+
+	type wantAssertion struct {
+		vals            map[string]valAssertion
+		treasuryBalance sdk.Coin
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want wantAssertion
+	}{
+		{
+			name: "positive",
+			args: args{
+				vals: map[string]valWithSlashingReq{
+					"val1": {
+						valReq: valReq{
+							selfBondCoin: tenBondCoins,
+							commission:   lowCommission,
+						},
+						shouldSlash: false,
+					},
+					"val2": { // bonded
+						valReq: valReq{
+							selfBondCoin: tenBondCoins,
+							commission:   lowCommission,
+						},
+						shouldSlash: true,
+					},
+				},
+				treasuryBalance: hundredBondCoins,
+			},
+			want: wantAssertion{
+				vals: map[string]valAssertion{
+					"val1": {
+						bondStatus:     stakingtypes.Bonded,
+						selfBondAmount: tenBondCoins.Amount.ToDec(),
+						// the val2 was slashed so the final amount will higher than val2
+						// also the slashing of the validator is based on the voting power, hence the initial
+						// amount to slash will be rounded
+						// full * self bond / total bond
+						daoBondAmount: tenBondCoins.Amount.ToDec().
+							// 25^16 here is the rounded part
+							Quo(tenBondCoins.Amount.ToDec().Mul(fraction).Add(sdk.NewIntWithDecimal(25, 16).ToDec()).Add(tenBondCoins.Amount.ToDec())).
+							Mul(hundredBondWithoutStakingPoolRate),
+					},
+					"val2": {
+						bondStatus:     stakingtypes.Bonded,
+						selfBondAmount: tenBondCoins.Amount.ToDec().Mul(fraction).Add(sdk.NewIntWithDecimal(25, 16).ToDec()),
+						// the val2 was slashed so the final amount will higher lower val1
+						// full * self bond / total bond
+						daoBondAmount: tenBondCoins.Amount.ToDec().Mul(fraction).Add(sdk.NewIntWithDecimal(25, 16).ToDec()).
+							// 25^16 here is the rounded part
+							Quo(tenBondCoins.Amount.ToDec().Mul(fraction).Add(sdk.NewIntWithDecimal(25, 16).ToDec()).Add(tenBondCoins.Amount.ToDec())).
+							Mul(hundredBondWithoutStakingPoolRate),
+					},
+				},
+				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(5, sdk.DefaultPowerReduction)),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			vals := make(map[string]valReq, len(tt.args.vals))
+			for moniker := range tt.args.vals {
+				vals[moniker] = tt.args.vals[moniker].valReq
+			}
+			simApp, _ := createSimAppWithValidators(t, vals, tt.args.treasuryBalance)
+			// initial rebalance
+			simApp.BeginNextBlock()
+			ctx := simApp.NewNextContext()
+			simApp.EndBlockAndCommit(ctx)
+
+			// slashing
+			simApp.BeginNextBlock()
+			ctx = simApp.NewNextContext()
+			for moniker := range tt.args.vals {
+				if !tt.args.vals[moniker].shouldSlash {
+					continue
+				}
+				for _, val := range simApp.OnomyApp().StakingKeeper.GetAllValidators(ctx) {
+					if val.GetMoniker() == moniker {
+						power := simApp.OnomyApp().StakingKeeper.GetLastValidatorPower(ctx, val.GetOperator())
+						consAddr, err := val.GetConsAddr()
+						require.NoError(t, err)
+						simApp.OnomyApp().StakingKeeper.Slash(ctx, consAddr, ctx.BlockHeight(), power, fraction)
+					}
+				}
+			}
+			simApp.EndBlockAndCommit(ctx)
+
+			// finalize rebalance
+			simApp.BeginNextBlock()
+			ctx = simApp.NewNextContext()
+			simApp.EndBlockAndCommit(ctx)
+
+			// assertions
+			assertValidators(t, simApp, ctx, tt.want.vals)
+
+			daoKeeper := simApp.OnomyApp().DaoKeeper
+			gotTreasuryBalance := daoKeeper.Treasury(ctx)
+			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
+
+			// the remaining pool is expected
+			// (staked + current) * pool rate = current
+			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
+				gotTreasuryBalance[0].Amount.ToDec())
+			// the check the overall balance remains the same
+			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
+		})
+	}
+}
+
 func createSimAppWithValidators(t *testing.T, vals map[string]valReq, treasuryBalance sdk.Coin) (*simapp.SimApp, map[string]*secp256k1.PrivKey) {
 	t.Helper()
 
@@ -432,11 +578,11 @@ func assertValidators(t *testing.T, simApp *simapp.SimApp, ctx sdk.Context, vals
 			switch delegation.DelegatorAddress {
 			case daoAddress.String():
 				{
-					require.Equal(t, valAssert.daoBondAmount, delegation.Shares)
+					require.Equal(t, valAssert.daoBondAmount, val.TokensFromShares(delegation.Shares), val.GetMoniker())
 				}
 			case sdk.AccAddress(val.GetOperator()).String():
 				{
-					require.Equal(t, valAssert.selfBondAmount, delegation.Shares)
+					require.Equal(t, valAssert.selfBondAmount, val.TokensFromShares(delegation.Shares), val.GetMoniker())
 				}
 			default:
 				{
