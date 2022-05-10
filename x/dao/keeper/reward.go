@@ -12,11 +12,14 @@ func (k Keeper) WithdrawReward(ctx sdk.Context) error {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	for _, val := range vals {
 		valOperator := val.GetOperator()
-		daoDelegation := k.stakingKeeper.Delegation(ctx, daoAddr, valOperator)
-		if daoDelegation == nil || daoDelegation.GetShares().IsZero() {
+		_, found := k.stakingKeeper.GetDelegation(ctx, daoAddr, valOperator)
+		if !found {
 			continue
 		}
-
+		// check existence of delegator starting info
+		if !k.distributionKeeper.HasDelegatorStartingInfo(ctx, valOperator, daoAddr) {
+			continue
+		}
 		if _, err := k.distributionKeeper.WithdrawDelegationRewards(ctx, daoAddr, valOperator); err != nil {
 			return err
 		}

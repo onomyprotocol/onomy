@@ -155,6 +155,7 @@ var (
 	// module account permissions.
 	maccPerms = map[string][]string{ // nolint:gochecknoglobals // cosmos-sdk application style
 		authtypes.FeeCollectorName:     nil,
+		daotypes.ModuleName:            {authtypes.Minter},
 		distrtypes.ModuleName:          nil,
 		minttypes.ModuleName:           {authtypes.Minter},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
@@ -162,7 +163,6 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		gravitytypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
-		daotypes.ModuleName:            {authtypes.Minter},
 	}
 
 	// module accounts that are allowed to receive tokens.
@@ -304,7 +304,7 @@ func New( // nolint:funlen // app new cosmos func
 		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.BlockedAddrs(),
 	)
 	stakingKeeper := stakingkeeper.NewKeeper(
-		appCodec, keys[stakingtypes.StoreKey], app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName),
+		appCodec, keys[stakingtypes.StoreKey], app.AccountKeeper, app.BankKeeper, &app.DistrKeeper, app.GetSubspace(stakingtypes.ModuleName),
 	)
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec, keys[minttypes.StoreKey], app.GetSubspace(minttypes.ModuleName), &stakingKeeper,
@@ -382,6 +382,13 @@ func New( // nolint:funlen // app new cosmos func
 			app.GravityKeeper.Hooks(),
 		),
 	)
+
+	// protect the dao module form the slashing
+	app.StakingKeeper = *stakingKeeper.SetSlashingProtestedModules(func() map[string]struct{} {
+		return map[string]struct{}{
+			daotypes.ModuleName: {},
+		}
+	})
 
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
