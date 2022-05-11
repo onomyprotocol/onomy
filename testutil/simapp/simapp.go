@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -47,6 +48,14 @@ type GenesisState map[string]json.RawMessage
 type Option struct {
 	before func(*SimApp, GenesisState) (*SimApp, GenesisState)
 	after  func(*SimApp) *SimApp
+}
+
+// ValReq is simplified struct for the validator creation.
+type ValReq struct {
+	Balance      sdk.Coins
+	SelfBondCoin sdk.Coin
+	Commission   stakingtypes.CommissionRates
+	Reward       sdk.Coin
 }
 
 // WithGenesisAccountsAndBalances returns genesis override Option for initial balances.
@@ -101,6 +110,39 @@ func NewDefaultGenesisState(cdc codec.JSONCodec) GenesisState {
 	return app.ModuleBasics.DefaultGenesis(cdc)
 }
 
+// SetupWithValidators create new simApp with the defined list of the validators.
+func SetupWithValidators(t *testing.T, vals map[string]ValReq, opts ...Option) (*SimApp, map[string]*secp256k1.PrivKey) {
+	t.Helper()
+
+	// prepare account genesis params
+	balances := make([]banktypes.Balance, 0, len(vals))
+	privateKeys := make(map[string]*secp256k1.PrivKey, len(vals))
+	for moniker := range vals {
+		privateKey := secp256k1.GenPrivKey()
+		privateKeys[moniker] = privateKey
+		address := sdk.AccAddress(privateKey.PubKey().Address())
+		balance := vals[moniker].Balance
+		if balance.AmountOf(vals[moniker].SelfBondCoin.Denom).LT(vals[moniker].SelfBondCoin.Amount) {
+			balance = balance.Add(vals[moniker].SelfBondCoin)
+		}
+		balances = append(balances, banktypes.Balance{
+			Address: address.String(),
+			Coins:   balance,
+		})
+	}
+
+	opts = append(opts, WithGenesisAccountsAndBalances(balances...), WithAppCommit())
+
+	simApp := Setup(opts...)
+
+	simApp.BeginNextBlock()
+	for moniker, val := range vals {
+		description := stakingtypes.Description{Moniker: moniker}
+		simApp.CreateValidator(t, val.SelfBondCoin, description, val.Commission, sdk.OneInt(), privateKeys[moniker])
+	}
+	return simApp, privateKeys
+}
+
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
 func Setup(opts ...Option) *SimApp {
 	onomyApp, genesisState := setup(5) // nolint:gomnd //test constant
@@ -146,23 +188,28 @@ func (s *SimApp) OnomyApp() *app.OnomyApp {
 
 // BeginNextBlock begins new SimApp block.
 func (s *SimApp) BeginNextBlock() {
-	s.beginNextBlock()
+	s.onomyApp.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{Height: s.onomyApp.LastBlockHeight() + 1}})
 }
 
-// EndBlockAndCommit ens the current block and commit the state.
+// EndBlockAndCommit ends the current block and commit the state.
 func (s *SimApp) EndBlockAndCommit(ctx sdk.Context) {
 	s.onomyApp.EndBlocker(ctx, abci.RequestEndBlock{Height: ctx.BlockHeight()})
 	s.onomyApp.Commit()
 }
 
+// EndBlock ends the current block.
+func (s *SimApp) EndBlock(ctx sdk.Context) {
+	s.onomyApp.EndBlocker(ctx, abci.RequestEndBlock{Height: ctx.BlockHeight()})
+}
+
 // NewContext returns empty sdk context for the SimApp.
 func (s *SimApp) NewContext() sdk.Context {
-	return s.newContext()
+	return s.onomyApp.BaseApp.NewContext(true, tmproto.Header{})
 }
 
 // CurrentContext returns current context for the SimApp.
 func (s *SimApp) CurrentContext() sdk.Context {
-	return s.currentContext()
+	return s.onomyApp.BaseApp.NewContext(true, tmproto.Header{Height: s.onomyApp.LastBlockHeight()})
 }
 
 // NewNextContext creates next block sdk context for the SimApp.
@@ -201,24 +248,38 @@ func (s *SimApp) CreateValidator(
 		messages = append(messages, setOrchestratorAddressMsg)
 	}
 
-	s.sendTxInNewBlock(t, priv, messages...)
+	s.sendTx(t, priv, messages...)
 }
 
-// CreateTextProposal creates new Text proposal.
-func (s *SimApp) CreateTextProposal(
+// CreateProposal creates a new proposal with the provided contant.
+func (s *SimApp) CreateProposal(
 	t *testing.T,
-	title, description string,
+	content govtypes.Content,
 	deposit sdk.Coin,
 	priv cryptotypes.PrivKey,
 ) {
 	t.Helper()
 
 	address := sdk.AccAddress(priv.PubKey().Address())
-	content := govtypes.ContentFromProposalType(title, description, govtypes.ProposalTypeText)
 	msg, err := govtypes.NewMsgSubmitProposal(content, sdk.NewCoins(deposit), address)
 	require.NoError(t, err)
 
-	s.sendTxInNewBlock(t, priv, msg)
+	s.sendTx(t, priv, msg)
+}
+
+// VoteProposal votes for the proposal.
+func (s *SimApp) VoteProposal(
+	t *testing.T,
+	proposalID uint64,
+	option govtypes.VoteOption,
+	priv cryptotypes.PrivKey,
+) {
+	t.Helper()
+
+	address := sdk.AccAddress(priv.PubKey().Address())
+
+	msg := govtypes.NewMsgVote(address, proposalID, option)
+	s.sendTx(t, priv, msg)
 }
 
 // GenAccount generates random account.
@@ -227,27 +288,13 @@ func GenAccount() sdk.AccAddress {
 	return sdk.AccAddress(pk.Address())
 }
 
-func (s *SimApp) beginNextBlock() {
-	s.onomyApp.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{Height: s.onomyApp.LastBlockHeight() + 1}})
-}
-
-func (s *SimApp) currentContext() sdk.Context {
-	return s.onomyApp.BaseApp.NewContext(true, tmproto.Header{Height: s.onomyApp.LastBlockHeight()})
-}
-
-func (s *SimApp) newContext() sdk.Context {
-	return s.onomyApp.BaseApp.NewContext(true, tmproto.Header{})
-}
-
-func (s *SimApp) sendTxInNewBlock(t *testing.T, priv cryptotypes.PrivKey, messages ...sdk.Msg) {
+func (s *SimApp) sendTx(t *testing.T, priv cryptotypes.PrivKey, messages ...sdk.Msg) {
 	t.Helper()
 
 	address := sdk.AccAddress(priv.PubKey().Address())
-	account := s.onomyApp.AccountKeeper.GetAccount(s.newContext(), address)
+	account := s.onomyApp.AccountKeeper.GetAccount(s.NewContext(), address)
 	accountNum := account.GetAccountNumber()
 	accountSeq := account.GetSequence()
-
-	s.beginNextBlock()
 
 	header := tmproto.Header{Height: s.onomyApp.LastBlockHeight() + 1}
 	txGen := cosmoscmd.MakeEncodingConfig(app.ModuleBasics).TxConfig

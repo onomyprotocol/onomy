@@ -7,8 +7,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
@@ -20,7 +20,6 @@ import (
 var (
 	fiftyPercents                     = sdk.NewDec(1).QuoInt64(2)                                                                       //nolint:gochecknoglobals
 	tenPercents                       = sdk.NewDec(1).Quo(sdk.NewDec(10))                                                               //nolint:gochecknoglobals
-	genesisCoins                      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)) //nolint:gochecknoglobals
 	nanoBondCoins                     = sdk.NewInt64Coin(sdk.DefaultBondDenom, 1000000000)                                              // not enough for validator to be bonded
 	twoBondCoins                      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(2, sdk.DefaultPowerReduction))   //nolint:gochecknoglobals
 	tenBondCoins                      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(10, sdk.DefaultPowerReduction))  //nolint:gochecknoglobals
@@ -30,21 +29,9 @@ var (
 	hundredBondWithoutStakingPoolRate = hundredBondCoins.Amount.ToDec().Mul(sdk.OneDec().Sub(types.DefaultStakingTokenPoolRate))        //nolint:gochecknoglobals
 )
 
-type valReq struct {
-	selfBondCoin sdk.Coin
-	commission   stakingtypes.CommissionRates
-	reward       sdk.Coin
-}
-
-type valAssertion struct {
-	bondStatus     stakingtypes.BondStatus
-	selfBondAmount sdk.Dec
-	daoBondAmount  sdk.Dec
-}
-
 func TestEndBlocker_ReBalance(t *testing.T) {
 	type args struct {
-		vals            map[string]valReq
+		vals            map[string]simapp.ValReq
 		treasuryBalance sdk.Coin
 	}
 
@@ -61,22 +48,22 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 		{
 			name: "positive",
 			args: args{
-				vals: map[string]valReq{
+				vals: map[string]simapp.ValReq{
 					"val1": { // bonded
-						selfBondCoin: twoBondCoins,
-						commission:   lowCommission,
+						SelfBondCoin: twoBondCoins,
+						Commission:   lowCommission,
 					},
 					"val2": { // bonded
-						selfBondCoin: tenBondCoins,
-						commission:   lowCommission,
+						SelfBondCoin: tenBondCoins,
+						Commission:   lowCommission,
 					},
 					"val3": { // won't be bonded
-						selfBondCoin: nanoBondCoins,
-						commission:   lowCommission,
+						SelfBondCoin: nanoBondCoins,
+						Commission:   lowCommission,
 					},
-					"val4": { // bonded, but high commission to be staked
-						selfBondCoin: tenBondCoins,
-						commission:   highCommission,
+					"val4": { // bonded, but high Commission to be staked
+						SelfBondCoin: tenBondCoins,
+						Commission:   highCommission,
 					},
 				},
 				treasuryBalance: hundredBondCoins,
@@ -116,7 +103,7 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			simApp, _ := createSimAppWithValidators(t, tt.args.vals, tt.args.treasuryBalance)
+			simApp, _ := createSimAppWithValidatorsAndTreasury(t, tt.args.vals, tt.args.treasuryBalance)
 
 			simApp.BeginNextBlock()
 			ctx := simApp.NewContext()
@@ -153,7 +140,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 	expectedDaoFullReward := sdk.NewInt64Coin(sdk.DefaultBondDenom, 1486956434)
 
 	type args struct {
-		vals            map[string]valReq
+		vals            map[string]simapp.ValReq
 		treasuryBalance sdk.Coin
 	}
 
@@ -170,21 +157,21 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 		{
 			name: "positive",
 			args: args{
-				vals: map[string]valReq{
+				vals: map[string]simapp.ValReq{
 					"val1": { // bonded
-						selfBondCoin: tenBondCoins,
-						commission:   lowCommission,
-						reward:       validatorReward,
+						SelfBondCoin: tenBondCoins,
+						Commission:   lowCommission,
+						Reward:       validatorReward,
 					},
 					"val2": { // bonded
-						selfBondCoin: tenBondCoins,
-						commission:   lowCommission,
-						reward:       validatorReward,
+						SelfBondCoin: tenBondCoins,
+						Commission:   lowCommission,
+						Reward:       validatorReward,
 					},
 					"val3": { // won't be bonded
-						selfBondCoin: nanoBondCoins,
-						commission:   lowCommission,
-						reward:       validatorReward,
+						SelfBondCoin: nanoBondCoins,
+						Commission:   lowCommission,
+						Reward:       validatorReward,
 					},
 				},
 				treasuryBalance: hundredBondCoins,
@@ -197,7 +184,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 						daoBondAmount:
 						// initial dao staking
 						hundredBondWithoutStakingPoolRate.QuoInt64(2).
-							// the reward
+							// the Reward
 							Add(expectedDaoFullReward.Amount.ToDec().QuoInt64(2).Mul(sdk.OneDec().Sub(types.DefaultStakingTokenPoolRate))).TruncateDec(),
 					},
 					"val2": {
@@ -206,7 +193,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 						daoBondAmount:
 						// initial dao staking
 						hundredBondWithoutStakingPoolRate.QuoInt64(2).
-							// the reward
+							// the Reward
 							Add(expectedDaoFullReward.Amount.ToDec().QuoInt64(2).Mul(sdk.OneDec().Sub(types.DefaultStakingTokenPoolRate))).TruncateDec(),
 					},
 					"val3": {
@@ -225,24 +212,24 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			const withdrawRewardPeriod = 6 // the simApp.BeginNextBlock() in assertion will be executed with that block number
-			simApp, _ := createSimAppWithValidators(t, tt.args.vals, tt.args.treasuryBalance)
+			simApp, _ := createSimAppWithValidatorsAndTreasury(t, tt.args.vals, tt.args.treasuryBalance)
 			simApp.BeginNextBlock()
 			ctx := simApp.NewNextContext()
-			// update dao params to withdraw reward
+			// update dao params to withdraw Reward
 			daoKeeper := simApp.OnomyApp().DaoKeeper
 			daoParams := daoKeeper.GetParams(ctx)
-			daoParams.WithdrawRewardPeriod = withdrawRewardPeriod // withdraw reward each 10 block
+			daoParams.WithdrawRewardPeriod = withdrawRewardPeriod // withdraw Reward each 10 block
 			daoKeeper.SetParams(ctx, daoParams)
 			// allocate validator rewards
 			for moniker := range tt.args.vals {
 				moniker := moniker
 				simApp.OnomyApp().StakingKeeper.IterateValidators(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
 					if moniker == validator.GetMoniker() {
-						// mind and send coins as a validator reward
-						require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(tt.args.vals[moniker].reward)))
-						require.NoError(t, simApp.OnomyApp().BankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, distrtypes.ModuleName, sdk.NewCoins(tt.args.vals[moniker].reward)))
+						// mind and send coins as a validator Reward
+						require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(tt.args.vals[moniker].Reward)))
+						require.NoError(t, simApp.OnomyApp().BankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, distrtypes.ModuleName, sdk.NewCoins(tt.args.vals[moniker].Reward)))
 
-						simApp.OnomyApp().DistrKeeper.AllocateTokensToValidator(ctx, validator, sdk.NewDecCoinsFromCoins(tt.args.vals[moniker].reward))
+						simApp.OnomyApp().DistrKeeper.AllocateTokensToValidator(ctx, validator, sdk.NewDecCoinsFromCoins(tt.args.vals[moniker].Reward))
 						return true
 					}
 					return false
@@ -266,7 +253,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 
 			// the check the overall balance is increased
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).
-				// substitute the reward from the total dao
+				// substitute the Reward from the total dao
 				Sub(expectedDaoFullReward.Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
 		})
 	}
@@ -274,7 +261,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 
 func TestEndBlocker_Vote(t *testing.T) {
 	type valWithProposalsReq struct {
-		valReq
+		simapp.ValReq
 		deposit sdk.Coin
 	}
 
@@ -296,16 +283,18 @@ func TestEndBlocker_Vote(t *testing.T) {
 			args: args{
 				vals: map[string]valWithProposalsReq{
 					"val1": {
-						valReq: valReq{
-							selfBondCoin: tenBondCoins,
-							commission:   lowCommission,
+						ValReq: simapp.ValReq{
+							Balance:      sdk.NewCoins(tenBondCoins.Add(tenBondCoins)),
+							SelfBondCoin: tenBondCoins,
+							Commission:   lowCommission,
 						},
 						deposit: tenBondCoins,
 					},
 					"val2": {
-						valReq: valReq{
-							selfBondCoin: tenBondCoins,
-							commission:   lowCommission,
+						ValReq: simapp.ValReq{
+							Balance:      sdk.NewCoins(tenBondCoins.Add(tenBondCoins)),
+							SelfBondCoin: tenBondCoins,
+							Commission:   lowCommission,
 						},
 						deposit: tenBondCoins,
 					},
@@ -323,16 +312,18 @@ func TestEndBlocker_Vote(t *testing.T) {
 			args: args{
 				vals: map[string]valWithProposalsReq{
 					"val1": {
-						valReq: valReq{
-							selfBondCoin: tenBondCoins,
-							commission:   lowCommission,
+						ValReq: simapp.ValReq{
+							Balance:      sdk.NewCoins(tenBondCoins.Add(tenBondCoins)),
+							SelfBondCoin: tenBondCoins,
+							Commission:   lowCommission,
 						},
 						deposit: tenBondCoins,
 					},
 					"val2": {
-						valReq: valReq{
-							selfBondCoin: tenBondCoins,
-							commission:   lowCommission,
+						ValReq: simapp.ValReq{
+							Balance:      sdk.NewCoins(tenBondCoins.Add(tenBondCoins)),
+							SelfBondCoin: tenBondCoins,
+							Commission:   lowCommission,
 						},
 						deposit: nanoBondCoins, // low deposit so the dao shouldn't vote
 					},
@@ -351,16 +342,17 @@ func TestEndBlocker_Vote(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			const proposalNamePattern = "proposal-%s"
 
-			vals := make(map[string]valReq, len(tt.args.vals))
+			vals := make(map[string]simapp.ValReq, len(tt.args.vals))
 			for moniker := range tt.args.vals {
-				vals[moniker] = tt.args.vals[moniker].valReq
+				vals[moniker] = tt.args.vals[moniker].ValReq
 			}
-			simApp, privs := createSimAppWithValidators(t, vals, sdk.NewInt64Coin(sdk.DefaultBondDenom, 0))
+			simApp, privs := createSimAppWithValidatorsAndTreasury(t, vals, sdk.NewInt64Coin(sdk.DefaultBondDenom, 0))
 
 			// create the text proposals
 			for moniker := range tt.args.vals {
 				priv := privs[moniker]
-				simApp.CreateTextProposal(t, fmt.Sprintf(proposalNamePattern, moniker), "description", tt.args.vals[moniker].deposit, priv)
+				textProposalContent := govtypes.ContentFromProposalType(fmt.Sprintf(proposalNamePattern, moniker), "description", govtypes.ProposalTypeText)
+				simApp.CreateProposal(t, textProposalContent, tt.args.vals[moniker].deposit, priv)
 			}
 
 			simApp.BeginNextBlock()
@@ -395,7 +387,7 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 	fraction := sdk.NewDecWithPrec(5, 1)
 
 	type valWithSlashingReq struct {
-		valReq
+		simapp.ValReq
 		shouldSlash bool
 	}
 
@@ -419,16 +411,16 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 			args: args{
 				vals: map[string]valWithSlashingReq{
 					"val1": {
-						valReq: valReq{
-							selfBondCoin: tenBondCoins,
-							commission:   lowCommission,
+						ValReq: simapp.ValReq{
+							SelfBondCoin: tenBondCoins,
+							Commission:   lowCommission,
 						},
 						shouldSlash: false,
 					},
 					"val2": { // bonded
-						valReq: valReq{
-							selfBondCoin: tenBondCoins,
-							commission:   lowCommission,
+						ValReq: simapp.ValReq{
+							SelfBondCoin: tenBondCoins,
+							Commission:   lowCommission,
 						},
 						shouldSlash: true,
 					},
@@ -468,11 +460,11 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			vals := make(map[string]valReq, len(tt.args.vals))
+			vals := make(map[string]simapp.ValReq, len(tt.args.vals))
 			for moniker := range tt.args.vals {
-				vals[moniker] = tt.args.vals[moniker].valReq
+				vals[moniker] = tt.args.vals[moniker].ValReq
 			}
-			simApp, _ := createSimAppWithValidators(t, vals, tt.args.treasuryBalance)
+			simApp, _ := createSimAppWithValidatorsAndTreasury(t, vals, tt.args.treasuryBalance)
 			// initial rebalance
 			simApp.BeginNextBlock()
 			ctx := simApp.NewNextContext()
@@ -518,21 +510,9 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 	}
 }
 
-func createSimAppWithValidators(t *testing.T, vals map[string]valReq, treasuryBalance sdk.Coin) (*simapp.SimApp, map[string]*secp256k1.PrivKey) {
+func createSimAppWithValidatorsAndTreasury(t *testing.T, vals map[string]simapp.ValReq, treasuryBalance sdk.Coin) (*simapp.SimApp, map[string]*secp256k1.PrivKey) {
 	t.Helper()
 
-	// prepare account genesis params
-	balances := make([]banktypes.Balance, 0, len(vals))
-	privateKeys := make(map[string]*secp256k1.PrivKey, len(vals))
-	for moniker := range vals {
-		privateKey := secp256k1.GenPrivKey()
-		privateKeys[moniker] = privateKey
-		address := sdk.AccAddress(privateKey.PubKey().Address())
-		balances = append(balances, banktypes.Balance{
-			Address: address.String(),
-			Coins:   sdk.Coins{genesisCoins},
-		})
-	}
 	// treasury genesis
 	treasuryOverrideOpt := simapp.WithGenesisOverride(
 		func(m map[string]json.RawMessage) map[string]json.RawMessage {
@@ -544,17 +524,13 @@ func createSimAppWithValidators(t *testing.T, vals map[string]valReq, treasuryBa
 			return m
 		})
 
-	simApp := simapp.Setup(
-		simapp.WithGenesisAccountsAndBalances(balances...),
-		treasuryOverrideOpt,
-		simapp.WithAppCommit(),
-	)
+	return simapp.SetupWithValidators(t, vals, treasuryOverrideOpt)
+}
 
-	for moniker, val := range vals {
-		description := stakingtypes.Description{Moniker: moniker}
-		simApp.CreateValidator(t, val.selfBondCoin, description, val.commission, sdk.OneInt(), privateKeys[moniker])
-	}
-	return simApp, privateKeys
+type valAssertion struct {
+	bondStatus     stakingtypes.BondStatus
+	selfBondAmount sdk.Dec
+	daoBondAmount  sdk.Dec
 }
 
 func assertValidators(t *testing.T, simApp *simapp.SimApp, ctx sdk.Context, vals map[string]valAssertion) {

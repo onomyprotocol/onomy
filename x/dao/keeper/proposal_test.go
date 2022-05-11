@@ -1,10 +1,16 @@
 package keeper_test
 
 import (
+	"encoding/json"
 	"testing"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/gov"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/onomyprotocol/onomy/testutil/simapp"
@@ -398,6 +404,169 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 			require.NoError(t, err)
 			got := simApp.OnomyApp().BankKeeper.GetAllBalances(ctx, recipientAddr)
 			require.Equal(t, tt.wantAccountBalance, got)
+		})
+	}
+}
+
+func TestKeeper_ProposalsFullCycle(t *testing.T) {
+	var (
+		acc               = simapp.GenAccount()
+		tenPercents       = sdk.NewDec(1).QuoInt64(10)
+		oneBondCoin       = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(1, sdk.DefaultPowerReduction))
+		twoBondCoins      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(2, sdk.DefaultPowerReduction))
+		tenBondCoins      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(10, sdk.DefaultPowerReduction))
+		thousandBondCoins = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction))
+		commission        = stakingtypes.NewCommissionRates(tenPercents, tenPercents, tenPercents)
+	)
+
+	type args struct {
+		treasuryBalance sdk.Coins
+		proposal        func(proposer sdk.AccAddress) govtypes.Content
+	}
+
+	tests := []struct {
+		name                string
+		args                args
+		wantTreasuryBalance sdk.Coins
+	}{
+		{
+			name: "positive_fund_treasury",
+			args: args{
+				proposal: func(proposer sdk.AccAddress) govtypes.Content {
+					return types.NewFundTreasuryProposal(proposer, "title", "desc", sdk.NewCoins(oneBondCoin))
+				},
+			},
+			// the expectation includes the DefaultStakingTokenPoolRate logic because of the end-blocker rebalancer,
+			// also we add 1 because of the redelegation truncation
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, oneBondCoin.
+				Amount.ToDec().Mul(types.DefaultStakingTokenPoolRate).TruncateInt().AddRaw(1))),
+		},
+		{
+			name: "positive_exchange_with_treasury",
+			args: args{
+				treasuryBalance: sdk.NewCoins(thousandBondCoins),
+				proposal: func(proposer sdk.AccAddress) govtypes.Content {
+					return types.NewExchangeWithTreasuryProposal(proposer, "title", "desc", []types.CoinsExchangePair{
+						{
+							CoinAsk: oneBondCoin,
+							CoinBid: twoBondCoins,
+						},
+					})
+				},
+			},
+			// the expectation includes the DefaultStakingTokenPoolRate logic because of the end-blocker rebalancer,
+			// also we add 1 because of the redelegation truncation
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Sub(oneBondCoin).Add(twoBondCoins).
+				Amount.ToDec().Mul(types.DefaultStakingTokenPoolRate).TruncateInt().AddRaw(1))),
+		},
+		{
+			name: "positive_fund_account",
+			args: args{
+				treasuryBalance: sdk.NewCoins(thousandBondCoins),
+				proposal: func(_ sdk.AccAddress) govtypes.Content {
+					// we can any acc for that proposal
+					return types.NewFundAccountProposal(acc, "title", "desc", sdk.NewCoins(oneBondCoin))
+				},
+			},
+			// the expectation includes the DefaultStakingTokenPoolRate logic because of the end-blocker rebalancer,
+			// also we add 1 because of the redelegation truncation
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Sub(oneBondCoin).
+				Amount.ToDec().Mul(types.DefaultStakingTokenPoolRate).TruncateInt().AddRaw(1))),
+		},
+		{
+			name: "positive_change_staking_token_pool_rate_param",
+			args: args{
+				treasuryBalance: sdk.NewCoins(thousandBondCoins),
+				proposal: func(_ sdk.AccAddress) govtypes.Content {
+					return proposal.NewParameterChangeProposal("title", "desc", []proposal.ParamChange{
+						{
+							Subspace: types.ModuleName,
+							Key:      string(types.KeyStakingTokenPoolRate),
+							Value:    `"0.5"`,
+						},
+					})
+				},
+			},
+			// new pool rate must change the treasury pool
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Amount.QuoRaw(2))),
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			const (
+				proposer = "proposer"
+				voter    = "voter"
+			)
+
+			vals := map[string]simapp.ValReq{
+				// low voting poser
+				proposer: {
+					SelfBondCoin: oneBondCoin,
+					Commission:   commission,
+					Balance:      sdk.NewCoins(tenBondCoins),
+				},
+				// high voting poser
+				voter: {
+					SelfBondCoin: tenBondCoins,
+					Commission:   commission,
+					Balance:      sdk.NewCoins(tenBondCoins.Add(tenBondCoins)),
+				},
+			}
+
+			options := make([]simapp.Option, 0)
+			if tt.args.treasuryBalance != nil {
+				// treasury genesis
+				treasuryOverrideOpt := simapp.WithGenesisOverride(
+					func(m map[string]json.RawMessage) map[string]json.RawMessage {
+						daoGenesis := types.DefaultGenesis()
+						daoGenesis.TreasuryBalance = tt.args.treasuryBalance
+						daoGenesisString, err := json.Marshal(daoGenesis)
+						require.NoError(t, err)
+						m[types.ModuleName] = daoGenesisString
+						return m
+					})
+				options = append(options, treasuryOverrideOpt)
+			}
+
+			simApp, privs := simapp.SetupWithValidators(t, vals, options...)
+
+			privProposer := privs[proposer]
+			privVoter := privs[voter]
+
+			simApp.BeginNextBlock()
+			ctx := simApp.CurrentContext()
+
+			addressProposer := sdk.AccAddress(privProposer.PubKey().Address())
+			simApp.CreateProposal(t, tt.args.proposal(addressProposer), oneBondCoin, privProposer)
+
+			simApp.EndBlock(ctx)
+
+			proposalID := uint64(1)
+
+			// vote
+			simApp.BeginNextBlock()
+			ctx = simApp.CurrentContext()
+			simApp.VoteProposal(t, proposalID, govtypes.OptionYes, privVoter)
+			simApp.EndBlock(ctx)
+
+			// execute the proposal
+			simApp.BeginNextBlock()
+			ctx = simApp.CurrentContext()
+			// +30 days to finish the voting
+			ctx = ctx.WithBlockTime(ctx.BlockTime().Add(time.Hour * 24 * 30))
+			gov.EndBlocker(ctx, simApp.OnomyApp().GovKeeper)
+			// assert the proposal
+			proposal, _ := simApp.OnomyApp().GovKeeper.GetProposal(ctx, proposalID)
+			require.Equal(t, govtypes.StatusPassed, proposal.Status)
+
+			// execute the proposal
+			simApp.BeginNextBlock()
+			ctx = simApp.CurrentContext()
+			simApp.EndBlock(ctx)
+
+			// assert treasury
+			require.Equal(t, tt.wantTreasuryBalance.String(), simApp.OnomyApp().DaoKeeper.Treasury(ctx).String())
 		})
 	}
 }
