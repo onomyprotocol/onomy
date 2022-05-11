@@ -48,7 +48,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=onomy \
 BUILD_FLAGS := -ldflags '$(ldflags)' -gcflags="all=-N -l"
 
 .PHONY: all
-all: lint test install
+all: lint proto-lint test install
 
 .PHONY: build
 build: go.sum
