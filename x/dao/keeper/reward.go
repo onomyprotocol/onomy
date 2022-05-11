@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
@@ -20,9 +22,12 @@ func (k Keeper) WithdrawReward(ctx sdk.Context) error {
 		if !k.distributionKeeper.HasDelegatorStartingInfo(ctx, valOperator, daoAddr) {
 			continue
 		}
-		if _, err := k.distributionKeeper.WithdrawDelegationRewards(ctx, daoAddr, valOperator); err != nil {
+
+		reward, err := k.distributionKeeper.WithdrawDelegationRewards(ctx, daoAddr, valOperator)
+		if err != nil {
 			return err
 		}
+		k.Logger(ctx).Info(fmt.Sprintf("withdrawn reward: %s", reward.String()))
 	}
 	return nil
 }

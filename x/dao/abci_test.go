@@ -105,9 +105,15 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			simApp, _ := createSimAppWithValidatorsAndTreasury(t, tt.args.vals, tt.args.treasuryBalance)
 
+			// iterate couple times to check that the state is the same
+			for i := 0; i < 10; i++ {
+				simApp.BeginNextBlock()
+				ctx := simApp.NewNextContext()
+				simApp.EndBlockAndCommit(ctx)
+			}
+
 			simApp.BeginNextBlock()
-			ctx := simApp.NewContext()
-			dao.EndBlocker(ctx, simApp.OnomyApp().DaoKeeper)
+			ctx := simApp.NewNextContext()
 
 			// assertions
 			assertValidators(t, simApp, ctx, tt.want.vals)
@@ -123,14 +129,6 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 
 			// the check the overall balance remains the same
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
-
-			// TBD:
-			// add tests with the unbonding -> bonding validator
-			// add test with the redelegation
-			// add tests with decimals rounding
-			// add tests with normal delegation (the dao delegation should keep the same)
-			// add tests with the changed validator shares rate
-			// add begin and end block for 10 times and check that the state remains the same
 		})
 	}
 }
