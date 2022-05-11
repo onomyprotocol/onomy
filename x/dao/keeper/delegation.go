@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
@@ -129,6 +131,10 @@ func undelegateValidators(ctx sdk.Context, vals []stakingtypes.Validator, undele
 			return err
 		}
 	}
+	if len(undelegations) > 0 {
+		k.Logger(ctx).Info(fmt.Sprintf("rebalanced, undelegated: %+v", undelegations))
+	}
+
 	return nil
 }
 
@@ -143,5 +149,9 @@ func (k Keeper) delegateValidators(ctx sdk.Context, vals []stakingtypes.Validato
 			return err
 		}
 	}
+	if len(delegations) > 0 {
+		k.Logger(ctx).Info(fmt.Sprintf("rebalanced, delegated: %+v", delegations))
+	}
+
 	return nil
 }
