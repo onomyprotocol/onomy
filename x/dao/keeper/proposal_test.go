@@ -457,7 +457,7 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 			// the expectation includes the DefaultStakingTokenPoolRate logic because of the end-blocker rebalancer,
 			// also we add 1 because of the redelegation truncation
 			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Sub(oneBondCoin).Add(twoBondCoins).
-				Amount.ToDec().Mul(types.DefaultStakingTokenPoolRate).TruncateInt().AddRaw(1))),
+				Amount.ToDec().Mul(types.DefaultStakingTokenPoolRate).TruncateInt())),
 		},
 		{
 			name: "positive_fund_account",
@@ -488,7 +488,7 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 				},
 			},
 			// new pool rate must change the treasury pool
-			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Amount.QuoRaw(2))),
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Amount.QuoRaw(2).AddRaw(1))),
 		},
 	}
 	for _, tt := range tests {

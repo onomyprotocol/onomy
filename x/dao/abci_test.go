@@ -75,15 +75,15 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 						selfBondAmount: twoBondCoins.Amount.ToDec(),
 						// full * self bond / total bond
 						daoBondAmount: twoBondCoins.Amount.ToDec().
-							Quo(twoBondCoins.Amount.Add(tenBondCoins.Amount).ToDec()).
-							Mul(hundredBondWithoutStakingPoolRate),
+							Mul(hundredBondWithoutStakingPoolRate).
+							Quo(twoBondCoins.Amount.Add(tenBondCoins.Amount).ToDec()).TruncateDec(),
 					},
 					"val2": {
 						bondStatus:     stakingtypes.Bonded,
 						selfBondAmount: tenBondCoins.Amount.ToDec(),
 						daoBondAmount: tenBondCoins.Amount.ToDec().
-							Quo(twoBondCoins.Amount.Add(tenBondCoins.Amount).ToDec()).
-							Mul(hundredBondWithoutStakingPoolRate),
+							Mul(hundredBondWithoutStakingPoolRate).
+							Quo(twoBondCoins.Amount.Add(tenBondCoins.Amount).ToDec()).TruncateDec(),
 					},
 					"val3": {
 						bondStatus:     stakingtypes.Unbonded,
@@ -96,7 +96,7 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 						daoBondAmount:  sdk.ZeroDec(),
 					},
 				},
-				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(5, sdk.DefaultPowerReduction)),
+				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(5, sdk.DefaultPowerReduction).AddRaw(1)),
 			},
 		},
 	}
@@ -122,10 +122,8 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 			gotTreasuryBalance := daoKeeper.Treasury(ctx)
 			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
 
-			// the remaining pool is expected
-			// (staked + current) * pool rate = current
-			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
-				gotTreasuryBalance[0].Amount.ToDec())
+			// pool rate = current pool / total
+			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultStakingTokenPoolRate)
 
 			// the check the overall balance remains the same
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
@@ -216,7 +214,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 			// update dao params to withdraw Reward
 			daoKeeper := simApp.OnomyApp().DaoKeeper
 			daoParams := daoKeeper.GetParams(ctx)
-			daoParams.WithdrawRewardPeriod = withdrawRewardPeriod // withdraw Reward each 10 block
+			daoParams.WithdrawRewardPeriod = withdrawRewardPeriod
 			daoKeeper.SetParams(ctx, daoParams)
 			// allocate validator rewards
 			for moniker := range tt.args.vals {
@@ -244,10 +242,8 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 			gotTreasuryBalance := daoKeeper.Treasury(ctx)
 			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
 
-			// the remaining pool is expected
-			// (staked + current) * pool rate = current
-			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
-				gotTreasuryBalance[0].Amount.ToDec())
+			// pool rate = current pool / total
+			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultStakingTokenPoolRate)
 
 			// the check the overall balance is increased
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).
@@ -435,9 +431,9 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 						// amount to slash will be rounded
 						// full * self bond / total bond
 						daoBondAmount: tenBondCoins.Amount.ToDec().
-							// 25^16 here is the rounded part
-							Quo(tenBondCoins.Amount.ToDec().Mul(fraction).Add(sdk.NewIntWithDecimal(25, 16).ToDec()).Add(tenBondCoins.Amount.ToDec())).
-							Mul(hundredBondWithoutStakingPoolRate),
+							// 25*10^16 here is the rounded part
+							Mul(hundredBondWithoutStakingPoolRate).
+							Quo(tenBondCoins.Amount.ToDec().Mul(fraction).Add(sdk.NewIntWithDecimal(25, 16).ToDec()).Add(tenBondCoins.Amount.ToDec())).TruncateDec(),
 					},
 					"val2": {
 						bondStatus:     stakingtypes.Bonded,
@@ -445,12 +441,12 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 						// the val2 was slashed so the final amount will higher lower val1
 						// full * self bond / total bond
 						daoBondAmount: tenBondCoins.Amount.ToDec().Mul(fraction).Add(sdk.NewIntWithDecimal(25, 16).ToDec()).
-							// 25^16 here is the rounded part
-							Quo(tenBondCoins.Amount.ToDec().Mul(fraction).Add(sdk.NewIntWithDecimal(25, 16).ToDec()).Add(tenBondCoins.Amount.ToDec())).
-							Mul(hundredBondWithoutStakingPoolRate),
+							// 25*10^16 here is the rounded part
+							Mul(hundredBondWithoutStakingPoolRate).
+							Quo(tenBondCoins.Amount.ToDec().Mul(fraction).Add(sdk.NewIntWithDecimal(25, 16).ToDec()).Add(tenBondCoins.Amount.ToDec())).TruncateDec(),
 					},
 				},
-				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(5, sdk.DefaultPowerReduction)),
+				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(5, sdk.DefaultPowerReduction).AddRaw(1)),
 			},
 		},
 	}
@@ -498,10 +494,9 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 			gotTreasuryBalance := daoKeeper.Treasury(ctx)
 			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
 
-			// the remaining pool is expected
-			// (staked + current) * pool rate = current
-			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).Mul(types.DefaultStakingTokenPoolRate).RoundInt().ToDec(),
-				gotTreasuryBalance[0].Amount.ToDec())
+			// pool rate = current pool / total
+			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultStakingTokenPoolRate)
+
 			// the check the overall balance remains the same
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
 		})

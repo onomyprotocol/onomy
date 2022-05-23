@@ -159,11 +159,11 @@ func (m *CoinsExchangePair) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "coins pairs can't be nil")
 	}
 
-	if m.CoinAsk.IsZero() || !m.CoinAsk.IsValid() {
+	if !m.CoinAsk.IsValid() || m.CoinAsk.IsZero() {
 		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "invalid coin ask")
 	}
 
-	if m.CoinAsk.IsZero() || !m.CoinBid.IsValid() {
+	if !m.CoinBid.IsValid() || m.CoinBid.IsZero() {
 		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "invalid coin bid")
 	}
 

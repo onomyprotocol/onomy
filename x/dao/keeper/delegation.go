@@ -53,7 +53,7 @@ func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Va
 
 	targetDelegationState := make(map[string]sdk.Dec) // the key is OperatorAddress
 	for valAddr, selfDelegationAmt := range valsSelfBonds {
-		valDaoDelegationAmt := selfDelegationAmt.Quo(valsSelfBondsSupply).Mul(daoBondDenomToDelegate)
+		valDaoDelegationAmt := selfDelegationAmt.Mul(daoBondDenomToDelegate).Quo(valsSelfBondsSupply)
 		if !valDaoDelegationAmt.IsZero() {
 			targetDelegationState[valAddr] = valDaoDelegationAmt
 		}
