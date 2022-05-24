@@ -7,7 +7,9 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install --no-install-recommends -yq
                                                 build-essential \
                                                 ca-certificates \
                                                 tar \
-                                                git
+                                                git \
+                                                nodejs \
+                                                npm
 # scripts utils
 RUN apt-get install --no-install-recommends -yq jq \
                                                 moreutils
@@ -19,12 +21,27 @@ ENV PATH="/usr/local/go/bin:$PATH"
 ENV GOPATH=/go
 ENV PATH=$PATH:$GOPATH/bin
 
+ENV GOLANG_PROTOBUF_VERSION=1.3.5 \
+  GOGO_PROTOBUF_VERSION=1.3.2 \
+  GRPC_GATEWAY_VERSION=1.14.7
+
 RUN GO111MODULE=on go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1
 RUN GO111MODULE=on go get github.com/vasi-stripe/gogroup/cmd/gogroup@v0.0.0-20200806161525-b5d7f67a97b5
 RUN GO111MODULE=on go get mvdan.cc/gofumpt@v0.0.0-20200927160801-5bfeb2e70dd6
 RUN GO111MODULE=on go get github.com/bufbuild/buf/cmd/buf@v0.56.0
 
-RUN curl https://get.starport.network/starport@v0.19.1! | bash
+RUN GO111MODULE=on go get \
+  github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} \
+  github.com/gogo/protobuf/protoc-gen-gogo@v${GOGO_PROTOBUF_VERSION} \
+  github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
+  github.com/gogo/protobuf/protoc-gen-gogofaster@v${GOGO_PROTOBUF_VERSION} \
+  github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${GRPC_GATEWAY_VERSION} \
+  github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPC_GATEWAY_VERSION} \
+  github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
+
+RUN GO111MODULE=on go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
+
+RUN npm install -g swagger-combine@v1.4.0
 
 RUN rm -rf /root/.cache/go-build/ /go/pkg/*
 COPY entrypoint.sh /entrypoint.sh
