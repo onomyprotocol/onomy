@@ -1,0 +1,69 @@
+syntax = "proto3";
+package onomyprotocol.dao.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/onomyprotocol/onomy/x/dao/types";
+option (gogoproto.equal_all) = true;
+
+// FundTreasuryProposal details a dao fund treasury proposal.
+message FundTreasuryProposal {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  string sender = 1;
+  string title = 2;
+  string description = 3;
+  repeated cosmos.base.v1beta1.Coin amount = 4 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+// ExchangeWithTreasuryProposal details a dao exchange with treasury proposal.
+message ExchangeWithTreasuryProposal {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  string sender = 1;
+  string title = 2;
+  string description = 3;
+  repeated CoinsExchangePair coins_pairs = 4 [
+    (gogoproto.moretags) = "yaml:\"coins_pairs\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// CoinsExchangePair is an ask/bid coins pair to exchange.
+message CoinsExchangePair {
+  cosmos.base.v1beta1.Coin coin_ask = 1 [
+    (gogoproto.moretags) = "yaml:\"coin_ask\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
+  ];
+  cosmos.base.v1beta1.Coin coin_bid = 2 [
+    (gogoproto.moretags) = "yaml:\"coin_bid\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
+  ];
+}
+
+// FundAccountProposal details a dao fund account proposal.
+message FundAccountProposal {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  string recipient = 1;
+  string title = 2;
+  string description = 3;
+  repeated cosmos.base.v1beta1.Coin amount = 4 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}

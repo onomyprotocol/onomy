@@ -93,6 +93,10 @@ import (
 	gravitykeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
 	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
 	"github.com/onomyprotocol/onomy/docs"
+	"github.com/onomyprotocol/onomy/x/dao"
+	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
+	daokeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
+	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 const (
@@ -112,6 +116,8 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.CancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
+		daoclient.FundTreasuryProposalHandler,
+		daoclient.ExchangeWithTreasuryProposalProposalHandler,
 	)
 
 	return govProposalHandlers
@@ -143,11 +149,13 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		gravity.AppModuleBasic{},
+		dao.AppModuleBasic{},
 	)
 
 	// module account permissions.
 	maccPerms = map[string][]string{ // nolint:gochecknoglobals // cosmos-sdk application style
 		authtypes.FeeCollectorName:     nil,
+		daotypes.ModuleName:            {authtypes.Minter},
 		distrtypes.ModuleName:          nil,
 		minttypes.ModuleName:           {authtypes.Minter},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
@@ -160,6 +168,7 @@ var (
 	// module accounts that are allowed to receive tokens.
 	allowedReceivingModAcc = map[string]bool{ // nolint:gochecknoglobals // cosmos-sdk application style
 		distrtypes.ModuleName: true,
+		daotypes.ModuleName:   true,
 	}
 )
 
@@ -223,6 +232,8 @@ type OnomyApp struct {
 
 	GravityKeeper gravitykeeper.Keeper
 
+	DaoKeeper daokeeper.Keeper
+
 	// mm is the module manager
 	mm *module.Manager
 
@@ -257,7 +268,7 @@ func New( // nolint:funlen // app new cosmos func
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		gravitytypes.StoreKey,
+		gravitytypes.StoreKey, daotypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -293,7 +304,7 @@ func New( // nolint:funlen // app new cosmos func
 		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.BlockedAddrs(),
 	)
 	stakingKeeper := stakingkeeper.NewKeeper(
-		appCodec, keys[stakingtypes.StoreKey], app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName),
+		appCodec, keys[stakingtypes.StoreKey], app.AccountKeeper, app.BankKeeper, &app.DistrKeeper, app.GetSubspace(stakingtypes.ModuleName),
 	)
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec, keys[minttypes.StoreKey], app.GetSubspace(minttypes.ModuleName), &stakingKeeper,
@@ -350,6 +361,18 @@ func New( // nolint:funlen // app new cosmos func
 		&app.AccountKeeper,
 	)
 
+	app.DaoKeeper = *daokeeper.NewKeeper(
+		appCodec,
+		keys[daotypes.StoreKey],
+		keys[daotypes.MemStoreKey],
+		app.GetSubspace(daotypes.ModuleName),
+		&app.BankKeeper,
+		&app.AccountKeeper,
+		&app.DistrKeeper,
+		&app.GovKeeper,
+		&app.StakingKeeper,
+	)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
@@ -360,6 +383,13 @@ func New( // nolint:funlen // app new cosmos func
 		),
 	)
 
+	// protect the dao module form the slashing
+	app.StakingKeeper = *stakingKeeper.SetSlashingProtestedModules(func() map[string]struct{} {
+		return map[string]struct{}{
+			daotypes.ModuleName: {},
+		}
+	})
+
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
@@ -367,7 +397,8 @@ func New( // nolint:funlen // app new cosmos func
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(gravitytypes.RouterKey, gravitykeeper.NewGravityProposalHandler(app.GravityKeeper))
+		AddRoute(gravitytypes.RouterKey, gravitykeeper.NewGravityProposalHandler(app.GravityKeeper)).
+		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(app.DaoKeeper))
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
@@ -405,6 +436,7 @@ func New( // nolint:funlen // app new cosmos func
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
+		dao.NewAppModule(appCodec, app.DaoKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -416,7 +448,7 @@ func New( // nolint:funlen // app new cosmos func
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, feegrant.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, gravitytypes.ModuleName,
+		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, gravitytypes.ModuleName, daotypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -439,6 +471,7 @@ func New( // nolint:funlen // app new cosmos func
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		gravitytypes.ModuleName,
+		daotypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -461,6 +494,7 @@ func New( // nolint:funlen // app new cosmos func
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
+		dao.NewAppModule(appCodec, app.DaoKeeper),
 	)
 	app.sm.RegisterStoreDecoders()
 
@@ -636,13 +670,9 @@ func (app *OnomyApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
-// GetMaccPerms returns a copy of the module account permissions.
-func GetMaccPerms() map[string][]string {
-	dupMaccPerms := make(map[string][]string)
-	for k, v := range maccPerms {
-		dupMaccPerms[k] = v
-	}
-	return dupMaccPerms
+// SetOrderEndBlockers sets the order of set end-blocker calls.
+func (app *OnomyApp) SetOrderEndBlockers(moduleNames ...string) {
+	app.mm.SetOrderEndBlockers(moduleNames...)
 }
 
 // initParamsKeeper init params keeper and its subspaces.
@@ -660,6 +690,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(gravitytypes.ModuleName)
+	paramsKeeper.Subspace(daotypes.ModuleName)
 
 	return paramsKeeper
 }

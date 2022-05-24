@@ -1,5 +1,5 @@
-// Package testutil contains testutils.
-package testutil
+// Package integration contains integration test utils.
+package integration
 
 import (
 	"bytes"
@@ -23,6 +23,7 @@ import (
 
 	"github.com/onomyprotocol/onomy/app"
 	onomydCmd "github.com/onomyprotocol/onomy/cmd/onomyd/cmd"
+	"github.com/onomyprotocol/onomy/testutil/retry"
 )
 
 const (
@@ -144,7 +145,7 @@ func (oc *OnomyChain) Start(timeout time.Duration) error {
 	go ExecuteChainCmd("start", oc.homeFlag)
 
 	// wait for grpc port
-	return AwaitForPort(OnomyGrpcHost, OnomyGrpcPort, timeout)
+	return retry.AwaitForPort(OnomyGrpcHost, OnomyGrpcPort, timeout)
 }
 
 // Stop stops the OnomyChain.

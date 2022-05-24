@@ -1,0 +1,20 @@
+syntax = "proto3";
+package onomyprotocol.dao.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "onomyprotocol/dao/v1/params.proto";
+
+option go_package = "github.com/onomyprotocol/onomy/x/dao/types";
+
+// GenesisState defines the dao module's genesis state.
+message GenesisState {
+  // the dao module managed params
+  Params params = 1 [(gogoproto.nullable) = false];
+  // the list of dao module coins
+  repeated cosmos.base.v1beta1.Coin treasury_balance = 2 [
+    (gogoproto.moretags) = "yaml:\"treasury_balance\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
