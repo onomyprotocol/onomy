@@ -90,18 +90,16 @@ format:
 ###                                Protobuf                                 ###
 ###############################################################################
 
-
 .PHONY: proto-gen-all
 proto-gen-all: proto-gen-go proto-gen-openapi
 
 .PHONY: proto-gen-openapi
 proto-gen-openapi:
-	starport generate openapi
-	go mod tidy
+	bash ./dev/scripts/protoc-swagger-gen.sh
 
 .PHONY: proto-gen-go
 proto-gen-go:
-	starport generate proto-go
+	bash ./dev/scripts/protocgen.sh
 	go mod tidy
 	make format
 
