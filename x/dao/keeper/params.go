@@ -22,21 +22,21 @@ func (k Keeper) WithdrawRewardPeriod(ctx sdk.Context) (res int64) {
 	return
 }
 
-// StakingMaxCommissionRate - the max validator's commission to be staked by the dao.
-func (k Keeper) StakingMaxCommissionRate(ctx sdk.Context) (res sdk.Dec) {
-	k.ps.Get(ctx, types.KeyStakingMaxCommissionRate, &res)
+// MaxValCommission - the max validator's commission to be staked by the dao.
+func (k Keeper) MaxValCommission(ctx sdk.Context) (res sdk.Dec) {
+	k.ps.Get(ctx, types.KeyMaxValCommission, &res)
 	return
 }
 
-// StakingTokenMaxProposalRate - the rate of max allowed proposal from the treasury amount.
-func (k Keeper) StakingTokenMaxProposalRate(ctx sdk.Context) (res sdk.Dec) {
-	k.ps.Get(ctx, types.KeyStakingTokenMaxProposalRate, &res)
+// MaxProposalRate - the rate of max allowed proposal from the treasury amount.
+func (k Keeper) MaxProposalRate(ctx sdk.Context) (res sdk.Dec) {
+	k.ps.Get(ctx, types.KeyMaxProposalRate, &res)
 	return
 }
 
-// StakingTokenPoolRate - the rate of total dao's staking coins to keep unstaked.
-func (k Keeper) StakingTokenPoolRate(ctx sdk.Context) (res sdk.Dec) {
-	k.ps.Get(ctx, types.KeyStakingTokenPoolRate, &res)
+// PoolRate - the rate of total dao's staking coins to keep unstaked.
+func (k Keeper) PoolRate(ctx sdk.Context) (res sdk.Dec) {
+	k.ps.Get(ctx, types.KeyPoolRate, &res)
 	return
 }
 

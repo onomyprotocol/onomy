@@ -26,7 +26,7 @@ var (
 	hundredBondCoins                  = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)) //nolint:gochecknoglobals
 	lowCommission                     = stakingtypes.NewCommissionRates(tenPercents, tenPercents, tenPercents)                          //nolint:gochecknoglobals
 	highCommission                    = stakingtypes.NewCommissionRates(fiftyPercents, fiftyPercents, fiftyPercents)                    //nolint:gochecknoglobals
-	hundredBondWithoutStakingPoolRate = hundredBondCoins.Amount.ToDec().Mul(sdk.OneDec().Sub(types.DefaultStakingTokenPoolRate))        //nolint:gochecknoglobals
+	hundredBondWithoutStakingPoolRate = hundredBondCoins.Amount.ToDec().Mul(sdk.OneDec().Sub(types.DefaultPoolRate))                    //nolint:gochecknoglobals
 )
 
 func TestEndBlocker_ReBalance(t *testing.T) {
@@ -123,7 +123,7 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
 
 			// pool rate = current pool / total
-			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultStakingTokenPoolRate)
+			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultPoolRate)
 
 			// the check the overall balance remains the same
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
@@ -181,7 +181,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 						// initial dao staking
 						hundredBondWithoutStakingPoolRate.QuoInt64(2).
 							// the Reward
-							Add(expectedDaoFullReward.Amount.ToDec().QuoInt64(2).Mul(sdk.OneDec().Sub(types.DefaultStakingTokenPoolRate))).TruncateDec(),
+							Add(expectedDaoFullReward.Amount.ToDec().QuoInt64(2).Mul(sdk.OneDec().Sub(types.DefaultPoolRate))).TruncateDec(),
 					},
 					"val2": {
 						bondStatus:     stakingtypes.Bonded,
@@ -190,7 +190,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 						// initial dao staking
 						hundredBondWithoutStakingPoolRate.QuoInt64(2).
 							// the Reward
-							Add(expectedDaoFullReward.Amount.ToDec().QuoInt64(2).Mul(sdk.OneDec().Sub(types.DefaultStakingTokenPoolRate))).TruncateDec(),
+							Add(expectedDaoFullReward.Amount.ToDec().QuoInt64(2).Mul(sdk.OneDec().Sub(types.DefaultPoolRate))).TruncateDec(),
 					},
 					"val3": {
 						bondStatus:     stakingtypes.Unbonded,
@@ -200,7 +200,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 				},
 				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom,
 					sdk.TokensFromConsensusPower(5, sdk.DefaultPowerReduction).
-						Add(expectedDaoFullReward.Amount.ToDec().Mul(types.DefaultStakingTokenPoolRate).RoundInt())),
+						Add(expectedDaoFullReward.Amount.ToDec().Mul(types.DefaultPoolRate).RoundInt())),
 			},
 		},
 	}
@@ -243,7 +243,7 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
 
 			// pool rate = current pool / total
-			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultStakingTokenPoolRate)
+			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultPoolRate)
 
 			// the check the overall balance is increased
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()).
@@ -495,7 +495,7 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
 
 			// pool rate = current pool / total
-			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultStakingTokenPoolRate)
+			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultPoolRate)
 
 			// the check the overall balance remains the same
 			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())

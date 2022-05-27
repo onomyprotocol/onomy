@@ -24,14 +24,14 @@ func (k Keeper) GetDaoDelegationSupply(ctx sdk.Context) sdk.Dec {
 // getTargetDelegationState builds a map of the validators and the stake amount they should have now.
 // if the validator is not in the map, the DAO stake is zero.
 func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Validator) map[string]sdk.Dec {
-	maxStakingCommissionRate := k.StakingMaxCommissionRate(ctx)
+	maxValCommission := k.MaxValCommission(ctx)
 	valsSelfBonds := make(map[string]sdk.Dec) // the key is OperatorAddress
 	valsSelfBondsSupply := sdk.ZeroDec()
 	for _, val := range vals {
 		if !val.IsBonded() {
 			continue
 		}
-		if val.GetCommission().GT(maxStakingCommissionRate) {
+		if val.GetCommission().GT(maxValCommission) {
 			continue
 		}
 
@@ -49,7 +49,7 @@ func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Va
 	daoDelegationSupply := k.getDaoDelegationSupply(ctx)
 	daoBondDenomSupply := k.treasuryBondDenomAmount(ctx).ToDec().Add(daoDelegationSupply)
 
-	daoBondDenomToDelegate := daoBondDenomSupply.Sub(daoBondDenomSupply.Mul(k.StakingTokenPoolRate(ctx)))
+	daoBondDenomToDelegate := daoBondDenomSupply.Sub(daoBondDenomSupply.Mul(k.PoolRate(ctx)))
 
 	targetDelegationState := make(map[string]sdk.Dec) // the key is OperatorAddress
 	for valAddr, selfDelegationAmt := range valsSelfBonds {

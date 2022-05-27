@@ -29364,17 +29364,17 @@ paths:
                     type: string
                     format: int64
                     title: the period of blocks to withdraw the dao staking reward
-                  staking_token_pool_rate:
+                  pool_rate:
                     type: string
                     format: byte
                     title: the rate of total dao's staking coins to keep unstaked
-                  staking_token_max_proposal_rate:
+                  max_proposal_rate:
                     type: string
                     format: byte
                     title: >-
                       the max rage of total dao's staking coins to be allowed in
                       proposals
-                  staking_max_commission_rate:
+                  max_val_commission:
                     type: string
                     format: byte
                     title: the max validator's commission to be staked by the dao
@@ -48106,15 +48106,15 @@ definitions:
         type: string
         format: int64
         title: the period of blocks to withdraw the dao staking reward
-      staking_token_pool_rate:
+      pool_rate:
         type: string
         format: byte
         title: the rate of total dao's staking coins to keep unstaked
-      staking_token_max_proposal_rate:
+      max_proposal_rate:
         type: string
         format: byte
         title: the max rage of total dao's staking coins to be allowed in proposals
-      staking_max_commission_rate:
+      max_val_commission:
         type: string
         format: byte
         title: the max validator's commission to be staked by the dao
@@ -48130,17 +48130,17 @@ definitions:
             type: string
             format: int64
             title: the period of blocks to withdraw the dao staking reward
-          staking_token_pool_rate:
+          pool_rate:
             type: string
             format: byte
             title: the rate of total dao's staking coins to keep unstaked
-          staking_token_max_proposal_rate:
+          max_proposal_rate:
             type: string
             format: byte
             title: >-
               the max rage of total dao's staking coins to be allowed in
               proposals
-          staking_max_commission_rate:
+          max_val_commission:
             type: string
             format: byte
             title: the max validator's commission to be staked by the dao
