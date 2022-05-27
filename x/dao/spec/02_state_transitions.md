@@ -17,8 +17,8 @@ This document describes the state transition operations:
 
 The DAO delegates its staking coins (NOMs) from the treasury to validators proportionately based on the self-bonded amount
 of each validator with respect to the total self-bonded amount of all validators, in addition, if the validator commission rate
-more than "staking_max_commission_rate" param the validator will be excluded from the DAO staking. The DAO
-limits the delegation by the "staking_token_pool_rate" parameter. It means that "staking_token_pool_rate" of the total
+more than "max_val_commission" param the validator will be excluded from the DAO staking. The DAO
+limits the delegation by the "pool_rate" parameter. It means that "pool_rate" of the total
 amount of DAO's staking coins (NOMs) won't be staked.
 
 ### Rebalance
@@ -51,5 +51,5 @@ The DAO module extends the existing proposals with new types of proposals:
 
 Additional proposals rule:
 
-* Each funding or exchange proposal may not exceed more than the "staking_token_max_proposal_rate" of the total amount of
+* Each funding or exchange proposal may not exceed more than the "max_proposal_rate" of the total amount of
   DAO's staking coins (NOMs).

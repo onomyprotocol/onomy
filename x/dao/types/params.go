@@ -11,24 +11,24 @@ import (
 var (
 	// DefaultWithdrawRewardPeriod is default value for the DefaultWithdrawRewardPeriod param.
 	DefaultWithdrawRewardPeriod = int64(51840) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
-	// DefaultStakingTokenPoolRate is default value for the DefaultStakingTokenPoolRate param.
-	DefaultStakingTokenPoolRate = sdk.NewDec(1).Quo(sdk.NewDec(20)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
-	// DefaultStakingTokenMaxProposalRate is default value for the DefaultStakingTokenMaxProposalRate param.
-	DefaultStakingTokenMaxProposalRate = sdk.NewDec(1).Quo(sdk.NewDec(20)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
-	// DefaultStakingMaxCommissionRate is default value for the DefaultStakingMaxCommissionRate param.
-	DefaultStakingMaxCommissionRate = sdk.NewDec(1).Quo(sdk.NewDec(5)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
+	// DefaultPoolRate is default value for the DefaultPoolRate param.
+	DefaultPoolRate = sdk.NewDec(1).Quo(sdk.NewDec(20)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
+	// DefaultMaxProposalRate is default value for the DefaultMaxProposalRate param.
+	DefaultMaxProposalRate = sdk.NewDec(1).Quo(sdk.NewDec(20)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
+	// DefaultMaxValCommission is default value for the DefaultMaxValCommission param.
+	DefaultMaxValCommission = sdk.NewDec(1).Quo(sdk.NewDec(5)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
 )
 
 // Parameter store keys.
 var (
 	// KeyWithdrawRewardPeriod is byte key for KeyWithdrawRewardPeriod param.
 	KeyWithdrawRewardPeriod = []byte("WithdrawRewardPeriod") //nolint:gochecknoglobals // cosmos-sdk style
-	// KeyStakingTokenPoolRate is byte key for KeyStakingTokenPoolRate param.
-	KeyStakingTokenPoolRate = []byte("StakingTokenPoolRate") //nolint:gochecknoglobals // cosmos-sdk style
-	// KeyStakingTokenMaxProposalRate is byte key for KeyStakingTokenMaxProposalRate param.
-	KeyStakingTokenMaxProposalRate = []byte("StakingTokenMaxProposalRate") //nolint:gochecknoglobals // cosmos-sdk style
-	// KeyStakingMaxCommissionRate is byte key for KeyStakingMaxCommissionRate param.
-	KeyStakingMaxCommissionRate = []byte("StakingMaxCommissionRate") //nolint:gochecknoglobals // cosmos-sdk style
+	// KeyPoolRate is byte key for KeyPoolRate param.
+	KeyPoolRate = []byte("PoolRate") //nolint:gochecknoglobals // cosmos-sdk style
+	// KeyMaxProposalRate is byte key for KeyMaxProposalRate param.
+	KeyMaxProposalRate = []byte("MaxProposalRate") //nolint:gochecknoglobals // cosmos-sdk style
+	// KeyMaxValCommission is byte key for KeyMaxValCommission param.
+	KeyMaxValCommission = []byte("MaxValCommission") //nolint:gochecknoglobals // cosmos-sdk style
 )
 
 var _ paramtypes.ParamSet = (*Params)(nil)
@@ -41,23 +41,23 @@ func ParamKeyTable() paramtypes.KeyTable {
 // NewParams creates a new Params instance.
 func NewParams(
 	withdrawRewardPeriod int64,
-	stakingTokenPoolRate,
-	stakingTokenMaxProposalRate,
-	stakingMaxCommissionRate sdk.Dec,
+	poolRate,
+	maxProposalRate,
+	maxValCommission sdk.Dec,
 ) Params {
 	return Params{
-		WithdrawRewardPeriod:        withdrawRewardPeriod,
-		StakingTokenPoolRate:        stakingTokenPoolRate,
-		StakingTokenMaxProposalRate: stakingTokenMaxProposalRate,
-		StakingMaxCommissionRate:    stakingMaxCommissionRate,
+		WithdrawRewardPeriod: withdrawRewardPeriod,
+		PoolRate:             poolRate,
+		MaxProposalRate:      maxProposalRate,
+		MaxValCommission:     maxValCommission,
 	}
 }
 
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
 	return NewParams(
-		DefaultWithdrawRewardPeriod, DefaultStakingTokenPoolRate, DefaultStakingTokenMaxProposalRate,
-		DefaultStakingMaxCommissionRate,
+		DefaultWithdrawRewardPeriod, DefaultPoolRate, DefaultMaxProposalRate,
+		DefaultMaxValCommission,
 	)
 }
 
@@ -65,9 +65,9 @@ func DefaultParams() Params {
 func (m *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyWithdrawRewardPeriod, &m.WithdrawRewardPeriod, validateWithdrawRewardPeriod),
-		paramtypes.NewParamSetPair(KeyStakingTokenPoolRate, &m.StakingTokenPoolRate, validateStakingTokenPoolRate),
-		paramtypes.NewParamSetPair(KeyStakingTokenMaxProposalRate, &m.StakingTokenMaxProposalRate, validateStakingTokenMaxProposalRate),
-		paramtypes.NewParamSetPair(KeyStakingMaxCommissionRate, &m.StakingMaxCommissionRate, validateStakingMaxCommissionRate),
+		paramtypes.NewParamSetPair(KeyPoolRate, &m.PoolRate, validatePoolRate),
+		paramtypes.NewParamSetPair(KeyMaxProposalRate, &m.MaxProposalRate, validateMaxProposalRate),
+		paramtypes.NewParamSetPair(KeyMaxValCommission, &m.MaxValCommission, validateMaxValCommission),
 	}
 }
 
@@ -76,14 +76,14 @@ func (m Params) Validate() error {
 	if err := validateWithdrawRewardPeriod(m.WithdrawRewardPeriod); err != nil {
 		return err
 	}
-	if err := validateStakingTokenPoolRate(m.StakingTokenPoolRate); err != nil {
+	if err := validatePoolRate(m.PoolRate); err != nil {
 		return err
 	}
-	if err := validateStakingTokenMaxProposalRate(m.StakingTokenMaxProposalRate); err != nil {
+	if err := validateMaxProposalRate(m.MaxProposalRate); err != nil {
 		return err
 	}
 
-	return validateStakingMaxCommissionRate(m.StakingMaxCommissionRate)
+	return validateMaxValCommission(m.MaxValCommission)
 }
 
 // String implements the Stringer interface.
@@ -105,7 +105,7 @@ func validateWithdrawRewardPeriod(i interface{}) error {
 	return nil
 }
 
-func validateStakingTokenPoolRate(i interface{}) error {
+func validatePoolRate(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
@@ -121,7 +121,7 @@ func validateStakingTokenPoolRate(i interface{}) error {
 	return nil
 }
 
-func validateStakingTokenMaxProposalRate(i interface{}) error {
+func validateMaxProposalRate(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
@@ -137,7 +137,7 @@ func validateStakingTokenMaxProposalRate(i interface{}) error {
 	return nil
 }
 
-func validateStakingMaxCommissionRate(i interface{}) error {
+func validateMaxValCommission(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)

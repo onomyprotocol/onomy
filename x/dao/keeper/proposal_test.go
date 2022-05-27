@@ -436,10 +436,10 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 					return types.NewFundTreasuryProposal(proposer, "title", "desc", sdk.NewCoins(oneBondCoin))
 				},
 			},
-			// the expectation includes the DefaultStakingTokenPoolRate logic because of the end-blocker rebalancer,
+			// the expectation includes the DefaultPoolRate logic because of the end-blocker rebalancer,
 			// also we add 1 because of the redelegation truncation
 			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, oneBondCoin.
-				Amount.ToDec().Mul(types.DefaultStakingTokenPoolRate).TruncateInt().AddRaw(1))),
+				Amount.ToDec().Mul(types.DefaultPoolRate).TruncateInt().AddRaw(1))),
 		},
 		{
 			name: "positive_exchange_with_treasury",
@@ -454,10 +454,10 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 					})
 				},
 			},
-			// the expectation includes the DefaultStakingTokenPoolRate logic because of the end-blocker rebalancer,
+			// the expectation includes the DefaultPoolRate logic because of the end-blocker rebalancer,
 			// also we add 1 because of the redelegation truncation
 			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Sub(oneBondCoin).Add(twoBondCoins).
-				Amount.ToDec().Mul(types.DefaultStakingTokenPoolRate).TruncateInt())),
+				Amount.ToDec().Mul(types.DefaultPoolRate).TruncateInt())),
 		},
 		{
 			name: "positive_fund_account",
@@ -468,20 +468,20 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 					return types.NewFundAccountProposal(acc, "title", "desc", sdk.NewCoins(oneBondCoin))
 				},
 			},
-			// the expectation includes the DefaultStakingTokenPoolRate logic because of the end-blocker rebalancer,
+			// the expectation includes the DefaultPoolRate logic because of the end-blocker rebalancer,
 			// also we add 1 because of the redelegation truncation
 			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Sub(oneBondCoin).
-				Amount.ToDec().Mul(types.DefaultStakingTokenPoolRate).TruncateInt().AddRaw(1))),
+				Amount.ToDec().Mul(types.DefaultPoolRate).TruncateInt().AddRaw(1))),
 		},
 		{
-			name: "positive_change_staking_token_pool_rate_param",
+			name: "positive_change_pool_rate_param",
 			args: args{
 				treasuryBalance: sdk.NewCoins(thousandBondCoins),
 				proposal: func(_ sdk.AccAddress) govtypes.Content {
 					return proposal.NewParameterChangeProposal("title", "desc", []proposal.ParamChange{
 						{
 							Subspace: types.ModuleName,
-							Key:      string(types.KeyStakingTokenPoolRate),
+							Key:      string(types.KeyPoolRate),
 							Value:    `"0.5"`,
 						},
 					})

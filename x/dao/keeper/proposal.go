@@ -47,7 +47,7 @@ func (k Keeper) ExchangeWithTreasuryProposal(ctx sdk.Context, request *types.Exc
 		return sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than ask coins amount")
 	}
 
-	if err := k.validateStakingTokenMaxProposalRate(ctx, treasuryBalance, coinsAsk); err != nil {
+	if err := k.validateMaxProposalRate(ctx, treasuryBalance, coinsAsk); err != nil {
 		return err
 	}
 
@@ -70,15 +70,15 @@ func (k Keeper) FundAccountProposal(ctx sdk.Context, request *types.FundAccountP
 	if _, isNegative := treasuryBalance.SafeSub(amountToSend); isNegative {
 		return sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than amount to send")
 	}
-	if err := k.validateStakingTokenMaxProposalRate(ctx, treasuryBalance, amountToSend); err != nil {
+	if err := k.validateMaxProposalRate(ctx, treasuryBalance, amountToSend); err != nil {
 		return err
 	}
 
 	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, recipientAddr, amountToSend)
 }
 
-func (k Keeper) validateStakingTokenMaxProposalRate(ctx sdk.Context, treasuryBalance, coinsAsk sdk.Coins) error {
-	maxProposalRate := k.StakingTokenMaxProposalRate(ctx)
+func (k Keeper) validateMaxProposalRate(ctx sdk.Context, treasuryBalance, coinsAsk sdk.Coins) error {
+	maxProposalRate := k.MaxProposalRate(ctx)
 	for _, tcoin := range treasuryBalance {
 		askAmount := coinsAsk.AmountOf(tcoin.Denom)
 		allowedAmount := tcoin.Amount.ToDec().Mul(maxProposalRate).TruncateInt()

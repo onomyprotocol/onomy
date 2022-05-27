@@ -130,9 +130,9 @@ Params defines the parameters for the module.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `withdraw_reward_period` | [int64](#int64) |  | the period of blocks to withdraw the dao staking reward |
-| `staking_token_pool_rate` | [bytes](#bytes) |  | the rate of total dao's staking coins to keep unstaked |
-| `staking_token_max_proposal_rate` | [bytes](#bytes) |  | the max rage of total dao's staking coins to be allowed in proposals |
-| `staking_max_commission_rate` | [bytes](#bytes) |  | the max validator's commission to be staked by the dao |
+| `pool_rate` | [bytes](#bytes) |  | the rate of total dao's staking coins to keep unstaked |
+| `max_proposal_rate` | [bytes](#bytes) |  | the max rage of total dao's staking coins to be allowed in proposals |
+| `max_val_commission` | [bytes](#bytes) |  | the max validator's commission to be staked by the dao |
 
 
 
