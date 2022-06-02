@@ -1,7 +1,7 @@
 //go:build integration
 // +build integration
 
-package wnom
+package bnom
 
 import (
 	"bytes"
@@ -19,7 +19,7 @@ const (
 	alchemyKey = "ALCHEMY_KEY"
 )
 
-type wnomTestsBaseContainer struct {
+type bnomTestsBaseContainer struct {
 	testcontainers.Container
 }
 
@@ -36,7 +36,7 @@ func (c *printLogConsumer) Accept(logline testcontainers.Log) {
 	}
 }
 
-func newWnomTestsBaseContainer(ctx context.Context) (*wnomTestsBaseContainer, error) {
+func newBnomTestsBaseContainer(ctx context.Context) (*bnomTestsBaseContainer, error) {
 	alchemyKeyValue := os.Getenv(alchemyKey)
 	if alchemyKeyValue == "" {
 		return nil, fmt.Errorf("%s env not found", alchemyKey)
@@ -68,31 +68,31 @@ func newWnomTestsBaseContainer(ctx context.Context) (*wnomTestsBaseContainer, er
 		return nil, err
 	}
 
-	return &wnomTestsBaseContainer{Container: container}, nil
+	return &bnomTestsBaseContainer{Container: container}, nil
 }
 
 // runEthNode runs the mocked eth node amd return it's address.
-func (c *wnomTestsBaseContainer) runEthNode(ctx context.Context) error {
+func (c *bnomTestsBaseContainer) runEthNode(ctx context.Context) error {
 	return c.execBash(ctx, "./run_eth.sh &>> logs/eth.log &")
 }
 
 // deployGravity deploys the gravity contract to the running node
 // and save the deployed address to the gravity_contract_address file.
-func (c *wnomTestsBaseContainer) deployGravity(ctx context.Context) error {
+func (c *bnomTestsBaseContainer) deployGravity(ctx context.Context) error {
 	return c.execBash(ctx, "./deploy_gravity.sh &>> logs/orchestrator.log")
 }
 
 // startOrchestrator start the orchestrator.
-func (c *wnomTestsBaseContainer) startOrchestrator(ctx context.Context, mnemo string) error {
+func (c *bnomTestsBaseContainer) startOrchestrator(ctx context.Context, mnemo string) error {
 	return c.execBash(ctx, fmt.Sprintf("./run_orchestrator.sh \"%s\" &>> logs/orchestrator.log &", mnemo))
 }
 
 // sendToCosmos send erc20 tokens from eth to cosmos.
-func (c *wnomTestsBaseContainer) sendToCosmos(ctx context.Context, erc20Contract string, amount int64, onomyDestinationAddress string) error {
+func (c *bnomTestsBaseContainer) sendToCosmos(ctx context.Context, erc20Contract string, amount int64, onomyDestinationAddress string) error {
 	return c.execBash(ctx, fmt.Sprintf("./send_to_cosmos.sh %s %d %s", erc20Contract, amount, onomyDestinationAddress))
 }
 
-func (c *wnomTestsBaseContainer) execBash(ctx context.Context, command string) error {
+func (c *bnomTestsBaseContainer) execBash(ctx context.Context, command string) error {
 	exitCode, err := c.Exec(ctx, []string{"bash", "-c", command})
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func (c *wnomTestsBaseContainer) execBash(ctx context.Context, command string) e
 	return nil
 }
 
-func (c *wnomTestsBaseContainer) terminate(ctx context.Context, t *testing.T) {
+func (c *bnomTestsBaseContainer) terminate(ctx context.Context, t *testing.T) {
 	t.Helper()
 
 	t.Logf("container logs:")
@@ -115,7 +115,7 @@ func (c *wnomTestsBaseContainer) terminate(ctx context.Context, t *testing.T) {
 	c.Container.Terminate(ctx) // nolint:errcheck
 }
 
-func (c *wnomTestsBaseContainer) logs(ctx context.Context) (string, error) {
+func (c *bnomTestsBaseContainer) logs(ctx context.Context) (string, error) {
 	readCloser, err := c.Container.Logs(ctx)
 	if err != nil {
 		return "", err

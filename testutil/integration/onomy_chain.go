@@ -29,8 +29,8 @@ import (
 const (
 	// AnomDenom is anom name .
 	AnomDenom = "anom"
-	// WnomERC20Address is wnom eth address .
-	WnomERC20Address = "0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C"
+	// BnomERC20Address is bnom eth address .
+	BnomERC20Address = "0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C"
 
 	// ChainName is default test chain name.
 	ChainName = "chain-1"
@@ -96,7 +96,7 @@ func NewOnomyChain() (*OnomyChain, error) {
 
 	// set up swap parameters
 	if err := replaceGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.gravity.params.erc20_to_denom_permanent_swap",
-		json.RawMessage(fmt.Sprintf(`{"erc20": "%s", "denom": "%s"}`, WnomERC20Address, AnomDenom))); err != nil {
+		json.RawMessage(fmt.Sprintf(`{"erc20": "%s", "denom": "%s"}`, BnomERC20Address, AnomDenom))); err != nil {
 		return nil, err
 	}
 
