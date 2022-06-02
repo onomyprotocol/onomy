@@ -16,7 +16,7 @@ var (
 	// DefaultMaxProposalRate is default value for the DefaultMaxProposalRate param.
 	DefaultMaxProposalRate = sdk.NewDec(1).Quo(sdk.NewDec(20)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
 	// DefaultMaxValCommission is default value for the DefaultMaxValCommission param.
-	DefaultMaxValCommission = sdk.NewDec(1).Quo(sdk.NewDec(5)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
+	DefaultMaxValCommission = sdk.NewDec(1).Quo(sdk.NewDec(10)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
 )
 
 // Parameter store keys.
