@@ -30,7 +30,7 @@ cd /root/home/gravity/solidity
 --eth-privkey="$ETH_ORCHESTRATOR_PRIVATE_KEY" \
 --contract=Gravity.json \
 --test-mode=false \
---wnom-address="0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C" | grep "Gravity deployed at Address" | grep -Eow '0x[0-9a-fA-F]{40}' > gravity_contract_address
+--bnom-address="0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C" | grep "Gravity deployed at Address" | grep -Eow '0x[0-9a-fA-F]{40}' > gravity_contract_address
 
 GRAVITY_CONTRACT_ADDRESS=$(cat gravity_contract_address)
 cp gravity_contract_address $ORIGINAL_DIR/gravity_contract_address
