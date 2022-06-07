@@ -11,7 +11,7 @@ require (
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20220526103318-82907aba8d4f
+	github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20220606130009-db180e048abe
 	github.com/onomyprotocol/tm-load-test v0.9.1-0.20211101093435-b38e68e11c01
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.2.1
