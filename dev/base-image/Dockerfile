@@ -7,7 +7,8 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install --no-install-recommends -yq
                                                 build-essential \
                                                 ca-certificates \
                                                 tar \
-                                                git
+                                                git \
+                                                crudini
 # scripts utils
 RUN apt-get install --no-install-recommends -yq jq \
                                                 iputils-ping \
