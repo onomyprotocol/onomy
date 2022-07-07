@@ -26,7 +26,7 @@ func TestFundTreasuryProposal_ValidateBasic(t *testing.T) { //nolint:dupl // tes
 		{
 			name: "positive",
 			fields: fields{
-				Sender:      simapp.GenAccount().String(),
+				Sender:      simapp.GenAccountAddress().String(),
 				Title:       "title",
 				Description: "desc",
 				Amount:      sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
@@ -79,7 +79,7 @@ func TestExchangeWithTreasuryProposal_ValidateBasic(t *testing.T) {
 		{
 			name: "positive",
 			fields: fields{
-				Sender:      simapp.GenAccount().String(),
+				Sender:      simapp.GenAccountAddress().String(),
 				Title:       "title",
 				Description: "desc",
 				CoinsPairs: []types.CoinsExchangePair{
@@ -98,7 +98,7 @@ func TestExchangeWithTreasuryProposal_ValidateBasic(t *testing.T) {
 		{
 			name: "negative_zero_coin",
 			fields: fields{
-				Sender:      simapp.GenAccount().String(),
+				Sender:      simapp.GenAccountAddress().String(),
 				Title:       "title",
 				Description: "desc",
 				CoinsPairs: []types.CoinsExchangePair{
@@ -158,7 +158,7 @@ func TestFundAccountProposal_ValidateBasic(t *testing.T) { // nolint:dupl // tes
 		{
 			name: "positive",
 			fields: fields{
-				Recipient:   simapp.GenAccount().String(),
+				Recipient:   simapp.GenAccountAddress().String(),
 				Title:       "title",
 				Description: "desc",
 				Amount:      sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),

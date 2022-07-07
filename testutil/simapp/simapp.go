@@ -282,8 +282,8 @@ func (s *SimApp) VoteProposal(
 	s.sendTx(t, priv, msg)
 }
 
-// GenAccount generates random account.
-func GenAccount() sdk.AccAddress {
+// GenAccountAddress generates random account.
+func GenAccountAddress() sdk.AccAddress {
 	pk := ed25519.GenPrivKey().PubKey()
 	return sdk.AccAddress(pk.Address())
 }
