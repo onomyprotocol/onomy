@@ -11,14 +11,36 @@ import (
 
 // ReBalanceDelegation re-balances the DAO staking among validators bases on the current validators self bond.
 func (k Keeper) ReBalanceDelegation(ctx sdk.Context) error {
+	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	vals := k.stakingKeeper.GetAllValidators(ctx)
-	targetDelegations := k.getTargetDelegationState(ctx, vals)
-	return k.reBalanceDaoStaking(ctx, vals, targetDelegations)
+	targetDaoStaking := k.getTargetDelegationState(ctx, vals)
+	delegations, undelegations := k.computeDelegationsAndUndelegation(ctx, daoAddr, vals, targetDaoStaking)
+
+	if len(delegations) == 0 && len(undelegations) == 0 {
+		return nil
+	}
+
+	// If we have updates in the (un)delegations we should withdraw the rewards and recompute the (un)delegations
+	//	with the received reward. Otherwise, it will be withdrawn during the (un)delegations execution (via staking hook),
+	//	and that will cause the re-balancing for each following block.
+	if err := k.WithdrawReward(ctx); err != nil {
+		return err
+	}
+
+	vals = k.stakingKeeper.GetAllValidators(ctx)
+	targetDaoStaking = k.getTargetDelegationState(ctx, vals)
+	delegations, undelegations = k.computeDelegationsAndUndelegation(ctx, daoAddr, vals, targetDaoStaking)
+
+	if err := undelegateValidators(ctx, vals, undelegations, k, daoAddr); err != nil {
+		return err
+	}
+
+	return k.delegateValidators(ctx, vals, delegations, daoAddr)
 }
 
 // GetDaoDelegationSupply returns total amount of the treasury bonded coins.
 func (k Keeper) GetDaoDelegationSupply(ctx sdk.Context) sdk.Dec {
-	return k.getDaoDelegationSupply(ctx)
+	return k.getDaoDelegationSupply(ctx, k.stakingKeeper.GetAllValidators(ctx))
 }
 
 // getTargetDelegationState builds a map of the validators and the stake amount they should have now.
@@ -46,7 +68,7 @@ func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Va
 		valsSelfBondsSupply = valsSelfBondsSupply.Add(selfDelegationAmount)
 	}
 
-	daoDelegationSupply := k.getDaoDelegationSupply(ctx)
+	daoDelegationSupply := k.getDaoDelegationSupply(ctx, vals)
 	daoBondDenomSupply := k.treasuryBondDenomAmount(ctx).ToDec().Add(daoDelegationSupply)
 
 	daoBondDenomToDelegate := daoBondDenomSupply.Sub(daoBondDenomSupply.Mul(k.PoolRate(ctx)))
@@ -63,9 +85,8 @@ func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Va
 }
 
 // getDaoDelegationSupply returns total amount of the treasury bonded coins.
-func (k Keeper) getDaoDelegationSupply(ctx sdk.Context) sdk.Dec {
+func (k Keeper) getDaoDelegationSupply(ctx sdk.Context, vals []stakingtypes.Validator) sdk.Dec {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
-	vals := k.stakingKeeper.GetAllValidators(ctx)
 
 	totalStakingSupply := sdk.ZeroDec()
 	for _, val := range vals {
@@ -80,9 +101,13 @@ func (k Keeper) getDaoDelegationSupply(ctx sdk.Context) sdk.Dec {
 	return totalStakingSupply
 }
 
-// the reBalanceDaoStaking set the targetDaoStaking state.
-func (k Keeper) reBalanceDaoStaking(ctx sdk.Context, vals []stakingtypes.Validator, targetDaoStaking map[string]sdk.Dec) error {
-	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+// computeDelegationsAndUndelegation computes the target (un)delegations.
+func (k Keeper) computeDelegationsAndUndelegation(
+	ctx sdk.Context,
+	daoAddr sdk.AccAddress,
+	vals []stakingtypes.Validator,
+	targetDaoStaking map[string]sdk.Dec,
+) (map[string]sdk.Int, map[string]sdk.Dec) {
 	delegations := make(map[string]sdk.Int)
 	undelegations := make(map[string]sdk.Dec)
 	for _, val := range vals {
@@ -110,12 +135,7 @@ func (k Keeper) reBalanceDaoStaking(ctx sdk.Context, vals []stakingtypes.Validat
 
 		delegations[valAddr.String()] = delegationDelta
 	}
-
-	if err := undelegateValidators(ctx, vals, undelegations, k, daoAddr); err != nil {
-		return err
-	}
-
-	return k.delegateValidators(ctx, vals, delegations, daoAddr)
+	return delegations, undelegations
 }
 
 // undelegateValidators undelegates the requested amount from the validators in the undelegations.

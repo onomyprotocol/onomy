@@ -7,6 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -25,14 +26,24 @@ var (
 	tenBondCoins                      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(10, sdk.DefaultPowerReduction))  //nolint:gochecknoglobals
 	hundredBondCoins                  = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)) //nolint:gochecknoglobals
 	lowCommission                     = stakingtypes.NewCommissionRates(tenPercents, tenPercents, tenPercents)                          //nolint:gochecknoglobals
+	zeroCommission                    = stakingtypes.NewCommissionRates(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec())                    //nolint:gochecknoglobals
 	highCommission                    = stakingtypes.NewCommissionRates(fiftyPercents, fiftyPercents, fiftyPercents)                    //nolint:gochecknoglobals
 	hundredBondWithoutStakingPoolRate = hundredBondCoins.Amount.ToDec().Mul(sdk.OneDec().Sub(types.DefaultPoolRate))                    //nolint:gochecknoglobals
 )
 
+type valAssertion struct {
+	bondStatus     stakingtypes.BondStatus
+	selfBondAmount sdk.Dec
+	daoBondAmount  sdk.Dec
+}
+
 func TestEndBlocker_ReBalance(t *testing.T) {
 	type args struct {
+		// initial validators
 		vals            map[string]simapp.ValReq
 		treasuryBalance sdk.Coin
+		// the validators which will be added to the running chain
+		incomingVals map[string]simapp.ValReq
 	}
 
 	type wantAssertion struct {
@@ -46,7 +57,7 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 		want wantAssertion
 	}{
 		{
-			name: "positive",
+			name: "positive_with_different_validator_states",
 			args: args{
 				vals: map[string]simapp.ValReq{
 					"val1": { // bonded
@@ -99,34 +110,124 @@ func TestEndBlocker_ReBalance(t *testing.T) {
 				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(5, sdk.DefaultPowerReduction).AddRaw(1)),
 			},
 		},
+		{
+			name: "positive_with_incoming_validator",
+			args: args{
+				vals: map[string]simapp.ValReq{
+					"val1": { // bonded
+						SelfBondCoin: tenBondCoins,
+						Commission:   zeroCommission,
+						Reward:       twoBondCoins,
+					},
+				},
+				treasuryBalance: hundredBondCoins,
+				incomingVals: map[string]simapp.ValReq{
+					"val2": { // bonded
+						SelfBondCoin: tenBondCoins,
+						Commission:   zeroCommission,
+						Balance:      sdk.NewCoins(tenBondCoins),
+					},
+				},
+			},
+			want: wantAssertion{
+				vals: map[string]valAssertion{
+					"val1": {
+						bondStatus:     stakingtypes.Bonded,
+						selfBondAmount: tenBondCoins.Amount.ToDec(),
+						daoBondAmount: func() sdk.Dec {
+							// this constant is a sum of initially delegated by DAO and the delegation after the reward
+							// where the rewards is without the validator's reward
+							res, err := sdk.NewDecFromStr("48359523809523809495")
+							require.NoError(t, err)
+							return res
+						}(),
+					},
+					"val2": {
+						bondStatus:     stakingtypes.Bonded,
+						selfBondAmount: tenBondCoins.Amount.ToDec(),
+						daoBondAmount: func() sdk.Dec {
+							res, err := sdk.NewDecFromStr("48359523809523809495")
+							require.NoError(t, err)
+							return res
+						}(),
+					},
+				},
+
+				treasuryBalance: sdk.NewCoin(sdk.DefaultBondDenom, func() sdk.Int {
+					// The final treasury amount is increased as well because of the reward
+					res, err := sdk.NewDecFromStr("5090476190476190475")
+					require.NoError(t, err)
+					return res.TruncateInt()
+				}()),
+			},
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			simApp, _ := createSimAppWithValidatorsAndTreasury(t, tt.args.vals, tt.args.treasuryBalance)
 
-			// iterate couple times to check that the state is the same
-			for i := 0; i < 10; i++ {
+			// emulate some blocks
+			for i := 0; i < 5; i++ {
 				simApp.BeginNextBlock()
 				ctx := simApp.NewNextContext()
 				simApp.EndBlockAndCommit(ctx)
 			}
 
-			simApp.BeginNextBlock()
-			ctx := simApp.NewNextContext()
+			// allocate the reward
+			allocated := allocateValidatorsReward(t, simApp, tt.args.vals)
+			// add new validators on the running chain
+			for moniker, val := range tt.args.incomingVals {
+				// create new account
+				simApp.BeginNextBlock()
+				ctx := simApp.NewNextContext()
 
-			// assertions
-			assertValidators(t, simApp, ctx, tt.want.vals)
+				balance := val.Balance
+				// create account
+				privateKey := secp256k1.GenPrivKey()
+				accountAddress := sdk.AccAddress(privateKey.PubKey().Address())
+				account := simApp.OnomyApp().AccountKeeper.NewAccount(ctx, &authtypes.BaseAccount{
+					Address: accountAddress.String(),
+				})
+				simApp.OnomyApp().AccountKeeper.SetAccount(ctx, account)
+				simApp.EndBlockAndCommit(ctx)
 
-			daoKeeper := simApp.OnomyApp().DaoKeeper
-			gotTreasuryBalance := daoKeeper.Treasury(ctx)
-			require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance), gotTreasuryBalance)
+				// fund account
+				simApp.BeginNextBlock()
+				ctx = simApp.NewNextContext()
+				require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, balance))
+				require.NoError(t, simApp.OnomyApp().BankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, account.GetAddress(), balance))
+				simApp.EndBlockAndCommit(ctx)
 
-			// pool rate = current pool / total
-			require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultPoolRate)
+				// create validator
+				description := stakingtypes.Description{Moniker: moniker}
+				simApp.CreateValidator(t, val.SelfBondCoin, description, val.Commission, sdk.OneInt(), privateKey)
+			}
 
-			// the check the overall balance remains the same
-			require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
+			// iterate couple times to check that the state is the same
+			for i := 0; i < 10; i++ {
+				// this is a tricky part which emulate the minting on ech block, this action should affect the assertion anyhow
+				allocateValidatorsReward(t, simApp, tt.args.vals)
+
+				simApp.BeginNextBlock()
+				ctx := simApp.NewNextContext()
+
+				// assertions
+				assertValidators(t, simApp, ctx, tt.want.vals)
+
+				daoKeeper := simApp.OnomyApp().DaoKeeper
+				gotTreasuryBalance := daoKeeper.Treasury(ctx)
+				require.Equal(t, sdk.NewCoins(tt.want.treasuryBalance).String(), gotTreasuryBalance.String())
+
+				// pool rate = current pool / total
+				require.Equal(t, gotTreasuryBalance[0].Amount.ToDec().Quo(daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec())), types.DefaultPoolRate)
+
+				// the check the overall balance remains the same in case there we no reward
+				if !allocated {
+					require.Equal(t, daoKeeper.GetDaoDelegationSupply(ctx).Add(gotTreasuryBalance[0].Amount.ToDec()), tt.args.treasuryBalance.Amount.ToDec())
+				}
+				simApp.EndBlockAndCommit(ctx)
+			}
 		})
 	}
 }
@@ -520,10 +621,34 @@ func createSimAppWithValidatorsAndTreasury(t *testing.T, vals map[string]simapp.
 	return simapp.SetupWithValidators(t, vals, treasuryOverrideOpt)
 }
 
-type valAssertion struct {
-	bondStatus     stakingtypes.BondStatus
-	selfBondAmount sdk.Dec
-	daoBondAmount  sdk.Dec
+func allocateValidatorsReward(t *testing.T, simApp *simapp.SimApp, vals map[string]simapp.ValReq) bool {
+	t.Helper()
+
+	allocated := false
+	for moniker := range vals {
+		moniker := moniker
+		if vals[moniker].Reward.IsNil() {
+			continue
+		}
+		// allocate the reward
+		simApp.BeginNextBlock()
+		ctx := simApp.NewNextContext()
+		simApp.OnomyApp().StakingKeeper.IterateValidators(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
+			if moniker == validator.GetMoniker() {
+				// mind and send coins as a validator Reward
+				require.NoError(t, simApp.OnomyApp().BankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(vals[moniker].Reward)))
+				require.NoError(t, simApp.OnomyApp().BankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, distrtypes.ModuleName, sdk.NewCoins(vals[moniker].Reward)))
+
+				simApp.OnomyApp().DistrKeeper.AllocateTokensToValidator(ctx, validator, sdk.NewDecCoinsFromCoins(vals[moniker].Reward))
+				allocated = true
+				return true
+			}
+			return false
+		})
+		simApp.EndBlockAndCommit(ctx)
+	}
+
+	return allocated
 }
 
 func assertValidators(t *testing.T, simApp *simapp.SimApp, ctx sdk.Context, vals map[string]valAssertion) {

@@ -23,7 +23,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 		denom2 = "denom2"
 	)
 
-	account := simapp.GenAccount()
+	accountAddress := simapp.GenAccountAddress()
 
 	type args struct {
 		accountBalance sdk.Coins
@@ -41,7 +41,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 			name: "positive_one_coin_full",
 			args: args{
 				accountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
-				sender:         account.String(),
+				sender:         accountAddress.String(),
 				amount:         sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
 			},
 			wantTreasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
@@ -50,7 +50,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 			name: "positive_one_coin_partial",
 			args: args{
 				accountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
-				sender:         account.String(),
+				sender:         accountAddress.String(),
 				amount:         sdk.NewCoins(sdk.NewInt64Coin(denom1, 5)),
 			},
 			wantTreasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 5)),
@@ -59,7 +59,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 			name: "positive_two_coins_partial",
 			args: args{
 				accountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10), sdk.NewInt64Coin(denom2, 8)),
-				sender:         account.String(),
+				sender:         accountAddress.String(),
 				amount:         sdk.NewCoins(sdk.NewInt64Coin(denom1, 5), sdk.NewInt64Coin(denom2, 8)),
 			},
 			wantTreasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 5), sdk.NewInt64Coin(denom2, 8)),
@@ -68,7 +68,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 			name: "negative_insufficient_balance",
 			args: args{
 				accountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
-				sender:         account.String(),
+				sender:         accountAddress.String(),
 				amount:         sdk.NewCoins(sdk.NewInt64Coin(denom1, 11)),
 			},
 			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "sender balance is less than amount to send"),
@@ -77,7 +77,7 @@ func TestKeeper_FundTreasuryProposal(t *testing.T) {
 			name: "negative_not_existing_token",
 			args: args{
 				accountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
-				sender:         account.String(),
+				sender:         accountAddress.String(),
 				amount:         sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
 			},
 			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "sender balance is less than amount to send"),
@@ -119,7 +119,7 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 		denom4 = "denom4"
 	)
 
-	account := simapp.GenAccount()
+	accountAddress := simapp.GenAccountAddress()
 
 	type args struct {
 		treasuryBalance sdk.Coins
@@ -140,7 +140,7 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 			args: args{
 				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10000)),
 				accountBalance:  sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
-				sender:          account.String(),
+				sender:          accountAddress.String(),
 				coinsPairs: []types.CoinsExchangePair{
 					{
 						CoinAsk: sdk.NewInt64Coin(denom1, 8),
@@ -165,7 +165,7 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 					sdk.NewInt64Coin(denom2, 100),
 					sdk.NewInt64Coin(denom3, 100),
 				),
-				sender: account.String(),
+				sender: accountAddress.String(),
 				coinsPairs: []types.CoinsExchangePair{
 					{
 						CoinAsk: sdk.NewInt64Coin(denom1, 8),
@@ -210,7 +210,7 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 					sdk.NewInt64Coin(denom1, 4),
 					sdk.NewInt64Coin(denom2, 12),
 				),
-				sender: account.String(),
+				sender: accountAddress.String(),
 				coinsPairs: []types.CoinsExchangePair{
 					{
 						CoinAsk: sdk.NewInt64Coin(denom1, 8),
@@ -239,7 +239,7 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 					sdk.NewInt64Coin(denom1, 100),
 					sdk.NewInt64Coin(denom2, 100),
 				),
-				sender: account.String(),
+				sender: accountAddress.String(),
 				coinsPairs: []types.CoinsExchangePair{
 					{
 						CoinAsk: sdk.NewInt64Coin(denom1, 8),
@@ -262,7 +262,7 @@ func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 			args: args{
 				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 100)),
 				accountBalance:  sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
-				sender:          account.String(),
+				sender:          accountAddress.String(),
 				coinsPairs: []types.CoinsExchangePair{
 					{
 						CoinAsk: sdk.NewInt64Coin(denom1, 8),
@@ -312,7 +312,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 		denom2 = "denom2"
 	)
 
-	account := simapp.GenAccount()
+	accountAddress := simapp.GenAccountAddress()
 
 	type args struct {
 		treasuryBalance sdk.Coins
@@ -330,7 +330,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 			name: "positive_one_coin_full",
 			args: args{
 				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10000)),
-				recipient:       account.String(),
+				recipient:       accountAddress.String(),
 				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
 			},
 			wantAccountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
@@ -339,7 +339,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 			name: "positive_one_coin_partial",
 			args: args{
 				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10000)),
-				recipient:       account.String(),
+				recipient:       accountAddress.String(),
 				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 5)),
 			},
 			wantAccountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 5)),
@@ -348,7 +348,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 			name: "positive_two_coins_partial",
 			args: args{
 				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10000), sdk.NewInt64Coin(denom2, 80000)),
-				recipient:       account.String(),
+				recipient:       accountAddress.String(),
 				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 5), sdk.NewInt64Coin(denom2, 8)),
 			},
 			wantAccountBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 5), sdk.NewInt64Coin(denom2, 8)),
@@ -357,7 +357,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 			name: "negative_insufficient_balance",
 			args: args{
 				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
-				recipient:       account.String(),
+				recipient:       accountAddress.String(),
 				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 11)),
 			},
 			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than amount to send"),
@@ -366,7 +366,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 			name: "negative_not_existing_token",
 			args: args{
 				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 10)),
-				recipient:       account.String(),
+				recipient:       accountAddress.String(),
 				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom2, 10)),
 			},
 			wantErr: sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than amount to send"),
@@ -375,7 +375,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 			name: "negative_prohibited_proposal_amount",
 			args: args{
 				treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(denom1, 50)),
-				recipient:       account.String(),
+				recipient:       accountAddress.String(),
 				amount:          sdk.NewCoins(sdk.NewInt64Coin(denom1, 5)),
 			},
 			wantErr: sdkerrors.Wrapf(types.ErrProhibitedCoinsAmount, "requested denom1:5 amount is more than max allowed denom1:2 "),
@@ -410,7 +410,7 @@ func TestKeeper_FundAccountProposal(t *testing.T) {
 
 func TestKeeper_ProposalsFullCycle(t *testing.T) {
 	var (
-		acc               = simapp.GenAccount()
+		accountAddress    = simapp.GenAccountAddress()
 		tenPercents       = sdk.NewDec(1).QuoInt64(10)
 		oneBondCoin       = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(1, sdk.DefaultPowerReduction))
 		twoBondCoins      = sdk.NewCoin(sdk.DefaultBondDenom, sdk.TokensFromConsensusPower(2, sdk.DefaultPowerReduction))
@@ -464,8 +464,8 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 			args: args{
 				treasuryBalance: sdk.NewCoins(thousandBondCoins),
 				proposal: func(_ sdk.AccAddress) govtypes.Content {
-					// we can any acc for that proposal
-					return types.NewFundAccountProposal(acc, "title", "desc", sdk.NewCoins(oneBondCoin))
+					// we can any accountAddress for that proposal
+					return types.NewFundAccountProposal(accountAddress, "title", "desc", sdk.NewCoins(oneBondCoin))
 				},
 			},
 			// the expectation includes the DefaultPoolRate logic because of the end-blocker rebalancer,

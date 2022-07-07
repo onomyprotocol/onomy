@@ -116,7 +116,7 @@ func TestCLI_ExchangeWithTreasuryProposal(t *testing.T) {
 }
 
 func TestCLI_FundAccountProposal(t *testing.T) {
-	account := simapp.GenAccount()
+	accountAddress := simapp.GenAccountAddress()
 
 	for _, tt := range []struct {
 		name            string
@@ -128,12 +128,12 @@ func TestCLI_FundAccountProposal(t *testing.T) {
 		{
 			name:            "positive",
 			treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(normalToken, 5000000000000000000)),
-			args:            fmt.Sprintf("%s 500000000%s --title=Title --description=Description --deposit=1000000000000000000%s", account.String(), normalToken, stakeToken),
+			args:            fmt.Sprintf("%s 500000000%s --title=Title --description=Description --deposit=1000000000000000000%s", accountAddress.String(), normalToken, stakeToken),
 		},
 		{
 			name:            "negative_insufficient_balance",
 			treasuryBalance: sdk.NewCoins(sdk.NewInt64Coin(normalToken, 1000000000000000000)),
-			args:            fmt.Sprintf("%s 500000000%s --title=Title --description=Description --deposit=1000000000000000000%s", account.String(), "newcoin", stakeToken),
+			args:            fmt.Sprintf("%s 500000000%s --title=Title --description=Description --deposit=1000000000000000000%s", accountAddress.String(), "newcoin", stakeToken),
 			code:            govtypes.ErrInvalidProposalContent.ABCICode(),
 		},
 	} { // nolint:dupl // test template
