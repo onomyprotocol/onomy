@@ -1,4 +1,4 @@
-FROM ubuntu:21.04
+FROM ubuntu:22.10
 
 RUN apt-get update -y -q && apt-get upgrade -yq
 # common (DEBIAN_FRONTEND is a fix for tzdata)
