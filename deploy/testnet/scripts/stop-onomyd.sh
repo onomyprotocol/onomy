@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eu
 
-echo "Stopping full node"
+echo "Stopping onomy node"
 
-kill $(pidof onomyd) && echo "onomyd is stopped"
+pkill onomyd && echo "onomyd is stopped"
