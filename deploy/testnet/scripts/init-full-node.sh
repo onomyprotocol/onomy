@@ -3,11 +3,11 @@ set -eu
 
 echo "Initializing full node"
 
-# Initial dir
+# Onomy home dir
 ONOMY_HOME=$HOME/.onomy
 
 # Name of the network to bootstrap
-CHAINID="onomy-testnet"
+CHAINID="onomy-testnet-1"
 # The address to run onomy node
 ONOMY_HOST="0.0.0.0"
 # The port of the onomy gRPC
@@ -20,8 +20,10 @@ ONOMY_NODE_CONFIG="$ONOMY_HOME_CONFIG/config.toml"
 ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 # Chain ID flag
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
-# Testnet seeds IPs
-ONOMY_SEEDS_DEFAULT_IPS="64.9.136.119,64.9.136.120,145.40.81.21"
+# Seeds IPs
+ONOMY_SEEDS_DEFAULT_IPS="64.9.136.119,64.9.136.120,54.88.212.224"
+# Statysync servers default IPs
+ONOMY_STATESYNC_SERVERS_DEFAULT_IPS="3.219.52.168,44.206.144.197"
 
 read -r -p "Enter a name for your node [onomy]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy}
@@ -52,48 +54,51 @@ done
 # create home directory
 mkdir -p $ONOMY_HOME
 
-# make a file to store node information
-echo '{
-  "node_name": "",
-  "chain_id": ""
-}' > $ONOMY_HOME/node_info.json
-
 # ------------------ Init onomy ------------------
-
 echo "Creating $ONOMY_NODE_NAME node with chain-id=$CHAINID..."
-echo "Initializing genesis files"
 
 # Initialize the home directory and add some keys
-echo "Init chain"
+echo "Initializing chain"
 onomyd $ONOMY_CHAINID_FLAG init $ONOMY_NODE_NAME
 
-#copy master genesis file from the seed
-seed_id=$(sed 's/.*@\(.*\):.*/\1/' <<< "$ONOMY_SEEDS")
-wget $seed_id:26657/genesis? -O $ONOMY_HOME/raw_genesis.json
-rm $ONOMY_HOME_CONFIG/genesis.json
-jq .result.genesis $ONOMY_HOME/raw_genesis.json >> $ONOMY_HOME_CONFIG/genesis.json
-rm $ONOMY_HOME/raw_genesis.json
+#copy genesis file
+cp -r ../genesis/genesis-testnet-1.json $ONOMY_HOME_CONFIG/genesis.json
 
-echo "Exposing ports and APIs of the $ONOMY_NODE_NAME"
-# Switch sed command in the case of linux
-fsed() {
-  if [ `uname` = 'Linux' ]; then
-    sed -i "$@"
-  else
-    sed -i '' "$@"
-  fi
-}
+echo "Updating node config"
 
-# Change ports
-fsed "s#\"tcp://127.0.0.1:26656\"#\"tcp://$ONOMY_HOST:26656\"#g" $ONOMY_NODE_CONFIG
-fsed "s#\"tcp://127.0.0.1:26657\"#\"tcp://$ONOMY_HOST:26657\"#g" $ONOMY_NODE_CONFIG
-fsed 's#addr_book_strict = true#addr_book_strict = false#g' $ONOMY_NODE_CONFIG
-fsed 's#external_address = ""#external_address = "tcp://'$ip:26656'"#g' $ONOMY_NODE_CONFIG
-fsed 's#seeds = ""#seeds = "'$ONOMY_SEEDS'"#g' $ONOMY_NODE_CONFIG
-fsed "s#0.0.0.0:9090#$ONOMY_HOST:$ONOMY_GRPC_PORT#g" $ONOMY_APP_CONFIG
-fsed 's#enable = false#enable = true#g' $ONOMY_APP_CONFIG
-fsed 's#swagger = false#swagger = true#g' $ONOMY_APP_CONFIG
-fsed 's#"chain_id": ""#"chain_id": "'$CHAINID'"#g'  $ONOMY_HOME/node_info.json
-fsed 's#"node_name": ""#"node_name": "'$ONOMY_NODE_NAME'"#g'  $ONOMY_HOME/node_info.json
+read -r -p "Do you want to setup state-sync?(y/n)[N]: " statesync
+statesync=${statesync:-n}
+
+statesync_nodes=
+blk_height=
+blk_hash=
+if [[ $statesync = 'y' ]] || [[ $statesync = 'Y' ]]; then
+    read -r -p "Enter IPs of statesync nodes (at least 2) [$ONOMY_STATESYNC_SERVERS_DEFAULT_IPS]:" statesync_ips
+    statesync_ips=${statesync_ips:-$ONOMY_STATESYNC_SERVERS_DEFAULT_IPS}
+    for statesync_ip in ${statesync_ips//,/ } ; do
+      blk_details=$(curl -s http://$statesync_ip:26657/block | jq -r '.result.block.header.height + "\n" + .result.block_id.hash')
+      blk_height=$(echo $blk_details | cut -d$' ' -f1)
+      blk_hash=$(echo $blk_details | cut -d$' ' -f2)
+      statesync_nodes="$statesync_nodes$statesync_ip:26657,"
+    done
+
+    # Change statesync settings
+    crudini --set $ONOMY_NODE_CONFIG statesync enable true
+    crudini --set $ONOMY_NODE_CONFIG statesync rpc_servers "\"$statesync_nodes\""
+    crudini --set $ONOMY_NODE_CONFIG statesync trust_height $blk_height
+    crudini --set $ONOMY_NODE_CONFIG statesync trust_hash "\"$blk_hash\""
+    echo "Setup for statesync is complete"
+fi
+
+# change config
+crudini --set $ONOMY_NODE_CONFIG p2p addr_book_strict false
+crudini --set $ONOMY_NODE_CONFIG p2p external_address "\"tcp://$ip:26656\""
+crudini --set $ONOMY_NODE_CONFIG p2p seeds "\"$ONOMY_SEEDS\""
+crudini --set $ONOMY_NODE_CONFIG rpc laddr "\"tcp://$ONOMY_HOST:26657\""
+
+crudini --set $ONOMY_APP_CONFIG grpc enable true
+crudini --set $ONOMY_APP_CONFIG grpc address "\"$ONOMY_HOST:$ONOMY_GRPC_PORT\""
+crudini --set $ONOMY_APP_CONFIG api enable true
+crudini --set $ONOMY_APP_CONFIG api swagger true
 
 echo "The initialisation of $ONOMY_NODE_NAME is done"

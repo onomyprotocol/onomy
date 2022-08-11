@@ -30,7 +30,7 @@ Clone the latest release of github repo
 git clone https://github.com/onomyprotocol/onomy.git
 ```
 
-Pass through the [full node](../../deploy/testnet/full.md) instruction
+Pass through the [full node](../../deploy/testnet/docs/full.md) instruction
 
 ### Check the status of the Onomy Network Testnet
 
@@ -92,7 +92,7 @@ rm -rf $HOME/raw.json
 
 ## Increasing the default open files limit
 
-The example for ([Red Hat Enterprise Linux](../../deploy/testnet/set-ulimit-rhel8.md)).
+The example for ([Red Hat Enterprise Linux](../../deploy/testnet/docs/set-ulimit-rhel8.md)).
 
 If we don't raise this value nodes will crash once the network grows large enough
 
