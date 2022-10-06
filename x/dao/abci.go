@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"fmt"
+	"runtime/debug"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
@@ -16,7 +16,8 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
 	if err := endBlocker(ctx, k); err != nil {
-		panic(fmt.Sprintf("%s EndBlocker, %v", types.ModuleName, err))
+		k.Logger(ctx).Error("dao EndBlocker error: %v", err)
+		debug.PrintStack()
 	}
 }
 
