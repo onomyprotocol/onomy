@@ -3,7 +3,7 @@
 At [Onomy Protocol](https://onomy.io/), we are excited to launch our public testnet for the Onomy Network (ONET)
 blockchain.
 
-As a Cosmos Tendermint-based chain, the ONET works via a Proof of Stake consensus mechanism, where the bNOM and it's 10^18 NOM representation is bonded to
+As a Cosmos Tendermint-based chain, the ONET works via a Proof of Stake consensus mechanism, where the aNOM and it's 10^18 NOM representation is bonded to
 validators either directly or through delegation. The ONET will power the Onomy Exchange (hybrid DEX) and Onomy
 Reserve (stablecoin issuance), whilst operating with 100x the efficiency of Ethereum and facilitating inter-chain asset
 trading of NOM, Onomy's stablecoins, and other crypto assets.
