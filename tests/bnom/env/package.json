@@ -5,7 +5,7 @@
     "clean": "shx rm -rf ./artifacts ./cache ./coverage ./typechain ./coverage.json",
     "compile": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat compile",
     "deploy": "hardhat deploy:Greeter",
-    "evm_fork_rinkeby": "npx hardhat node --fork https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_KEY} --fork-block-number 9509500",
+    "evm_fork_goerli": "npx hardhat node --fork https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_KEY} --fork-block-number 7864782",
     "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,sol,ts}\"",
     "prettier:check": "prettier --check --config ./.prettierrc.yaml \"**/*.{js,json,md,sol,ts}\"",
     "test": "hardhat test",

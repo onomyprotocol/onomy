@@ -1,5 +1,4 @@
 import "@nomiclabs/hardhat-waffle";
-import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 
@@ -85,11 +84,7 @@ const config: HardhatUserConfig = {
         runs: 800,
       },
     },
-  },
-  typechain: {
-    outDir: "typechain",
-    target: "ethers-v5",
-  },
+  }
 };
 
 export default config;

@@ -2,5 +2,4 @@
 set -eu
 
 echo "Running evm fork"
-
-npm run evm_fork_rinkeby
+npm run evm_fork_goerli

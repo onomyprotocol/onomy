@@ -26,7 +26,8 @@ func TestIntegrationBnomToAnom(t *testing.T) { // nolint:gocyclo, cyclop
 	const (
 		bootstrappingTimeout    = time.Minute
 		onomyDestinationAddress = "onomy1txg674n2km4ft6jfdccs94xtg8vl2kyksw3scl"
-		fauTokeAddress          = "0xFab46E002BbF0b4509813474841E0716E6730136"
+		// https://erc20faucet.com/
+		fauTokeAddress = "0xBA62BCfcAaFc6622853cca2BE6Ac7d845BC0f2Dc"
 	)
 
 	bnomTestsBaseContainer, err := newBnomTestsBaseContainer(ctx)
