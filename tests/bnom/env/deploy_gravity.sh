@@ -22,7 +22,6 @@ ETH_ORCHESTRATOR_PRIVATE_KEY=c40f62e75a11789dbaf6ba82233ce8a52c20efb434281ae6977
 #-------------------- Deploy the contract --------------------
 
 echo "Deploying Gravity contract"
-
 cd /root/home/gravity/solidity
 ./contract-deployer \
 --cosmos-node="http://$ONOMY_HOST:26657" \
@@ -30,7 +29,7 @@ cd /root/home/gravity/solidity
 --eth-privkey="$ETH_ORCHESTRATOR_PRIVATE_KEY" \
 --contract=Gravity.json \
 --test-mode=false \
---bnom-address="0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C" | grep "Gravity deployed at Address" | grep -Eow '0x[0-9a-fA-F]{40}' > gravity_contract_address
+--bnom-address="0x8EFe26D6839108E831D3a37cA503eA4F136A8E73" | grep "Gravity deployed at Address" | grep -Eow '0x[0-9a-fA-F]{40}' > gravity_contract_address
 
 GRAVITY_CONTRACT_ADDRESS=$(cat gravity_contract_address)
 cp gravity_contract_address $ORIGINAL_DIR/gravity_contract_address

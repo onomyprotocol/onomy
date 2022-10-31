@@ -35,8 +35,7 @@ var (
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
-type QueryParamsRequest struct {
-}
+type QueryParamsRequest struct{}
 
 func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
 func (m *QueryParamsRequest) String() string { return proto.CompactTextString(m) }
@@ -121,8 +120,7 @@ func (m *QueryParamsResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_QueryParamsResponse proto.InternalMessageInfo
 
 // QueryTreasuryRequest is request type for the Query/Treasury RPC method.
-type QueryTreasuryRequest struct {
-}
+type QueryTreasuryRequest struct{}
 
 func (m *QueryTreasuryRequest) Reset()         { *m = QueryTreasuryRequest{} }
 func (m *QueryTreasuryRequest) String() string { return proto.CompactTextString(m) }
@@ -301,8 +299,7 @@ type QueryServer interface {
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
-type UnimplementedQueryServer struct {
-}
+type UnimplementedQueryServer struct{}
 
 func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")

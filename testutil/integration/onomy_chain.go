@@ -30,7 +30,7 @@ const (
 	// AnomDenom is anom name .
 	AnomDenom = "anom"
 	// BnomERC20Address is bnom eth address .
-	BnomERC20Address = "0xe7c0fd1f0A3f600C1799CD8d335D31efBE90592C"
+	BnomERC20Address = "0x8EFe26D6839108E831D3a37cA503eA4F136A8E73"
 
 	// ChainName is default test chain name.
 	ChainName = "chain-1"
