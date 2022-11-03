@@ -18,9 +18,8 @@ jobs:
           - name: VALSET_STRESS
           - name: BATCH_STRESS
           - name: V2_HAPPY_PATH
-          # TODO migrate the test to goerli
-          # - name: RELAY_MARKET
-          #  secret_arg: ALCHEMY_KEY
+          - name: RELAY_MARKET
+            secret_arg: ALCHEMY_KEY
           - name: ORCHESTRATOR_KEYS
           - name: VALSET_REWARDS
           - name: EVIDENCE
