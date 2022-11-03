@@ -13,13 +13,6 @@ jobs:
         uses: actions/checkout@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
       - name: Generate build number
         id: buildnumber
         uses: einaregilsson/build-number@v3
@@ -36,9 +29,3 @@ jobs:
           file: deploy/devnet/Dockerfile
           push: true
           tags: onomy/onomy-devnet:v-${{ steps.buildnumber.outputs.build_number }}, onomy/onomy-devnet:latest
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
