@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'dev'
+      - 'dzmitryhil/fix-docker-pipeline'
 
 jobs:
   docker:
