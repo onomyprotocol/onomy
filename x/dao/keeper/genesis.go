@@ -10,8 +10,15 @@ import (
 func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) error {
 	k.SetParams(ctx, genState.Params)
 
-	balance := genState.TreasuryBalance
-	return k.bankKeeper.MintCoins(ctx, types.ModuleName, balance)
+	// if the height is 1 or 0 the chain is in the initial state
+	if ctx.BlockHeight() <= 1 {
+		balance := genState.TreasuryBalance
+		if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, balance); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
