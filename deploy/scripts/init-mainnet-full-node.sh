@@ -7,7 +7,7 @@ echo "Initializing full node"
 ONOMY_HOME=$HOME/.onomy
 
 # Name of the network to bootstrap
-CHAINID="onomy-testnet-1"
+CHAINID="onomy-mainnet-1"
 # The address to run onomy node
 ONOMY_HOST="0.0.0.0"
 # The port of the onomy gRPC
@@ -21,7 +21,7 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 # Chain ID flag
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seeds IPs
-ONOMY_SEEDS_DEFAULT_IPS="64.9.136.119,64.9.136.120,54.88.212.224"
+ONOMY_SEEDS_DEFAULT_IPS="3.88.76.0,3.226.87.93,54.88.212.224"
 # Statysync servers default IPs
 ONOMY_STATESYNC_SERVERS_DEFAULT_IPS="3.219.52.168,44.206.144.197"
 
@@ -62,7 +62,7 @@ echo "Initializing chain"
 onomyd $ONOMY_CHAINID_FLAG init $ONOMY_NODE_NAME
 
 #copy genesis file
-cp -r ../genesis/genesis-testnet-1.json $ONOMY_HOME_CONFIG/genesis.json
+cp -r ../../genesis/mainnet/genesis-mainnet-1.json $ONOMY_HOME_CONFIG/genesis.json
 
 echo "Updating node config"
 
