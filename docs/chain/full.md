@@ -1,6 +1,22 @@
 # Steps to run the full node
 
-* Go to [scripts](../scripts) folder
+# How to Run an Onomy Full Node
+
+As a Cosmos-based chain, the ONET full nodes are similar to any Cosmos full nodes. Unlike the validator flow, running a
+full node requires no external software.
+
+## Getting Started
+
+System requirements:
+
+- Any modern Linux distribution (RHEL 8 or Fedora 36 are preferred)
+- A quad-core CPU
+- 16 GiB RAM
+- 320gb of storage space
+
+## Run the full node
+
+* Go to "deploy/scripts" folder of the repository
 
 * Make the scripts executable
 
@@ -8,17 +24,7 @@
     chmod +x *
     ```
 
-* Install dependencies from source code
-
-    ```
-    ./bin.sh
-    ```
-
-* Init full node
-
-    ```
-    ./init-full-node.sh
-    ```
+* Install chain binaries using the doc [installation](installation.md).
 
 * Optionally expose monitoring
 
@@ -40,7 +46,7 @@
 
 * Start the node
 
-  Before running the script please set up "ulimit > 65535"
+  Before running the script please set up "ulimit > 65535" ([Red Hat Enterprise Linux](set-ulimit-rhel8.md))
 
   ```
   ./start-cosmovisor-onomyd.sh &>> $HOME/.onomy/logs/onomyd.log &

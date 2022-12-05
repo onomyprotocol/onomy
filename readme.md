@@ -15,10 +15,13 @@ Users can easily manage assets from connected networks via Onomy Access (multi-c
 ✨[Twitter](https://twitter.com/OnomyProtocol)
 ✨[Medium](https://medium.com/onomy-protocol) 
 
+# Mainnet
+
+Join the Mainnet! You can find the documentation [here](docs/chain/mainnet.md)
 
 # Testnet
 
-Join the Testnet #1! You can find the testnet documentation [here](docs/testnet/readme.md) 
+Join the Testnet! You can find the documentation [here](docs/chain/testnet.md) 
 
 # Development
 
