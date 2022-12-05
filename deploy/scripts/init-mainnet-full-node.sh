@@ -21,9 +21,9 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 # Chain ID flag
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seeds IPs
-ONOMY_SEEDS_DEFAULT_IPS="3.88.76.0,3.226.87.93,54.88.212.224"
+ONOMY_SEEDS_DEFAULT_IPS="44.213.44.5,3.210.0.126"
 # Statysync servers default IPs
-ONOMY_STATESYNC_SERVERS_DEFAULT_IPS="3.219.52.168,44.206.144.197"
+ONOMY_STATESYNC_SERVERS_DEFAULT_IPS="52.70.182.125,44.195.221.88"
 
 read -r -p "Enter a name for your node [onomy]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy}
@@ -62,7 +62,7 @@ echo "Initializing chain"
 onomyd $ONOMY_CHAINID_FLAG init $ONOMY_NODE_NAME
 
 #copy genesis file
-cp -r ../../genesis/mainnet/genesis-mainnet-1.json $ONOMY_HOME_CONFIG/genesis.json
+cp -r ../genesis/genesis-mainnet-1.json $ONOMY_HOME_CONFIG/genesis.json
 
 echo "Updating node config"
 
