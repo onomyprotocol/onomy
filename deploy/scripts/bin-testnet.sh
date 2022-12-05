@@ -1,13 +1,11 @@
 #Setting up constants
 ONOMY_HOME=$HOME/.onomy
 
-ONOMY_VERSION="v0.0.7"
-NODE_EXPORTER_VERSION="0.18.1"
+ONOMY_VERSION="v0.1.0"
 COSMOVISOR_VERSION="cosmovisor-v1.0.1"
 
 mkdir -p $ONOMY_HOME
 mkdir -p $ONOMY_HOME/bin
-mkdir -p $ONOMY_HOME/contracts
 mkdir -p $ONOMY_HOME/logs
 mkdir -p $ONOMY_HOME/cosmovisor/genesis/bin
 mkdir -p $ONOMY_HOME/cosmovisor/upgrades/bin

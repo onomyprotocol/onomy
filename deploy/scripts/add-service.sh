@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -e
 
 NAME=$1
 START_SCRIPT=$2
@@ -27,8 +27,6 @@ Environment=\"PATH=$PATH\"
 Environment=\"DAEMON_HOME=$DAEMON_HOME\"
 Environment=\"DAEMON_NAME=$DAEMON_NAME\"
 Environment=\"DAEMON_RESTART_AFTER_UPGRADE=$DAEMON_RESTART_AFTER_UPGRADE\"
-Environment=\"CHAIN_SCRIPTS=$PWD/\"
-Environment=\"ETH_RPC_ADDRESS=$ETH_RPC_ADDRESS\"
 ExecStart=/bin/bash $START_SCRIPT
 Restart=always
 RestartSec=3
