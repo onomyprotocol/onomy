@@ -62,7 +62,7 @@ echo "Initializing chain"
 onomyd $ONOMY_CHAINID_FLAG init $ONOMY_NODE_NAME
 
 #copy genesis file
-cp -r ../../genesis/testnet/genesis-testnet-1.json $ONOMY_HOME_CONFIG/genesis.json
+cp genesis-testnet-1.json $ONOMY_HOME_CONFIG/genesis.json
 
 echo "Updating node config"
 
