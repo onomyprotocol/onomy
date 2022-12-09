@@ -70,16 +70,16 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/cosmos/ibc-go/v2/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v2/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v2/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v2/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v2/modules/core/02-client"
-	ibcclientclient "github.com/cosmos/ibc-go/v2/modules/core/02-client/client"
-	ibcclienttypes "github.com/cosmos/ibc-go/v2/modules/core/02-client/types"
-	ibcporttypes "github.com/cosmos/ibc-go/v2/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/v2/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/v2/modules/core/keeper"
+	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v3/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
+	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	"github.com/spf13/cast"
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 	"github.com/tendermint/starport/starport/pkg/openapiconsole"
@@ -92,6 +92,7 @@ import (
 	"github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity"
 	gravitykeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
 	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
+	upgrade_v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -324,19 +325,23 @@ func New( // nolint:funlen // app new cosmos func
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
+	app.UpgradeKeeper.SetUpgradeHandler(upgrade_v1_0_1.Name, upgrade_v1_0_1.UpgradeHandler)
+
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
+		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), &app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
 	)
 
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-
+	var (
+		transferModule    = transfer.NewAppModule(app.TransferKeeper)
+		transferIBCModule = transfer.NewIBCModule(app.TransferKeeper)
+	)
 	// Create evidence Keeper for to register the IBC light client misbehavior evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec, keys[evidencetypes.StoreKey], &app.StakingKeeper, app.SlashingKeeper,
@@ -346,7 +351,7 @@ func New( // nolint:funlen // app new cosmos func
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -444,11 +449,25 @@ func New( // nolint:funlen // app new cosmos func
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
-		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, feegrant.ModuleName,
+		upgradetypes.ModuleName,
+		capabilitytypes.ModuleName,
+		minttypes.ModuleName,
+		distrtypes.ModuleName,
+		slashingtypes.ModuleName,
+		evidencetypes.ModuleName,
+		stakingtypes.ModuleName,
+		feegrant.ModuleName,
+		ibchost.ModuleName,
+		ibctransfertypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, gravitytypes.ModuleName, daotypes.ModuleName,
+		crisistypes.ModuleName,
+		govtypes.ModuleName,
+		stakingtypes.ModuleName,
+		gravitytypes.ModuleName,
+		daotypes.ModuleName,
+		ibchost.ModuleName,
+		ibctransfertypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -472,6 +491,7 @@ func New( // nolint:funlen // app new cosmos func
 		ibctransfertypes.ModuleName,
 		gravitytypes.ModuleName,
 		daotypes.ModuleName,
+		ibctransfertypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
