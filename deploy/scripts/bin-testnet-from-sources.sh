@@ -3,7 +3,7 @@ ONOMY_HOME=$HOME/.onomy
 ONOMY_SRC=$ONOMY_HOME/src/onomy
 COSMOVISOR_SRC=$ONOMY_HOME/src/cosmovisor
 
-ONOMY_VERSION="v0.1.0"
+ONOMY_VERSION="v1.0.1"
 COSMOVISOR_VERSION="cosmovisor-v1.0.1"
 
 mkdir -p $ONOMY_HOME
@@ -11,17 +11,17 @@ mkdir -p $ONOMY_HOME/src
 mkdir -p $ONOMY_HOME/bin
 mkdir -p $ONOMY_HOME/logs
 mkdir -p $ONOMY_HOME/cosmovisor/genesis/bin
-mkdir -p $ONOMY_HOME/cosmovisor/upgrades/bin
+mkdir -p $ONOMY_HOME/cosmovisor/upgrades/
 
 echo "-----------installing dependencies---------------"
 sudo dnf -y update
 sudo dnf -y copr enable ngompa/musl-libc
 sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 sudo dnf -y install subscription-manager
+sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
 sudo dnf makecache --refresh
-sudo dnf -y --skip-broken install curl nano ca-certificates tar git jq gcc-c++ gcc-toolset-9 openssl-devel musl-devel musl-gcc gmp-devel perl python3 moreutils wget nodejs make hostname procps-ng pass libsecret pinentry crudini
-
+sudo dnf -y --skip-broken install curl nano ca-certificates tar git jq gcc-c++ gcc-toolset-9 openssl-devel musl-devel musl-gcc gmp-devel perl python3 moreutils wget nodejs make hostname procps-ng pass libsecret pinentry crudini cmake
 
 gcc_source="/opt/rh/gcc-toolset-9/enable"
 if test -f $gcc_source; then
