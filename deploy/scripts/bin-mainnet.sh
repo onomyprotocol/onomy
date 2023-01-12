@@ -1,7 +1,7 @@
 #Setting up constants
 ONOMY_HOME=$HOME/.onomy
 
-ONOMY_VERSION="v1.0.0"
+ONOMY_VERSION="v1.0.1"
 COSMOVISOR_VERSION="cosmovisor-v1.0.1"
 
 mkdir -p $ONOMY_HOME
@@ -9,7 +9,7 @@ mkdir -p $ONOMY_HOME/bin
 mkdir -p $ONOMY_HOME/contracts
 mkdir -p $ONOMY_HOME/logs
 mkdir -p $ONOMY_HOME/cosmovisor/genesis/bin
-mkdir -p $ONOMY_HOME/cosmovisor/upgrades/bin
+mkdir -p $ONOMY_HOME/cosmovisor/upgrades/
 
 echo "-----------installing dependencies---------------"
 sudo dnf -y update

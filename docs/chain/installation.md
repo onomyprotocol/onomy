@@ -6,7 +6,7 @@ you will be generating.
 
 ## Bootstrapping steps and commands
 
-Start by logging into your Linux server. The following commands are intended to be run on that machine. 
+Start by logging into your Linux server. The following commands are intended to be run on that machine.
 
 1. [Install binaries using scripts](#installWithScripts)
 2. [Install compiled binaries](#installCompiled)
@@ -15,15 +15,15 @@ Start by logging into your Linux server. The following commands are intended to 
 
 1. Clone Onomy repo. (You might need to install git using `dnf install git`).
 
-```
-git clone https://github.com/onomyprotocol/onomy.git
-```
+    ```
+    git clone https://github.com/onomyprotocol/onomy.git
+    ```
 
 2. Run the installation script
 
-```
-cd onomy/deploy/scripts
-```
+    ```
+    cd onomy/deploy/scripts
+    ```
 
 * Install dependencies from compiled binaries
 
@@ -57,29 +57,21 @@ To download and install binaries follow these steps
 
 * Create new bin dir
 
-```
-cd $HOME/.onomy/bin
-```
+    ```
+    cd $HOME/.onomy/bin
+    ```
 
 * Download binaries
 
-For mainnet
-
-   ```
-   wget https://github.com/onomyprotocol/onomy/releases/download/v1.0.0/onomyd
-   ```
-
-For testnet
-
-   ```
-   wget https://github.com/onomyprotocol/onomy/releases/download/v0.1.0/onomyd
-   ```
+    ```
+    wget https://github.com/onomyprotocol/onomy/releases/download/v1.0.1/onomyd
+    ```
 
 * Make binaries executable
 
-```
-chmod +x *
-```
+    ```
+    chmod +x *
+    ```
 
 3. You can now use these binaries, but in order to use them from anywhere in your terminal, you will need add them to
    $PATH variable
