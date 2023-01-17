@@ -17,6 +17,7 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	sdkTypes "github.com/cosmos/cosmos-sdk/types"
@@ -163,6 +164,24 @@ func (oc *OnomyChain) GetAccountBalance(address string) ([]sdkTypes.Coin, error)
 		return nil, err
 	}
 	return balances.Balances, nil
+}
+
+// ExecuteValidatorTx executes the chain CLI tx command from validator account.
+// Example of usage:
+// onomyChain.ExecuteValidatorTx("tx dao fund-account onomy1qe082nde7s9jpcw02emkz8256frd86mazg007y 1anom --title=T  --deposit=1anom --description=D") .
+func (oc *OnomyChain) ExecuteValidatorTx(cmd string) {
+	argsSlice := make([]string, 0)
+
+	argsSlice = append(argsSlice, []string{
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, TestChainValidator1Name),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, fmt.Sprintf("%d%s", 1000, ChainDenom)), // nolint:gomnd //test constant
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		KeyRingFlag,
+		oc.homeFlag,
+	}...)
+
+	ExecuteChainCmd(cmd, argsSlice...)
 }
 
 // ExecuteChainCmd executes any cmd on the onomyd cli.
