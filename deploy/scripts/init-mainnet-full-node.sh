@@ -22,8 +22,6 @@ ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seeds IPs
 ONOMY_SEEDS_DEFAULT_IPS="44.213.44.5,3.210.0.126"
-# Statysync servers default IPs
-ONOMY_STATESYNC_SERVERS_DEFAULT_IPS="52.70.182.125,44.195.221.88"
 
 read -r -p "Enter a name for your node [onomy]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy}
@@ -65,30 +63,6 @@ onomyd $ONOMY_CHAINID_FLAG init $ONOMY_NODE_NAME
 cp -r ../genesis/genesis-mainnet-1.json $ONOMY_HOME_CONFIG/genesis.json
 
 echo "Updating node config"
-
-read -r -p "Do you want to setup state-sync?(y/n)[N]: " statesync
-statesync=${statesync:-n}
-
-statesync_nodes=
-blk_height=
-blk_hash=
-if [[ $statesync = 'y' ]] || [[ $statesync = 'Y' ]]; then
-    read -r -p "Enter IPs of statesync nodes (at least 2) [$ONOMY_STATESYNC_SERVERS_DEFAULT_IPS]:" statesync_ips
-    statesync_ips=${statesync_ips:-$ONOMY_STATESYNC_SERVERS_DEFAULT_IPS}
-    for statesync_ip in ${statesync_ips//,/ } ; do
-      blk_details=$(curl -s http://$statesync_ip:26657/block | jq -r '.result.block.header.height + "\n" + .result.block_id.hash')
-      blk_height=$(echo $blk_details | cut -d$' ' -f1)
-      blk_hash=$(echo $blk_details | cut -d$' ' -f2)
-      statesync_nodes="$statesync_nodes$statesync_ip:26657,"
-    done
-
-    # Change statesync settings
-    crudini --set $ONOMY_NODE_CONFIG statesync enable true
-    crudini --set $ONOMY_NODE_CONFIG statesync rpc_servers "\"$statesync_nodes\""
-    crudini --set $ONOMY_NODE_CONFIG statesync trust_height $blk_height
-    crudini --set $ONOMY_NODE_CONFIG statesync trust_hash "\"$blk_hash\""
-    echo "Setup for statesync is complete"
-fi
 
 # change config
 crudini --set $ONOMY_NODE_CONFIG p2p addr_book_strict false

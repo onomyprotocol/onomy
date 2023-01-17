@@ -12,7 +12,7 @@ System requirements:
 - Any modern Linux distribution (RHEL 8 or Fedora 36 are preferred)
 - A quad-core CPU
 - 16 GiB RAM
-- 320gb of storage space
+- 1TB of storage space
 
 ## Run the full node
 
@@ -23,8 +23,31 @@ System requirements:
     ```
     chmod +x *
     ```
+* Install chain binaries using the doc [installation](installation.md).  
 
-* Install chain binaries using the doc [installation](installation.md).
+* Init node.
+
+  For the `mainnet`
+  ```
+  ./init-mainnet-full-node.sh
+  ```
+
+  For the `testnet`
+  ```
+  ./init-testnet-full-node.sh
+  ```
+
+* Init statesync or use [genesis binaries](genesis-binaries.md) instruction to run from the genesis block.
+
+  For the `mainnet`
+  ```
+  ./init-mainnet-statesync.sh
+  ```
+
+  For the `testnet`
+  ```
+  ./init-testnet-statesync.sh
+  ```
 
 * Optionally expose monitoring
 
@@ -52,7 +75,7 @@ System requirements:
   ./start-cosmovisor-onomyd.sh &>> $HOME/.onomy/logs/onomyd.log &
   ```
 
-  Or If you want to run the node without cosmovisor:
+  Or If you want to run the node without cosmovisor (not supported by the genesis binaries):
 
   ```
   ./start-onomyd.sh &>> $HOME/.onomy/logs/onomyd.log &
@@ -64,7 +87,7 @@ System requirements:
   ./add-service.sh cosmovisor-onomyd ${PWD}/start-cosmovisor-onomyd.sh
   ```
 
-  Or If you want to run the node without cosmovisor:
+  Or If you want to run the node without cosmovisor (not supported by the genesis binaries):
 
   ```
   ./add-service.sh onomyd ${PWD}/start-onomyd.sh
