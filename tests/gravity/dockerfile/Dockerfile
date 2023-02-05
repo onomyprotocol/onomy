@@ -7,7 +7,7 @@ RUN rm /root/go.tar.gz
 ENV PATH=$PATH:/root/go/bin
 ENV GOPATH=/root/go
 
-ADD https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.10-bb74230f.tar.gz /geth/
+ADD https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.26-e5eb32ac.tar.gz /geth/
 RUN cd /geth && tar -xvf * && mv /geth/**/geth /usr/bin/geth
 # this is the Gravity bridge release, update it along with your go.mod entry
 ARG ETH_BRIDGE_VERSION="v0.1.0eth2"
