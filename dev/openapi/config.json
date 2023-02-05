@@ -127,7 +127,59 @@
       "url": "./tmp-swagger-gen/gravity/v1/query.swagger.json",
       "operationIds": {
         "rename": {
-          "Params": "Gravity"
+          "Params": "GravityParams",
+          "BatchConfirms": "GravityBatchConfirms",
+          "OutgoingLogicCalls": "GravityOutgoingLogicCalls",
+          "OutgoingTxBatches": "GravityOutgoingTxBatches",
+          "LastPendingBatchRequestByAddr": "GravityLastPendingBatchRequestByAddr",
+          "BatchRequestByNonce": "GravityBatchRequestByNonce",
+          "BatchFees": "GravityBatchFees",
+          "ValsetConfirmsByNonce": "GravityValsetConfirmsByNonce",
+          "DenomToERC20": "GravityDenomToERC20",
+          "ERC20ToDenom": "GravityERC20ToDenom",
+          "LogicConfirms": "GravityLogicConfirms",
+          "LastPendingLogicCallByAddr": "GravityLastPendingLogicCallByAddr",
+          "LastEventNonceByAddr": "GravityLastEventNonceByAddr",
+          "GetAttestations": "GravityGetAttestations",
+          "GetDelegateKeyByEth": "GravityGetDelegateKeyByEth",
+          "GetDelegateKeyByOrchestrator": "GravityGetDelegateKeyByOrchestrator",
+          "GetDelegateKeyByValidator": "GravityGetDelegateKeyByValidator",
+          "GetPendingSendToEth": "GravityGetPendingSendToEth",
+          "ValsetRequest": "GravityValsetRequest",
+          "ValsetConfirm": "GravityValsetConfirm",
+          "CurrentValset": "GravityCurrentValset",
+          "LastPendingValsetRequestByAddr": "GravityLastPendingValsetRequestByAddr",
+          "LastValsetRequests": "GravityLastValsetRequests"
+        }
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/arcbnb/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "ArcBnbParams",
+          "BatchConfirms": "ArcBnbBatchConfirms",
+          "OutgoingLogicCalls": "ArcBnbOutgoingLogicCalls",
+          "OutgoingTxBatches": "ArcBnbOutgoingTxBatches",
+          "LastPendingBatchRequestByAddr": "ArcBnbLastPendingBatchRequestByAddr",
+          "BatchRequestByNonce": "ArcBnbBatchRequestByNonce",
+          "BatchFees": "ArcBnbBatchFees",
+          "ValsetConfirmsByNonce": "ArcBnbValsetConfirmsByNonce",
+          "DenomToERC20": "ArcBnbDenomToERC20",
+          "ERC20ToDenom": "ArcBnbERC20ToDenom",
+          "LogicConfirms": "ArcBnbLogicConfirms",
+          "LastPendingLogicCallByAddr": "ArcBnbLastPendingLogicCallByAddr",
+          "LastEventNonceByAddr": "ArcBnbLastEventNonceByAddr",
+          "GetAttestations": "ArcBnbGetAttestations",
+          "GetDelegateKeyByEth": "ArcBnbGetDelegateKeyByEth",
+          "GetDelegateKeyByOrchestrator": "ArcBnbGetDelegateKeyByOrchestrator",
+          "GetDelegateKeyByValidator": "ArcBnbGetDelegateKeyByValidator",
+          "GetPendingSendToEth": "ArcBnbGetPendingSendToEth",
+          "ValsetRequest": "ArcBnbValsetRequest",
+          "ValsetConfirm": "ArcBnbValsetConfirm",
+          "CurrentValset": "ArcBnbCurrentValset",
+          "LastPendingValsetRequestByAddr": "ArcBnbLastPendingValsetRequestByAddr",
+          "LastValsetRequests": "ArcBnbLastValsetRequests"
         }
       }
     },
@@ -135,7 +187,7 @@
       "url": "./tmp-swagger-gen/onomyprotocol/dao/v1/query.swagger.json",
       "operationIds": {
         "rename": {
-          "Params": "DAO"
+          "Params": "DAOParams"
         }
       }
     }
