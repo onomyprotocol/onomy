@@ -26,7 +26,8 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
+	arcbnbtypes "github.com/onomyprotocol/arc/module/bnb/x/gravity/types"
+	arcethtypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
 	"github.com/onomyprotocol/onomy/app"
 )
 
@@ -238,15 +239,19 @@ func (s *SimApp) CreateValidator(
 	require.NoError(t, err)
 	messages = append(messages, createValidatorMsg)
 
-	setOrchestratorAddressMsg := &gravitytypes.MsgSetOrchestratorAddress{
+	setArcEthOrchestratorAddressMsg := &arcethtypes.MsgSetOrchestratorAddress{
 		Validator:    createValidatorMsg.ValidatorAddress,
 		Orchestrator: address.String(),
 		EthAddress:   gethcommon.BytesToAddress(bytes.Repeat([]byte{byte(1)}, 20)).String(), // nolint:gomnd // eth address
 	}
+	messages = append(messages, setArcEthOrchestratorAddressMsg)
 
-	if selfDelegation.Amount.GTE(sdk.DefaultPowerReduction) {
-		messages = append(messages, setOrchestratorAddressMsg)
+	setArcBnbOrchestratorAddressMsg := &arcbnbtypes.MsgSetOrchestratorAddress{
+		Validator:    createValidatorMsg.ValidatorAddress,
+		Orchestrator: address.String(),
+		EthAddress:   gethcommon.BytesToAddress(bytes.Repeat([]byte{byte(1)}, 20)).String(), // nolint:gomnd // eth address
 	}
+	messages = append(messages, setArcBnbOrchestratorAddressMsg)
 
 	s.sendTx(t, priv, messages...)
 }

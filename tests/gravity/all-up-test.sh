@@ -4,7 +4,7 @@ set -eux
 # to be run with any PWD
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-result=$( docker images -q onomy-gravity-base )
+result=$( docker images -q onomy-arc-base )
 
 # builds the container containing various system deps
 # also builds Gravity once in order to cache Go deps, this container
@@ -39,4 +39,4 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 # Run new test container instance
-docker run --name onomy_gravity_all_up_test_instance $PLATFORM_CMD --cap-add=NET_ADMIN -t onomy-gravity-base /bin/bash /onomy/tests/gravity/container-scripts/all-up-test-internal.sh $NODES $TEST_TYPE $ALCHEMY_ID
+docker run --name onomy_gravity_all_up_test_instance $PLATFORM_CMD --cap-add=NET_ADMIN -t onomy-arc-base /bin/bash /onomy/tests/gravity/container-scripts/all-up-test-internal.sh $NODES $TEST_TYPE $ALCHEMY_ID

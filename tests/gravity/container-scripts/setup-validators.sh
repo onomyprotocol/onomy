@@ -79,13 +79,34 @@ $BIN gravity gentx $ARGS $ONOMY_HOME --moniker validator$i --chain-id=$CHAIN_ID 
 if [ $i -gt 1 ]; then
 cp /validator$i/config/gentx/* /validator1/config/gentx/
 fi
-done
 
+# FIXME remove sleep !!!
+echo "sleeping..."
+sleep 10000000000000000
+
+# generate and sign other genesis arc transactions
+$BIN tx arcbnb set-orchestrator-address $($BIN keys show val -a) $ORCHESTRATOR_KEY $ETHEREUM_KEY --generate-only > /validator$i/add-arc-genesis-unsigned.json
+$BIN tx sign /validator$i/add-arc-genesis-unsigned.json \
+    --from validator$i \
+    --output-document /validator$i/add-arc-genesis-signed.json \
+    --offline \
+    --sequence=0 \
+    --account-number=0 \
+    $ARGS \
+    --chain-id=$CHAIN_ID
+done
 
 $BIN gravity collect-gentxs $STARTING_VALIDATOR_HOME
 GENTXS=$(ls /validator1/config/gentx | wc -l)
 cp /validator1/config/genesis.json /genesis.json
 echo "Collected $GENTXS gentx"
+
+# Add other arc genesis transactions
+for i in $(seq 1 $NODES);
+do
+echo "Collecting $NODES arc transactions"
+
+done
 
 # put the now final genesis.json into the correct folders
 for i in $(seq 1 $NODES);

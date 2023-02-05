@@ -17,6 +17,8 @@ ERC20_TOKEN_ADDRESS="$1"
 ERC20_TOKEN_AMOUNT="$2"
 COSMOS_DESTINATION_ADDRESS="$3"
 
+echo "Sending to cosmos address: $COSMOS_DESTINATION_ADDRESS, token: $ERC20_TOKEN_ADDRESS $ERC20_TOKEN_AMOUNT  orchestrator."
+
 gbt -a "$ONOMY_ADDRESS_PREFIX" client eth-to-cosmos \
         --ethereum-key "$ETH_ORCHESTRATOR_PRIVATE_KEY" \
         --ethereum-rpc="$ETH_ADDRESS" \

@@ -11,6 +11,7 @@ require (
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/onomyprotocol/arc/module/bnb v0.0.0-00010101000000-000000000000
 	github.com/onomyprotocol/cosmos-gravity-bridge/module v0.0.0-20220606130009-db180e048abe
 	github.com/onomyprotocol/tm-load-test v0.9.1-0.20211101093435-b38e68e11c01
 	github.com/spf13/cast v1.4.1
@@ -32,5 +33,6 @@ replace (
 	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.44.6-0.20221103153534-77ffa1c3fab2
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/keybase/go-keychain => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
+	github.com/onomyprotocol/arc/module/bnb => github.com/onomyprotocol/arc/module v0.0.0-20230202190859-8e0556466b4b
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )

@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -38,6 +39,18 @@ const (
 	ChainFlag = "--chain-id=" + ChainName
 	// KeyRingFlag is default keyring flag.
 	KeyRingFlag = "--keyring-backend=test"
+	// OfflineFlag is flag for signing offline txs.
+	OfflineFlag = "--offline"
+	// AccountNumberFlag is flag to set account number.
+	AccountNumberFlag = "--account-number"
+	// SequenceFlag is flag to set account tx sequence number.
+	SequenceFlag = "--sequence"
+	// GenerateOnlyFlag is flag to generate only the tx.
+	GenerateOnlyFlag = "--generate-only"
+	// FromFlag is flag to specify from whom the tx.
+	FromFlag = "--from"
+	// BenchFlag is flag to specify address format.
+	BenchFlag   = "--bech"
 	jsonOutFlag = "--output=json"
 	// ChainDenom is default chain denom.
 	ChainDenom = AnomDenom
@@ -54,6 +67,9 @@ const (
 	// TestChainValidator1EthAddress is default validator eth pub key.
 	TestChainValidator1EthAddress = "0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d"
 
+	gentxFolder  = "gentx"
+	configFolder = "config"
+
 	// OnomyGrpcHost is default host.
 	OnomyGrpcHost = "127.0.0.1"
 	// OnomyGrpcPort is default port.
@@ -61,6 +77,9 @@ const (
 
 	// GravityBridge is the prefix/name for the gravity bridge.
 	GravityBridge = "gravity"
+
+	// ArcBnbBridge is the prefix/name for the arc bnb bridge.
+	ArcBnbBridge = "arcbnb"
 )
 
 // OnomyChain is test struct for the chain running.
@@ -133,6 +152,52 @@ func NewOnomyChain() (*OnomyChain, error) {
 
 	// gravity collect gentx
 	ExecuteChainCmd(fmt.Sprintf("%s collect-gentxs", GravityBridge), homeFlag)
+
+	// prepare arc bnb
+	valoper := ExecuteChainCmd("keys",
+		"show",
+		TestChainValidator1Name,
+		BenchFlag, "val", "-a",
+		KeyRingFlag,
+		homeFlag)
+	valoper = strings.TrimSpace(valoper)
+
+	// arcbnb generate set-orchestrator-address transaction
+	arcBnbSetOrchestratorAddressUnsignedTx := ExecuteChainCmd(fmt.Sprintf("tx %s set-orchestrator-address", ArcBnbBridge),
+		valoper,
+		val1KeyOutput.Address,
+		TestChainValidator1EthAddress,
+		GenerateOnlyFlag,
+		ChainFlag,
+		KeyRingFlag,
+		FromFlag, val1KeyOutput.Address,
+		homeFlag)
+
+	arcBnbSetOrchestratorAddressUnsignedTxFileName := "arcBnbSetOrchestratorAddressUnsignedTx.json"
+	arcBnbSetOrchestratorAddressUnsignedTxPath := path.Join(dir, configFolder, arcBnbSetOrchestratorAddressUnsignedTxFileName)
+	f, err := os.Create(arcBnbSetOrchestratorAddressUnsignedTxPath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	if _, err = f.WriteString(arcBnbSetOrchestratorAddressUnsignedTx); err != nil {
+		return nil, err
+	}
+
+	// arcbnb sign set-orchestrator-address transaction
+	arcBnbSetOrchestratorAddressSignedTx := ExecuteChainCmd("tx", "sign",
+		arcBnbSetOrchestratorAddressUnsignedTxPath,
+		ChainFlag,
+		KeyRingFlag,
+		OfflineFlag,
+		AccountNumberFlag, "0", // this account is the same as prev
+		SequenceFlag, "1", // we increase the number here since this tx is second for the validator
+		FromFlag, val1KeyOutput.Address,
+		homeFlag)
+
+	if err := appendGentx(dir, arcBnbSetOrchestratorAddressSignedTx); err != nil {
+		return nil, err
+	}
 
 	return &OnomyChain{
 		homeFlag:  homeFlag,
@@ -230,6 +295,32 @@ func setField(object interface{}, fieldName string, value interface{}) {
 		Set(reflect.ValueOf(value))
 }
 
+func appendGentx(dir string, genTx string) error {
+	genTxsString, err := getGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.genutil.gen_txs")
+	if err != nil {
+		return err
+	}
+	var genTxDecoded []json.RawMessage
+	if err := json.Unmarshal(genTxsString, &genTxDecoded); err != nil {
+		return err
+	}
+	genTxDecoded = append(genTxDecoded, json.RawMessage(genTx))
+	newGenTxs, err := json.Marshal(genTxDecoded)
+	if err != nil {
+		return err
+	}
+	var newGenTxsDecoded json.RawMessage
+	if err := json.Unmarshal(newGenTxs, &newGenTxsDecoded); err != nil {
+		return err
+	}
+
+	if err := replaceGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.genutil.gen_txs", newGenTxsDecoded); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func replaceStringInFile(filePath, from, to string) error {
 	input, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -262,6 +353,20 @@ func replaceGenesysSettings(filePath, settingPath string, newValue json.RawMessa
 	return ioutil.WriteFile(filePath, output, 0666) // nolint:gomnd
 }
 
+func getGenesysSettings(filePath, settingPath string) (json.RawMessage, error) {
+	input, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	var fileRawJSON map[string]json.RawMessage
+	if err := json.Unmarshal(input, &fileRawJSON); err != nil {
+		return nil, err
+	}
+
+	return getJSONInJSONmap(fileRawJSON, strings.Split(settingPath, "."))
+}
+
 func replaceJSONInJSONmap(object map[string]json.RawMessage, settingPath []string, newValue json.RawMessage) error {
 	if len(settingPath) == 0 {
 		return nil
@@ -289,4 +394,36 @@ func replaceJSONInJSONmap(object map[string]json.RawMessage, settingPath []strin
 		object[key] = nextRawJSONBytes
 	}
 	return nil
+}
+
+func getJSONInJSONmap(object map[string]json.RawMessage, settingPath []string) (json.RawMessage, error) {
+	if len(settingPath) == 0 {
+		return nil, nil
+	}
+	for key := range object {
+		if key == settingPath[0] && len(settingPath) == 1 {
+			return object[key], nil
+		}
+
+		var nextRawJSON map[string]json.RawMessage
+		if err := json.Unmarshal(object[key], &nextRawJSON); err != nil {
+			// not object
+			continue
+		}
+
+		res, err := getJSONInJSONmap(nextRawJSON, settingPath[1:])
+		if err != nil {
+			return nil, err
+		}
+		if res != nil {
+			return res, nil
+		}
+
+		nextRawJSONBytes, err := json.Marshal(nextRawJSON)
+		if err != nil {
+			return nil, err
+		}
+		object[key] = nextRawJSONBytes
+	}
+	return nil, nil
 }

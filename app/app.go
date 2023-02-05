@@ -89,9 +89,14 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity"
-	gravitykeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
-	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
+	arcbnb "github.com/onomyprotocol/arc/module/bnb/x/gravity"
+	arcbnbkeeper "github.com/onomyprotocol/arc/module/bnb/x/gravity/keeper"
+	arcbnbtypes "github.com/onomyprotocol/arc/module/bnb/x/gravity/types"
+
+	arceth "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity"
+	arcethkeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
+	arcethtypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
+
 	v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
@@ -149,7 +154,8 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		gravity.AppModuleBasic{},
+		arceth.AppModuleBasic{},
+		arcbnb.AppModuleBasic{},
 		dao.AppModuleBasic{},
 	)
 
@@ -163,7 +169,8 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		gravitytypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
+		arcethtypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
+		arcbnbtypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens.
@@ -231,7 +238,8 @@ type OnomyApp struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	GravityKeeper gravitykeeper.Keeper
+	ArcEthGravityKeeper arcethkeeper.Keeper
+	ArcBnbGravityKeeper arcbnbkeeper.Keeper
 
 	DaoKeeper daokeeper.Keeper
 
@@ -269,7 +277,7 @@ func New( // nolint:funlen // app new cosmos func
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		gravitytypes.StoreKey, daotypes.StoreKey,
+		arcethtypes.StoreKey, arcbnbtypes.StoreKey, daotypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -353,9 +361,20 @@ func New( // nolint:funlen // app new cosmos func
 
 	app.IBCKeeper.SetRouter(ibcRouter)
 
-	app.GravityKeeper = gravitykeeper.NewKeeper(
-		keys[gravitytypes.StoreKey],
-		app.GetSubspace(gravitytypes.ModuleName),
+	app.ArcEthGravityKeeper = arcethkeeper.NewKeeper(
+		keys[arcethtypes.StoreKey],
+		app.GetSubspace(arcethtypes.ModuleName),
+		appCodec,
+		&app.BankKeeper,
+		&app.StakingKeeper,
+		&app.SlashingKeeper,
+		&app.DistrKeeper,
+		&app.AccountKeeper,
+	)
+
+	app.ArcBnbGravityKeeper = arcbnbkeeper.NewKeeper(
+		keys[arcbnbtypes.StoreKey],
+		app.GetSubspace(arcbnbtypes.ModuleName),
 		appCodec,
 		&app.BankKeeper,
 		&app.StakingKeeper,
@@ -382,7 +401,8 @@ func New( // nolint:funlen // app new cosmos func
 		stakingtypes.NewMultiStakingHooks(
 			app.DistrKeeper.Hooks(),
 			app.SlashingKeeper.Hooks(),
-			app.GravityKeeper.Hooks(),
+			app.ArcEthGravityKeeper.Hooks(),
+			app.ArcBnbGravityKeeper.Hooks(),
 		),
 	)
 
@@ -400,7 +420,8 @@ func New( // nolint:funlen // app new cosmos func
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(gravitytypes.RouterKey, gravitykeeper.NewGravityProposalHandler(app.GravityKeeper)).
+		AddRoute(arcethtypes.RouterKey, arcethkeeper.NewGravityProposalHandler(app.ArcEthGravityKeeper)).
+		AddRoute(arcbnbtypes.RouterKey, arcbnbkeeper.NewGravityProposalHandler(app.ArcBnbGravityKeeper)).
 		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(app.DaoKeeper))
 
 	app.GovKeeper = govkeeper.NewKeeper(
@@ -438,7 +459,8 @@ func New( // nolint:funlen // app new cosmos func
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
+		arceth.NewAppModule(app.ArcEthGravityKeeper, app.BankKeeper),
+		arcbnb.NewAppModule(app.ArcBnbGravityKeeper, app.BankKeeper),
 		dao.NewAppModule(appCodec, app.DaoKeeper),
 	)
 
@@ -451,7 +473,7 @@ func New( // nolint:funlen // app new cosmos func
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, feegrant.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, gravitytypes.ModuleName, daotypes.ModuleName,
+		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, arcethtypes.ModuleName, arcbnbtypes.ModuleName, daotypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -473,7 +495,8 @@ func New( // nolint:funlen // app new cosmos func
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		gravitytypes.ModuleName,
+		arcethtypes.ModuleName,
+		arcbnbtypes.ModuleName,
 		daotypes.ModuleName,
 	)
 
@@ -496,7 +519,8 @@ func New( // nolint:funlen // app new cosmos func
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
+		arceth.NewAppModule(app.ArcEthGravityKeeper, app.BankKeeper),
+		arcbnb.NewAppModule(app.ArcBnbGravityKeeper, app.BankKeeper),
 		dao.NewAppModule(appCodec, app.DaoKeeper),
 	)
 	app.sm.RegisterStoreDecoders()
@@ -535,7 +559,8 @@ func New( // nolint:funlen // app new cosmos func
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
 
-	gravitykeeper.RegisterProposalTypes()
+	arcethkeeper.RegisterProposalTypes()
+	arcbnbkeeper.RegisterProposalTypes()
 
 	return app
 }
@@ -692,7 +717,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(gravitytypes.ModuleName)
+	paramsKeeper.Subspace(arcethtypes.ModuleName)
+	paramsKeeper.Subspace(arcbnbtypes.ModuleName)
 	paramsKeeper.Subspace(daotypes.ModuleName)
 
 	return paramsKeeper

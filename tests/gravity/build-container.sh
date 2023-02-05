@@ -22,4 +22,4 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
        PLATFORM_CMD="--platform=linux/amd64"; fi
 fi
 
-docker build -t onomy-gravity-base $PLATFORM_CMD .
+docker build -t onomy-arc-base $PLATFORM_CMD .

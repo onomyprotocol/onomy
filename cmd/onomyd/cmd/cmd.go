@@ -11,12 +11,14 @@ import (
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	gravitycmd "github.com/onomyprotocol/cosmos-gravity-bridge/module/cmd/gravity/cmd"
+	arcbnbcmd "github.com/onomyprotocol/arc/module/bnb/cmd/gravity/cmd"
+	arcethcmd "github.com/onomyprotocol/cosmos-gravity-bridge/module/cmd/gravity/cmd"
 	"github.com/onomyprotocol/onomy/app"
 )
 
 const (
 	gravityName = "gravity"
+	arcbnbname  = "arcbnb"
 )
 
 // NewRootCmd initiates the cli for onomy chain.
@@ -47,12 +49,18 @@ func NewRootCmd() (*cobra.Command, cosmoscmd.EncodingConfig) {
 	}
 
 	// eth_keys cmd
-	rootCmd.AddCommand(gravitycmd.Commands(app.DefaultNodeHome))
+	rootCmd.AddCommand(arcethcmd.Commands(app.DefaultNodeHome))
 
 	// gravity cmd wrapper
 	rootCmd.AddCommand(WrapBridgeCommands(app.DefaultNodeHome, gravityName, []*cobra.Command{
-		gravitycmd.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		gravitycmd.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
+		arcethcmd.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
+		arcethcmd.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
+	}))
+
+	// arcbnb cmd wrapper
+	rootCmd.AddCommand(WrapBridgeCommands(app.DefaultNodeHome, arcbnbname, []*cobra.Command{
+		arcbnbcmd.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
+		arcbnbcmd.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 	}))
 
 	return rootCmd, encodingConfig
