@@ -67,7 +67,6 @@ const (
 	// TestChainValidator1EthAddress is default validator eth pub key.
 	TestChainValidator1EthAddress = "0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d"
 
-	gentxFolder  = "gentx"
 	configFolder = "config"
 
 	// OnomyGrpcHost is default host.
@@ -89,7 +88,7 @@ type OnomyChain struct {
 }
 
 // NewOnomyChain creates a new OnomyChain.
-func NewOnomyChain() (*OnomyChain, error) {
+func NewOnomyChain() (*OnomyChain, error) { //nolint:gocyclo,cyclop // test func
 	// prepare test folder for genesys and data files
 	dir, err := ioutil.TempDir("", "")
 	if err != nil {
@@ -179,7 +178,7 @@ func NewOnomyChain() (*OnomyChain, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer f.Close() // nolint: errcheck
 	if _, err = f.WriteString(arcBnbSetOrchestratorAddressUnsignedTx); err != nil {
 		return nil, err
 	}
@@ -295,7 +294,7 @@ func setField(object interface{}, fieldName string, value interface{}) {
 		Set(reflect.ValueOf(value))
 }
 
-func appendGentx(dir string, genTx string) error {
+func appendGentx(dir, genTx string) error {
 	genTxsString, err := getGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.genutil.gen_txs")
 	if err != nil {
 		return err
@@ -314,11 +313,7 @@ func appendGentx(dir string, genTx string) error {
 		return err
 	}
 
-	if err := replaceGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.genutil.gen_txs", newGenTxsDecoded); err != nil {
-		return err
-	}
-
-	return nil
+	return replaceGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.genutil.gen_txs", newGenTxsDecoded)
 }
 
 func replaceStringInFile(filePath, from, to string) error {
@@ -396,7 +391,7 @@ func replaceJSONInJSONmap(object map[string]json.RawMessage, settingPath []strin
 	return nil
 }
 
-func getJSONInJSONmap(object map[string]json.RawMessage, settingPath []string) (json.RawMessage, error) {
+func getJSONInJSONmap(object map[string]json.RawMessage, settingPath []string) (json.RawMessage, error) { //nolint:gocognit // test func
 	if len(settingPath) == 0 {
 		return nil, nil
 	}

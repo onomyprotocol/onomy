@@ -92,11 +92,9 @@ import (
 	arcbnb "github.com/onomyprotocol/arc/module/bnb/x/gravity"
 	arcbnbkeeper "github.com/onomyprotocol/arc/module/bnb/x/gravity/keeper"
 	arcbnbtypes "github.com/onomyprotocol/arc/module/bnb/x/gravity/types"
-
 	arceth "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity"
 	arcethkeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
 	arcethtypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
-
 	v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
