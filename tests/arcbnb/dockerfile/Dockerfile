@@ -1,4 +1,4 @@
-FROM fedora:33
+FROM fedora:34
 RUN dnf install -y git make gcc gcc-c++ which iproute iputils procps-ng vim-minimal tmux net-tools htop tar jq npm openssl-devel perl rust cargo
 
 RUN curl https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz --output /root/go.tar.gz
