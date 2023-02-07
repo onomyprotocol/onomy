@@ -4,6 +4,7 @@ package simapp
 import (
 	"bytes"
 	"encoding/json"
+	"sort"
 	"testing"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
@@ -137,10 +138,32 @@ func SetupWithValidators(t *testing.T, vals map[string]ValReq, opts ...Option) (
 	simApp := Setup(opts...)
 
 	simApp.BeginNextBlock()
+
+	// it is required for the arc bridge to have at least one bonded validators in any case,
+	// but we have tests which create bonded and un-bonded validators on same request and in case
+	// the unbonded first the sim app panics, this ordering resolves that issue
+
+	powerOrderedValidators := make([]struct {
+		moniker string
+		val     ValReq
+	}, 0, len(vals))
 	for moniker, val := range vals {
-		description := stakingtypes.Description{Moniker: moniker}
+		powerOrderedValidators = append(powerOrderedValidators, struct {
+			moniker string
+			val     ValReq
+		}{moniker: moniker, val: val})
+	}
+	sort.Slice(powerOrderedValidators, func(i, j int) bool {
+		return powerOrderedValidators[i].val.SelfBondCoin.Amount.GT(powerOrderedValidators[j].val.SelfBondCoin.Amount)
+	})
+
+	for _, powerOrderedValidator := range powerOrderedValidators {
+		val := powerOrderedValidator.val
+		moniker := powerOrderedValidator.moniker
+		description := stakingtypes.Description{Moniker: powerOrderedValidator.moniker}
 		simApp.CreateValidator(t, val.SelfBondCoin, description, val.Commission, sdk.OneInt(), privateKeys[moniker])
 	}
+
 	return simApp, privateKeys
 }
 
