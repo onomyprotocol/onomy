@@ -1,14 +1,16 @@
 package v1_1_0_test
 
 import (
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/stretchr/testify/require"
+
 	v1_1_0 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.0"
 	"github.com/onomyprotocol/onomy/testutil/simapp"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestSetupUpgradeHandler(t *testing.T) {

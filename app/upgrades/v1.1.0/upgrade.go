@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+
 	arcbnbkeeper "github.com/onomyprotocol/arc/module/bnb/x/gravity/keeper"
 	arcbnbtypes "github.com/onomyprotocol/arc/module/bnb/x/gravity/types"
 	arcethkeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
@@ -16,7 +17,6 @@ const Name = "v1.1.0"
 // PrepareUpgradeHandler prepares the v1.1.0 upgrade.
 func PrepareUpgradeHandler(arcEthGravityKeeper arcethkeeper.Keeper, arcBnbGravityKeeper arcbnbkeeper.Keeper) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-
 		delegateKeys := arcEthGravityKeeper.GetDelegateKeys(ctx)
 
 		// use the same keys as for the gravity for the arc bnb
