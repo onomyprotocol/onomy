@@ -14,7 +14,7 @@ import (
 )
 
 func TestSetupUpgradeHandler(t *testing.T) {
-	tenPercents := sdk.NewDec(1).Quo(sdk.NewDec(10)) //nolint:gochecknoglobals
+	tenPercents := sdk.NewDec(1).Quo(sdk.NewDec(10))
 	commission := stakingtypes.NewCommissionRates(tenPercents, tenPercents, tenPercents)
 
 	// generate the validator with the eth gravity orchestrator
