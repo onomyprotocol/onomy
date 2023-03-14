@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -33,9 +34,10 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdFundTreasuryProposal())
-	cmd.AddCommand(CmdExchangeWithTreasuryProposal())
-	cmd.AddCommand(CmdFundAccountProposal())
+	// we wrap each command manually because the same commands are integrated with the gov CLI with adds those flags
+	cmd.AddCommand(addTxFlags(CmdFundTreasuryProposal()))
+	cmd.AddCommand(addTxFlags(CmdExchangeWithTreasuryProposal()))
+	cmd.AddCommand(addTxFlags(CmdFundAccountProposal()))
 
 	return cmd
 }
@@ -219,6 +221,11 @@ $ %s tx gov submit-proposal fund-account recipient-address 5000000000000000000an
 
 	addProposalFlags(cmd)
 
+	return cmd
+}
+
+func addTxFlags(cmd *cobra.Command) *cobra.Command {
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
