@@ -60,14 +60,11 @@ jq -r .mnemonic $ONOMY_HOME/validator_key.json > $ONOMY_HOME/validator-phrases
 echo "Adding validator addresses to genesis files"
 $ONOMY add-genesis-account "$($ONOMY keys show $ONOMY_VALIDATOR_NAME -a $ONOMY_KEYRING_FLAG)" $ONOMY_GENESIS_COINS
 
-echo "Generating ethereum keys"
-$ONOMY eth_keys add --output=json | jq . >> $ONOMY_HOME/eth_key.json
-
 echo "Creating gentxs"
-$ONOMY gravity gentx $ONOMY_VALIDATOR_NAME 1000000000000000000000000$STAKE_DENOM "$(jq -r .address $ONOMY_HOME/eth_key.json)" "$(jq -r .address $ONOMY_HOME/validator_key.json)" --moniker validator --ip $ONOMY_HOST $ONOMY_KEYRING_FLAG $ONOMY_CHAINID_FLAG
+$ONOMY gentx $ONOMY_VALIDATOR_NAME 1000000000000000000000000$STAKE_DENOM --moniker validator --ip $ONOMY_HOST $ONOMY_KEYRING_FLAG $ONOMY_CHAINID_FLAG
 
 echo "Collecting gentxs in $ONOMY_NODE_NAME"
-$ONOMY gravity collect-gentxs
+$ONOMY collect-gentxs
 
 echo "Exposing ports and APIs of the $ONOMY_NODE_NAME"
 

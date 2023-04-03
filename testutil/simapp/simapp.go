@@ -2,7 +2,6 @@
 package simapp
 
 import (
-	"bytes"
 	"encoding/json"
 	"testing"
 
@@ -18,7 +17,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	gethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -26,7 +24,6 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
 	"github.com/onomyprotocol/onomy/app"
 )
 
@@ -237,16 +234,6 @@ func (s *SimApp) CreateValidator(
 	)
 	require.NoError(t, err)
 	messages = append(messages, createValidatorMsg)
-
-	setOrchestratorAddressMsg := &gravitytypes.MsgSetOrchestratorAddress{
-		Validator:    createValidatorMsg.ValidatorAddress,
-		Orchestrator: address.String(),
-		EthAddress:   gethcommon.BytesToAddress(bytes.Repeat([]byte{byte(1)}, 20)).String(), // nolint:gomnd // eth address
-	}
-
-	if selfDelegation.Amount.GTE(sdk.DefaultPowerReduction) {
-		messages = append(messages, setOrchestratorAddressMsg)
-	}
 
 	s.sendTx(t, priv, messages...)
 }

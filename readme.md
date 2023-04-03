@@ -35,7 +35,7 @@ All the changes should pass through the flow "**feature-branch**" -> "**Pull Req
 make format-in-docker
 ```
 
-## Run CI 
+## Run CI
 
 ```
 make all-in-docker
