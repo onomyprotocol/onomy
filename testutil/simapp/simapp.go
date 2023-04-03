@@ -26,7 +26,7 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
+	gravitytypes "github.com/onomyprotocol/arc/module/x/gravity/types"
 	"github.com/onomyprotocol/onomy/app"
 )
 

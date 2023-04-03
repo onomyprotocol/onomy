@@ -11,7 +11,7 @@ import (
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	gravitycmd "github.com/onomyprotocol/cosmos-gravity-bridge/module/cmd/gravity/cmd"
+	gravitycmd "github.com/onomyprotocol/arc/module/cmd/gravity/cmd"
 	"github.com/onomyprotocol/onomy/app"
 )
 

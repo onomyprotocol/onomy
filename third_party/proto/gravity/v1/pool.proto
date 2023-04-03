@@ -3,7 +3,7 @@ package gravity.v1;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types";
+option go_package = "github.com/onomyprotocol/arc/module/x/gravity/types";
 
 // IDSet represents a set of IDs
 message IDSet { repeated uint64 ids = 1; }
