@@ -28,7 +28,9 @@ require (
 
 replace (
 	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230407041659-16a494c87f72
-	github.com/onomyprotocol/arc/module => github.com/AaronKutch/cosmos-gravity-bridge/module v0.0.0-20230409212655-8694b0e7d8c7
+	github.com/onomyprotocol/arc/module => github.com/onomyprotocol/arc/module [FIXME]
+	// or use this
+	//github.com/onomyprotocol/arc/module => github.com/AaronKutch/cosmos-gravity-bridge/module v0.0.0-20230409212655-8694b0e7d8c7
 
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
