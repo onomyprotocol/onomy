@@ -25,10 +25,11 @@ ENV PATH=$PATH:$GOPATH/bin
 
 # ------------------ nodejs ------------------
 
-RUN curl -sL https://deb.nodesource.com/setup_15.x  | bash -
+RUN curl -sL https://deb.nodesource.com/setup_20.x  | bash -
 RUN apt-get -y install nodejs
 
 # ------------------ ethereum go (geth) ------------------
 
+RUN apt install -y gnupg
 RUN add-apt-repository -y ppa:ethereum/ethereum
 RUN apt-get install --no-install-recommends -yq ethereum
