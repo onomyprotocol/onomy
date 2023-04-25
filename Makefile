@@ -43,8 +43,9 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=onomy \
 	-X github.com/cosmos/cosmos-sdk/version.AppName=onomy \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
-
+	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
+ldflags += $(LDFLAGS)
+ldflags := $(strip $(ldflags))
 BUILD_FLAGS := -ldflags '$(ldflags)' -gcflags="all=-N -l"
 
 .PHONY: all
