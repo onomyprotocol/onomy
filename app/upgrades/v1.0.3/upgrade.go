@@ -1,4 +1,4 @@
-// Package v1_0_3-RC1 is contains chain upgrade of the corresponding version.
+// Package v1_0_3 is contains chain upgrade of the corresponding version.
 package v1_0_3 //nolint:revive,stylecheck // app version
 
 import (
