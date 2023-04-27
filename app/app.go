@@ -93,6 +93,7 @@ import (
 	"github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity"
 	gravitykeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
 	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
+	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
