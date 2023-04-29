@@ -8,7 +8,7 @@ import (
 )
 
 // Name is migration name.
-const Name = "v1.0.3-RC1"
+const Name = "v1.0.3"
 
 // UpgradeHandler is an x/upgrade handler.
 func UpgradeHandler(_ sdk.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
