@@ -5,22 +5,19 @@ package types
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	io "io"
+	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ = proto.Marshal
-	_ = fmt.Errorf
-	_ = math.Inf
-)
+var _ = proto.Marshal
+var _ = fmt.Errorf
+var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -41,11 +38,9 @@ func (*FundTreasuryProposal) ProtoMessage() {}
 func (*FundTreasuryProposal) Descriptor() ([]byte, []int) {
 	return fileDescriptor_763c2cafbce2acfd, []int{0}
 }
-
 func (m *FundTreasuryProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *FundTreasuryProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_FundTreasuryProposal.Marshal(b, m, deterministic)
@@ -58,15 +53,12 @@ func (m *FundTreasuryProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-
 func (m *FundTreasuryProposal) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_FundTreasuryProposal.Merge(m, src)
 }
-
 func (m *FundTreasuryProposal) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *FundTreasuryProposal) XXX_DiscardUnknown() {
 	xxx_messageInfo_FundTreasuryProposal.DiscardUnknown(m)
 }
@@ -86,11 +78,9 @@ func (*ExchangeWithTreasuryProposal) ProtoMessage() {}
 func (*ExchangeWithTreasuryProposal) Descriptor() ([]byte, []int) {
 	return fileDescriptor_763c2cafbce2acfd, []int{1}
 }
-
 func (m *ExchangeWithTreasuryProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *ExchangeWithTreasuryProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_ExchangeWithTreasuryProposal.Marshal(b, m, deterministic)
@@ -103,15 +93,12 @@ func (m *ExchangeWithTreasuryProposal) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-
 func (m *ExchangeWithTreasuryProposal) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ExchangeWithTreasuryProposal.Merge(m, src)
 }
-
 func (m *ExchangeWithTreasuryProposal) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *ExchangeWithTreasuryProposal) XXX_DiscardUnknown() {
 	xxx_messageInfo_ExchangeWithTreasuryProposal.DiscardUnknown(m)
 }
@@ -130,11 +117,9 @@ func (*CoinsExchangePair) ProtoMessage()    {}
 func (*CoinsExchangePair) Descriptor() ([]byte, []int) {
 	return fileDescriptor_763c2cafbce2acfd, []int{2}
 }
-
 func (m *CoinsExchangePair) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *CoinsExchangePair) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_CoinsExchangePair.Marshal(b, m, deterministic)
@@ -147,15 +132,12 @@ func (m *CoinsExchangePair) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-
 func (m *CoinsExchangePair) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CoinsExchangePair.Merge(m, src)
 }
-
 func (m *CoinsExchangePair) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *CoinsExchangePair) XXX_DiscardUnknown() {
 	xxx_messageInfo_CoinsExchangePair.DiscardUnknown(m)
 }
@@ -189,11 +171,9 @@ func (*FundAccountProposal) ProtoMessage() {}
 func (*FundAccountProposal) Descriptor() ([]byte, []int) {
 	return fileDescriptor_763c2cafbce2acfd, []int{3}
 }
-
 func (m *FundAccountProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *FundAccountProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_FundAccountProposal.Marshal(b, m, deterministic)
@@ -206,15 +186,12 @@ func (m *FundAccountProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-
 func (m *FundAccountProposal) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_FundAccountProposal.Merge(m, src)
 }
-
 func (m *FundAccountProposal) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *FundAccountProposal) XXX_DiscardUnknown() {
 	xxx_messageInfo_FundAccountProposal.DiscardUnknown(m)
 }
@@ -292,7 +269,6 @@ func (this *CoinsExchangePair) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (m *FundTreasuryProposal) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -521,7 +497,6 @@ func encodeVarintDao(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-
 func (m *FundTreasuryProposal) Size() (n int) {
 	if m == nil {
 		return 0
@@ -619,11 +594,9 @@ func (m *FundAccountProposal) Size() (n int) {
 func sovDao(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-
 func sozDao(x uint64) (n int) {
 	return sovDao(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-
 func (m *FundTreasuryProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -804,7 +777,6 @@ func (m *FundTreasuryProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *ExchangeWithTreasuryProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -985,7 +957,6 @@ func (m *ExchangeWithTreasuryProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *CoinsExchangePair) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1102,7 +1073,6 @@ func (m *CoinsExchangePair) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *FundAccountProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1283,7 +1253,6 @@ func (m *FundAccountProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func skipDao(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0

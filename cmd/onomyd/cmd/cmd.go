@@ -5,18 +5,11 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	cosmossimappcmd "github.com/cosmos/cosmos-sdk/simapp/simd/cmd"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	gravitycmd "github.com/onomyprotocol/cosmos-gravity-bridge/module/cmd/gravity/cmd"
 	"github.com/onomyprotocol/onomy/app"
-)
-
-const (
-	gravityName = "gravity"
 )
 
 // NewRootCmd initiates the cli for onomy chain.
@@ -29,31 +22,6 @@ func NewRootCmd() (*cobra.Command, cosmoscmd.EncodingConfig) {
 		app.ModuleBasics,
 		app.New,
 	)
-
-	cmdsToReplace := map[string]*cobra.Command{
-		"add-genesis-account [address_or_key_name] [coin][,[coin]]": cosmossimappcmd.AddGenesisAccountCmd(app.DefaultNodeHome),
-	}
-
-	for _, v := range rootCmd.Commands() {
-		cmd, ok := cmdsToReplace[v.Use]
-		if ok {
-			rootCmd.RemoveCommand(v)
-			rootCmd.AddCommand(cmd)
-			delete(cmdsToReplace, v.Use)
-		}
-	}
-	if len(cmdsToReplace) != 0 {
-		panic("on onomy cmd replacements, not all of the commands were replaced")
-	}
-
-	// eth_keys cmd
-	rootCmd.AddCommand(gravitycmd.Commands(app.DefaultNodeHome))
-
-	// gravity cmd wrapper
-	rootCmd.AddCommand(WrapBridgeCommands(app.DefaultNodeHome, gravityName, []*cobra.Command{
-		gravitycmd.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		gravitycmd.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-	}))
 
 	return rootCmd, encodingConfig
 }

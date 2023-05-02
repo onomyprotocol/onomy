@@ -22,13 +22,3 @@ RUN tar -C /usr/local -xzf go.tar.gz
 ENV PATH="/usr/local/go/bin:$PATH"
 ENV GOPATH=/go
 ENV PATH=$PATH:$GOPATH/bin
-
-# ------------------ nodejs ------------------
-
-RUN curl -sL https://deb.nodesource.com/setup_15.x  | bash -
-RUN apt-get -y install nodejs
-
-# ------------------ ethereum go (geth) ------------------
-
-RUN add-apt-repository -y ppa:ethereum/ethereum
-RUN apt-get install --no-install-recommends -yq ethereum

@@ -26,7 +26,3 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run test-case third
         run: bash tests/tm-load-test/run-test.sh 1 10 10 310 
-
-    
-    
-    

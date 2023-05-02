@@ -29,8 +29,6 @@ import (
 const (
 	// AnomDenom is anom name .
 	AnomDenom = "anom"
-	// BnomERC20Address is bnom eth address .
-	BnomERC20Address = "0x8EFe26D6839108E831D3a37cA503eA4F136A8E73"
 
 	// ChainName is default test chain name.
 	ChainName = "chain-1"
@@ -51,16 +49,11 @@ const (
 	TestChainValidatorStakeAmount = MinGlobalSelfDelegation + ChainDenom
 	// TestChainValidator1Name is default validator name.
 	TestChainValidator1Name = "validator1"
-	// TestChainValidator1EthAddress is default validator eth pub key.
-	TestChainValidator1EthAddress = "0x2d9480eBA3A001033a0B8c3Df26039FD3433D55d"
 
 	// OnomyGrpcHost is default host.
 	OnomyGrpcHost = "127.0.0.1"
 	// OnomyGrpcPort is default port.
 	OnomyGrpcPort = "9090"
-
-	// GravityBridge is the prefix/name for the gravity bridge.
-	GravityBridge = "gravity"
 )
 
 // OnomyChain is test struct for the chain running.
@@ -94,12 +87,6 @@ func NewOnomyChain() (*OnomyChain, error) {
 		return nil, err
 	}
 
-	// set up swap parameters
-	if err := replaceGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.gravity.params.erc20_to_denom_permanent_swap",
-		json.RawMessage(fmt.Sprintf(`{"erc20": "%s", "denom": "%s"}`, BnomERC20Address, AnomDenom))); err != nil {
-		return nil, err
-	}
-
 	// set up min_global_self_delegation param
 	if err := replaceGenesysSettings(filepath.Join(dir, "config", "genesis.json"), "app_state.staking.params.min_global_self_delegation",
 		json.RawMessage(fmt.Sprintf(`"%s"`, MinGlobalSelfDelegation))); err != nil {
@@ -120,19 +107,17 @@ func NewOnomyChain() (*OnomyChain, error) {
 	// add user to genesys
 	ExecuteChainCmd("add-genesis-account", val1KeyOutput.Address, ValidatorGenesysAmount, homeFlag)
 
-	// gravity gentx
-	ExecuteChainCmd(fmt.Sprintf("%s gentx", GravityBridge),
+	// gentx
+	ExecuteChainCmd("gentx",
 		TestChainValidator1Name,
 		TestChainValidatorStakeAmount,
-		TestChainValidator1EthAddress,
-		val1KeyOutput.Address,
 		MinSelfDelegationFlag,
 		ChainFlag,
 		KeyRingFlag,
 		homeFlag)
 
-	// gravity collect gentx
-	ExecuteChainCmd(fmt.Sprintf("%s collect-gentxs", GravityBridge), homeFlag)
+	// collect gentx
+	ExecuteChainCmd("collect-gentxs", homeFlag)
 
 	return &OnomyChain{
 		homeFlag:  homeFlag,
