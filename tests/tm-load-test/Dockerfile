@@ -22,4 +22,3 @@ WORKDIR /root/home
 
 RUN bash $ONOMY_DIR/tests/tm-load-test/init-master.sh
 WORKDIR $ONOMY_DIR/tests/tm-load-test
- 
