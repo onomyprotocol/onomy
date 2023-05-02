@@ -11,9 +11,6 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 
@@ -52,9 +49,6 @@ func New(t *testing.T, opts ...Option) *TestNetwork {
 	cfg.GenesisState = app.ModuleBasics.DefaultGenesis(encCfg.Marshaler)
 	cfg.AppConstructor = func(val network.Validator) servertypes.Application {
 		onomyApp := simapp.Setup().OnomyApp()
-		// the override is required in order not to face the issue with the gravity end blocker validation
-		// because it requires the eth address to be linked with the validator account
-		onomyApp.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
 		return onomyApp
 	}
 

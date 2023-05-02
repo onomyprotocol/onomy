@@ -576,7 +576,7 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 						power := simApp.OnomyApp().StakingKeeper.GetLastValidatorPower(ctx, val.GetOperator())
 						consAddr, err := val.GetConsAddr()
 						require.NoError(t, err)
-						simApp.OnomyApp().StakingKeeper.Slash(ctx, consAddr, ctx.BlockHeight(), power, fraction)
+						simApp.OnomyApp().StakingKeeper.Slash(ctx, consAddr, ctx.BlockHeight(), power, fraction, stakingtypes.InfractionEmpty)
 					}
 				}
 			}
