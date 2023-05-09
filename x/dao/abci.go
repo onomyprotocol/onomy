@@ -23,11 +23,17 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 
 func endBlocker(ctx sdk.Context, k keeper.Keeper) (err error) {
 	if k.GetDaoDelegationSupply(ctx).GT(sdk.NewDec(0)) {
+		if err = k.VoteAbstain(ctx); err != nil {
+			return err
+		}
+
 		if err = k.WithdrawReward(ctx); err != nil {
 			return err
 		}
 
-		k.UndelegateAllValidators(ctx)
+		if err = k.UndelegateAllValidators(ctx); err != nil {
+			return err
+		}
 	}
 
 	return err
