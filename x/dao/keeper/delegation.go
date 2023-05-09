@@ -168,6 +168,28 @@ func undelegateValidators(ctx sdk.Context, vals []stakingtypes.Validator, undele
 	return nil
 }
 
+// Undelegate all validators
+func (k Keeper) UndelegateAllValidators(ctx sdk.Context) (err error) {
+	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+
+	vals := k.stakingKeeper.GetAllValidators(ctx)
+
+	for _, val := range vals {
+		valAddr := val.GetOperator()
+
+		delegation, found := k.stakingKeeper.GetDelegation(ctx, daoAddr, val.GetOperator())
+		if !found || delegation.GetShares().IsZero() {
+			continue
+		}
+
+		if _, err = k.stakingKeeper.UnbondAndUndelegateCoins(ctx, daoAddr, valAddr, delegation.GetShares()); err != nil {
+			return err
+		}
+	}
+
+	return err
+}
+
 // delegateValidators delegates the requested amount from the validators in the delegations.
 func (k Keeper) delegateValidators(ctx sdk.Context, vals []stakingtypes.Validator, delegations map[string]sdk.Int, daoAddr sdk.AccAddress) error {
 	for _, val := range vals {

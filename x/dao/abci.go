@@ -21,16 +21,14 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	}
 }
 
-func endBlocker(ctx sdk.Context, k keeper.Keeper) error {
-	if ctx.BlockHeight()%k.WithdrawRewardPeriod(ctx) == 0 {
-		if err := k.WithdrawReward(ctx); err != nil {
+func endBlocker(ctx sdk.Context, k keeper.Keeper) (err error) {
+	if k.GetDaoDelegationSupply(ctx).GT(sdk.NewDec(0)) {
+		if err = k.WithdrawReward(ctx); err != nil {
 			return err
 		}
+
+		k.UndelegateAllValidators(ctx)
 	}
 
-	if err := k.ReBalanceDelegation(ctx); err != nil {
-		return err
-	}
-
-	return k.VoteAbstain(ctx)
+	return err
 }
