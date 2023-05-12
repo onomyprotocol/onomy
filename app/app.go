@@ -378,6 +378,7 @@ func New( // nolint:funlen // app new cosmos func
 		&app.AccountKeeper,
 		&app.DistrKeeper,
 		&app.GovKeeper,
+		&app.MintKeeper,
 		&app.StakingKeeper,
 	)
 

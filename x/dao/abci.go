@@ -36,5 +36,9 @@ func endBlocker(ctx sdk.Context, k keeper.Keeper) (err error) {
 		}
 	}
 
+	if err = k.InflateDao(ctx); err != nil {
+		return err
+	}
+
 	return err
 }

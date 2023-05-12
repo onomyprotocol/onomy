@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
@@ -24,6 +25,7 @@ type AccountKeeper interface {
 // BankKeeper defines the contract needed to be fulfilled for banking and supply dependencies.
 type BankKeeper interface {
 	GetAllBalances(sdk.Context, sdk.AccAddress) sdk.Coins
+	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
 	SendCoinsFromAccountToModule(sdk.Context, sdk.AccAddress, string, sdk.Coins) error
 	SendCoinsFromModuleToAccount(sdk.Context, string, sdk.AccAddress, sdk.Coins) error
 	SendCoinsFromModuleToModule(ctx sdk.Context, senderPool, recipientPool string, amt sdk.Coins) error
@@ -41,6 +43,12 @@ type GovKeeper interface {
 	AddVote(sdk.Context, uint64, sdk.AccAddress, govtypes.WeightedVoteOptions) error
 	GetVote(sdk.Context, uint64, sdk.AccAddress) (govtypes.Vote, bool)
 	IterateProposals(sdk.Context, func(proposal govtypes.Proposal) bool)
+}
+
+// MintKeeper expected mint keeper.
+type MintKeeper interface {
+	GetMinter(ctx sdk.Context) (minter minttypes.Minter)
+	GetParams(ctx sdk.Context) (params minttypes.Params)
 }
 
 // StakingKeeper expected staking keeper.
