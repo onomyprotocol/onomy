@@ -6,10 +6,10 @@ import (
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
-// VoteAbstain votes abstain on all the proposals from the DAO account.
+// Inflates DAO treasury by APR from minter
 func (k Keeper) InflateDao(ctx sdk.Context) (err error) {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
-	daoBalance := k.bankKeeper.GetBalance(ctx, daoAddr, "nom")
+	daoBalance := k.bankKeeper.GetBalance(ctx, daoAddr, "anom")
 	minter := k.mintKeeper.GetMinter(ctx)
 	params := k.mintKeeper.GetParams(ctx)
 	minter.AnnualProvisions = minter.NextAnnualProvisions(params, daoBalance.Amount)
