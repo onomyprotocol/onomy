@@ -6,7 +6,7 @@ import (
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
-// Inflates DAO treasury by APR from minter.
+// InflateDAO inflates treasury by APR from minter.
 func (k Keeper) InflateDao(ctx sdk.Context) (err error) {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	daoBalance := k.bankKeeper.GetBalance(ctx, daoAddr, "anom")

@@ -15,30 +15,25 @@ import (
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
-	if err := endBlocker(ctx, k); err != nil {
+	if k.GetDaoDelegationSupply(ctx).GT(sdk.NewDec(0)) {
+		if err := k.VoteAbstain(ctx); err != nil {
+			k.Logger(ctx).Error("dao EndBlocker error: %v", err)
+			debug.PrintStack()
+		}
+
+		if err := k.WithdrawReward(ctx); err != nil {
+			k.Logger(ctx).Error("dao EndBlocker error: %v", err)
+			debug.PrintStack()
+		}
+
+		if err := k.UndelegateAllValidators(ctx); err != nil {
+			k.Logger(ctx).Error("dao EndBlocker error: %v", err)
+			debug.PrintStack()
+		}
+	}
+
+	if err := k.InflateDao(ctx); err != nil {
 		k.Logger(ctx).Error("dao EndBlocker error: %v", err)
 		debug.PrintStack()
 	}
-}
-
-func endBlocker(ctx sdk.Context, k keeper.Keeper) (err error) {
-	if k.GetDaoDelegationSupply(ctx).GT(sdk.NewDec(0)) {
-		if err = k.VoteAbstain(ctx); err != nil {
-			return err
-		}
-
-		if err = k.WithdrawReward(ctx); err != nil {
-			return err
-		}
-
-		if err = k.UndelegateAllValidators(ctx); err != nil {
-			return err
-		}
-	}
-
-	if err = k.InflateDao(ctx); err != nil {
-		return err
-	}
-
-	return err
 }

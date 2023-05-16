@@ -654,6 +654,7 @@ func allocateValidatorsReward(t *testing.T, simApp *simapp.SimApp, vals map[stri
 	return allocated
 }
 
+/*
 func assertValidators(t *testing.T, simApp *simapp.SimApp, ctx sdk.Context, vals map[string]valAssertion) {
 	t.Helper()
 
@@ -689,3 +690,4 @@ func assertValidators(t *testing.T, simApp *simapp.SimApp, ctx sdk.Context, vals
 		}
 	}
 }
+.*/

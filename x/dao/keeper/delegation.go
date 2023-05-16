@@ -168,7 +168,7 @@ func undelegateValidators(ctx sdk.Context, vals []stakingtypes.Validator, undele
 	return nil
 }
 
-// Undelegate all validators.
+// UndelegateAllValidators undelegate all validators.
 func (k Keeper) UndelegateAllValidators(ctx sdk.Context) (err error) {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 
