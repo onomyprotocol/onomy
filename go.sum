@@ -2203,6 +2203,8 @@ github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:v
 github.com/olekukonko/tablewriter v0.0.1/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
 github.com/olekukonko/tablewriter v0.0.2/go.mod h1:rSAaSIOAGT9odnlyGlUfAJaoc5w2fSBUmeGDbRWPxyQ=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
+github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230516025249-4f68d0177e89 h1:n1y7UEiL7AkLGFKixFypAWztxZ0X1bvO2n9h7qKSULQ=
+github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230516025249-4f68d0177e89/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
 github.com/onomyprotocol/tm-load-test v0.9.1-0.20211101093435-b38e68e11c01 h1:+B99URBdjbxtLuKUCSdOpyZ+Q6OpXNvQPsjXGgSBPRo=
 github.com/onomyprotocol/tm-load-test v0.9.1-0.20211101093435-b38e68e11c01/go.mod h1:KRiRasq+MPZHPAFx5VPkdkvXZTNW62ePuMn0+B5mrig=
 github.com/onsi/ginkgo v0.0.0-20151202141238-7f8ab55aaf3b/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
