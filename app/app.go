@@ -95,7 +95,7 @@ import (
 	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
 	v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
 	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
-	v1_0_3_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.2"
+	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -330,7 +330,7 @@ func New( // nolint:funlen // app new cosmos func
 
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_1.Name, v1_0_1.UpgradeHandler)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3.Name, v1_0_3.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_2.Name, v1_0_3_2.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_4.Name, v1_0_3_4.UpgradeHandler)
 
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(

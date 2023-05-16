@@ -6,5 +6,5 @@ This folder contains sub-folders for every chain upgrade.
 
 - v1.0.1 - IBC integration fix
 - v1.0.3 - Hyperinflation fix
-- v1.0.3.1 - OIP 6 Undelegate DAO from all validators
+- v1.0.3.4 - OIP 6 Undelegate DAO from all validators
 
