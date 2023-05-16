@@ -11,7 +11,7 @@ import (
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
-//nolint:all EndBlocker calls the dao re-balancing every block.
+// EndBlocker calls the dao re-balancing every block.
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
