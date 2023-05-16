@@ -4,7 +4,8 @@ go 1.19
 
 require (
 	github.com/cosmos/cosmos-sdk v0.45.15
-	github.com/cosmos/ibc-go/v2 v2.0.4
+	github.com/cosmos/ibc-go/v4 v4.2.0
+	github.com/cosmos/interchain-security v1.2.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
