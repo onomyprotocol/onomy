@@ -146,6 +146,10 @@ require (
 )
 
 replace (
+	// how to update: run `go get github.com/onomyprotocol/onomy-sdk@[commit hash here]`, look
+	// at the warning for something in the format v...-[date]-[hash beginning], and paste that
+	// below, next time `go mod tidy` is run it should work.
+
 	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
 	// v0.44.8-onomy
 	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230527201514-b355cbab8616
