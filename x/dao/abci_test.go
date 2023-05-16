@@ -14,6 +14,7 @@ import (
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
+/**
 var (
 	fiftyPercents                     = sdk.NewDec(1).QuoInt64(2)                                                                       //nolint:gochecknoglobals
 	tenPercents                       = sdk.NewDec(1).Quo(sdk.NewDec(10))                                                               //nolint:gochecknoglobals
@@ -32,6 +33,7 @@ type valAssertion struct {
 	selfBondAmount sdk.Dec
 	daoBondAmount  sdk.Dec
 }
+/**
 
 /**
 func TestEndBlocker_ReBalance(t *testing.T) {
@@ -603,7 +605,7 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 		})
 	}
 }
-**/
+.*/
 
 func createSimAppWithValidatorsAndTreasury(t *testing.T, vals map[string]simapp.ValReq, treasuryBalance sdk.Coin) (*simapp.SimApp, map[string]*secp256k1.PrivKey) {
 	t.Helper()
