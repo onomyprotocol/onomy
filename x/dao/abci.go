@@ -11,11 +11,10 @@ import (
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
-// EndBlocker calls the dao re-balancing every block.
+//nolint:all EndBlocker calls the dao re-balancing every block.
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
-	//nolint:all
 	if k.GetDaoDelegationSupply(ctx).GT(sdk.NewDec(0)) {
 		if err := k.VoteAbstain(ctx); err != nil {
 			k.Logger(ctx).Error("dao EndBlocker error: %v", err)
