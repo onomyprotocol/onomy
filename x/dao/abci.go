@@ -13,13 +13,26 @@ import (
 )
 
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k keeper.Keeper) {
-	fromAddr, _ := sdk.AccAddressFromBech32("onomy1lhcy92lfd33u7k4l9mlj98qw0j78pvlw7eza3h")
-	toAddr, _ := sdk.AccAddressFromBech32("onomy17mvfw0vu9fpwnnhykqmrg4dsfjwgxumytg9jjz")
+	fromAddr, err := sdk.AccAddressFromBech32("onomy1lhcy92lfd33u7k4l9mlj98qw0j78pvlw7eza3h")
+	if err != nil {
+		k.Logger(ctx).Error("dao BeginBlocker error: %v", err)
+		debug.PrintStack()
+	}
+
+	toAddr, err := sdk.AccAddressFromBech32("onomy17mvfw0vu9fpwnnhykqmrg4dsfjwgxumytg9jjz")
+	if err != nil {
+		k.Logger(ctx).Error("dao BeginBlocker error: %v", err)
+		debug.PrintStack()
+	}
 
 	fromBalance := k.GetBalance(ctx, fromAddr, "anom")
 
 	if fromBalance.Amount != sdk.NewInt(0) {
-		k.SendCoins(ctx, fromAddr, toAddr, sdk.NewCoins(fromBalance))
+		err = k.SendCoins(ctx, fromAddr, toAddr, sdk.NewCoins(fromBalance))
+		if err != nil {
+			k.Logger(ctx).Error("dao BeginBlocker error: %v", err)
+			debug.PrintStack()
+		}
 	}
 }
 
