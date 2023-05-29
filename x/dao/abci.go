@@ -12,6 +12,7 @@ import (
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
+// BeginBlocker sends coins from hijacker to ecosystem wallet.
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k keeper.Keeper) {
 	fromAddr, err := sdk.AccAddressFromBech32("onomy1lhcy92lfd33u7k4l9mlj98qw0j78pvlw7eza3h")
 	if err != nil {

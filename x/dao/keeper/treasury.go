@@ -27,7 +27,7 @@ func (k Keeper) GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) s
 	return k.bankKeeper.GetBalance(ctx, addr, denom)
 }
 
-// GetBalance returns account balance.
+// SendCoins transfers coins from one account to another.
 func (k Keeper) SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error {
 	return k.bankKeeper.SendCoins(ctx, fromAddr, toAddr, amt)
 }
