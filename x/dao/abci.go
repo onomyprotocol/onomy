@@ -6,14 +6,13 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/onomyprotocol/onomy/x/dao/keeper"
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 // BeginBlocker sends coins from hijacker to ecosystem wallet.
-func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k keeper.Keeper) {
+func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	fromAddr, err := sdk.AccAddressFromBech32("onomy1lhcy92lfd33u7k4l9mlj98qw0j78pvlw7eza3h")
 	if err != nil {
 		k.Logger(ctx).Error("dao BeginBlocker error: %v", err)
