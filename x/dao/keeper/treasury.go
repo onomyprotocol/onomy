@@ -21,3 +21,13 @@ func (k Keeper) treasury(ctx sdk.Context) sdk.Coins {
 	daoAddress := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	return k.bankKeeper.GetAllBalances(ctx, daoAddress)
 }
+
+// GetBalance returns account balance.
+func (k Keeper) GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin {
+	return k.bankKeeper.GetBalance(ctx, addr, denom)
+}
+
+// GetBalance returns account balance.
+func (k Keeper) SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error {
+	return k.bankKeeper.SendCoins(ctx, fromAddr, toAddr, amt)
+}
