@@ -146,13 +146,14 @@ require (
 )
 
 replace (
+	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
+	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
 	// how to update: run `go get github.com/onomyprotocol/onomy-sdk@[commit hash here]`, look
 	// at the warning for something in the format v...-[date]-[hash beginning], and paste that
-	// below, next time `go mod tidy` is run it should work.
-
-	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
-	// v0.44.8-onomy
-	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230527201514-b355cbab8616
+	// below, next time `go mod tidy` is run it should work. Note that the v prefix may be wrong
+	//github.com/cosmos/cosmos-sdk => ../onomy-sdk
+	// v0.45.15-ics-onomy
+	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230601224256-db2b1a72fd43
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.27
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
