@@ -99,6 +99,7 @@ import (
 	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
 	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
 	v1_0_3_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.5"
+	v1_1_0 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.0"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -342,6 +343,7 @@ func New( // nolint:funlen // app new cosmos func
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3.Name, v1_0_3.UpgradeHandler)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_4.Name, v1_0_3_4.UpgradeHandler)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_5.Name, v1_0_3_5.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_1_0.Name, v1_1_0.UpgradeHandler)
 
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
