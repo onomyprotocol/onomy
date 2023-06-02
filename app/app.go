@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -339,12 +341,6 @@ func New( // nolint:funlen // app new cosmos func
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_1.Name, v1_0_1.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3.Name, v1_0_3.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_4.Name, v1_0_3_4.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_5.Name, v1_0_3_5.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_1_0.Name, v1_1_0.UpgradeHandler)
-
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), &app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
@@ -417,7 +413,6 @@ func New( // nolint:funlen // app new cosmos func
 		app.EvidenceKeeper,
 		authtypes.FeeCollectorName,
 	)
-
 	providerModule := ibcprovider.NewAppModule(&app.ProviderKeeper)
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -600,6 +595,8 @@ func New( // nolint:funlen // app new cosmos func
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
+	app.setupUpgradeHandlers()
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
@@ -774,4 +771,38 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 // SimulationManager implements the SimulationApp interface.
 func (app *OnomyApp) SimulationManager() *module.SimulationManager {
 	return app.sm
+}
+
+func (app *OnomyApp) setupUpgradeHandlers() {
+	app.UpgradeKeeper.SetUpgradeHandler(v1_0_1.Name, v1_0_1.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3.Name, v1_0_3.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_4.Name, v1_0_3_4.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_5.Name, v1_0_3_5.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_1_0.Name, v1_1_0.UpgradeHandler)
+
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
+	}
+
+	// configure store loader that checks if version == upgradeHeight and applies store upgrades
+	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		return
+	}
+
+	var storeUpgrades *storetypes.StoreUpgrades
+
+	switch upgradeInfo.Name {
+	case v1_1_0.Name:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			// TODO not sure if we need the StoreKey
+			Added: []string{providertypes.ModuleName, providertypes.StoreKey},
+		}
+	default:
+		// no store upgrades
+	}
+
+	if storeUpgrades != nil {
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
+	}
 }
