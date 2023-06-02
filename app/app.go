@@ -249,7 +249,8 @@ type OnomyApp struct {
 	DaoKeeper daokeeper.Keeper
 
 	// mm is the module manager
-	mm *module.Manager
+	mm           *module.Manager
+	configurator module.Configurator
 
 	// sm is the simulation manager
 	sm *module.SimulationManager
@@ -546,7 +547,8 @@ func New( // nolint:funlen // app new cosmos func
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter()))
+	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
+	app.mm.RegisterServices(app.configurator)
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
@@ -778,7 +780,20 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3.Name, v1_0_3.UpgradeHandler)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_4.Name, v1_0_3_4.UpgradeHandler)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_5.Name, v1_0_3_5.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_1_0.Name, v1_1_0.UpgradeHandler)
+	// we need to have the reference to `app` which is why we need this `func` here
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v1_1_0.Name,
+		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			for moduleName, eachModule := range app.mm.Modules {
+				fromVM[moduleName] = eachModule.ConsensusVersion()
+			}
+
+			// This is critical for the chain upgrade to work
+			app.ProviderKeeper.InitGenesis(ctx, providertypes.DefaultGenesisState())
+
+			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
+		},
+	)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
