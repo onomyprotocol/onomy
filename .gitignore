@@ -6,3 +6,5 @@ release/
 *.tar.gz
 onomyd
 /tmp-swagger-gen/
+/target
+Cargo.lock
