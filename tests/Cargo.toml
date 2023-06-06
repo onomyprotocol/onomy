@@ -11,8 +11,6 @@ path = "src/lib/common.rs"
 [dependencies]
 log = "0.4"
 #onomy_test_lib = { path = "./../../onomy_tests/onomy_test_lib" }
-onomy_test_lib = { git = "https://github.com/pendulum-labs/onomy_tests", rev = "02d3f90db7846d08212f9e18fb82497cefe7fea1" }
+onomy_test_lib = { git = "https://github.com/pendulum-labs/onomy_tests", rev = "cff45955c8c4e9869d502745b88041960a2a2c7c" }
 serde_json = "1.0"
-stacked_errors = { version = "0.1", default-features = false, features = [] }
-super_orchestrator = { version = "0.1", default-features = false, features = [] }
 tokio = "1.28"
