@@ -1,8 +1,10 @@
-use onomy_test_lib::{Args, TIMEOUT};
-use stacked_errors::Result;
-use super_orchestrator::{
-    docker::{Container, ContainerNetwork},
-    sh,
+use onomy_test_lib::{
+    super_orchestrator::{
+        docker::{Container, ContainerNetwork},
+        sh,
+        stacked_errors::Result,
+    },
+    Args, TIMEOUT,
 };
 
 /// Useful for running simple container networks that have a standard format and
@@ -32,9 +34,10 @@ pub async fn container_runner(
                     entry_name,
                     Some(&format!("./tests/dockerfiles/{dockerfile}.dockerfile")),
                     None,
-                    &[],
                     &[(logs_dir, "/logs")],
-                    &format!("./target/{container_target}/release/{bin_entrypoint}"),
+                    Some(&format!(
+                        "./target/{container_target}/release/{bin_entrypoint}"
+                    )),
                     &["--entry-name", entry_name],
                 )
             })

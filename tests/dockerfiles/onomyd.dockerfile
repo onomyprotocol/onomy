@@ -7,13 +7,13 @@ ENV DAEMON_NAME="onomyd"
 ENV DAEMON_HOME="/root/.onomy"
 ENV ONOMY_CURRENT_VERSION=v1.1.0
 
-ADD ./dockerfile_resources/onomyd $DAEMON_HOME/cosmovisor/genesis/$ONOMY_CURRENT_VERSION/bin/onomyd
+ADD ./dockerfile_resources/$DAEMON_NAME $DAEMON_HOME/cosmovisor/genesis/$ONOMY_CURRENT_VERSION/bin/$DAEMON_NAME
 
 # for manual testing
-RUN chmod +x $DAEMON_HOME/cosmovisor/genesis/$ONOMY_CURRENT_VERSION/bin/onomyd
+RUN chmod +x $DAEMON_HOME/cosmovisor/genesis/$ONOMY_CURRENT_VERSION/bin/$DAEMON_NAME
 
 # set up symbolic links
-RUN cosmovisor init $DAEMON_HOME/cosmovisor/genesis/$ONOMY_CURRENT_VERSION/bin/onomyd
+RUN cosmovisor init $DAEMON_HOME/cosmovisor/genesis/$ONOMY_CURRENT_VERSION/bin/$DAEMON_NAME
 
 # some commands don't like if the data directory does not exist
 RUN mkdir $DAEMON_HOME/data
