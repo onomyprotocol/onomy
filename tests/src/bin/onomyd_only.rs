@@ -1,10 +1,10 @@
 use common::container_runner;
 use onomy_test_lib::{
     cosmovisor::{
-        cosmovisor_start, get_apr_annual, get_delegations_to_validator, get_staking_pool,
-        get_treasury, get_treasury_inflation_annual, onomyd_setup,
+        cosmovisor_get_addr, cosmovisor_start, get_apr_annual, get_delegations_to,
+        get_staking_pool, get_treasury, get_treasury_inflation_annual, onomyd_setup,
     },
-    json_inner, onomy_std_init,
+    json_inner, onomy_std_init, reprefix_bech32,
     super_orchestrator::{
         sh,
         stacked_errors::{MapAddError, Result},
@@ -38,10 +38,12 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     onomyd_setup(daemon_home, false).await?;
     let mut cosmovisor_runner = cosmovisor_start("onomyd_runner.log", false, None).await?;
 
-    assert!((get_apr_annual().await? - 13.25).abs() < 0.1);
+    let addr: &String = &cosmovisor_get_addr("validator").await?;
+    let valoper_addr = &reprefix_bech32(addr, "onomyvaloper").unwrap();
+    assert!((get_apr_annual(valoper_addr).await? - 13.25).abs() < 0.1);
 
     // make sure DAO is not delegating
-    let delegations = yaml_str_to_json_value(&get_delegations_to_validator().await?)?;
+    let delegations = yaml_str_to_json_value(&get_delegations_to(valoper_addr).await?)?;
     assert_eq!(
         json_inner(&delegations["delegation_responses"][0]["balance"]["amount"]),
         token18(1.0e6, "")

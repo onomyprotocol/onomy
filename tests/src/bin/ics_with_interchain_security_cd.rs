@@ -2,9 +2,11 @@ use std::time::Duration;
 
 use log::info;
 use onomy_test_lib::{
-    cosmovisor::{cosmovisor_start, onomyd_setup, sh_cosmovisor, wait_for_height},
+    cosmovisor::{
+        cosmovisor_get_addr, cosmovisor_start, onomyd_setup, sh_cosmovisor, wait_for_height,
+    },
     hermes::{create_channel_pair, create_connection_pair, sh_hermes},
-    json_inner, onomy_std_init,
+    json_inner, nom, onomy_std_init, reprefix_bech32,
     super_orchestrator::{
         docker::{Container, ContainerNetwork},
         net_message::NetMessenger,
@@ -12,7 +14,7 @@ use onomy_test_lib::{
         stacked_errors::{MapAddError, Result},
         Command, FileOptions, STD_DELAY, STD_TRIES,
     },
-    Args, TIMEOUT,
+    token18, Args, TIMEOUT,
 };
 use serde_json::Value;
 use tokio::time::sleep;
@@ -374,15 +376,36 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
 
     let mut genesis: Value = serde_json::from_str(&genesis_s)?;
     genesis["app_state"]["ccvconsumer"] = ccvconsumer_state;
-    genesis["app_state"]["auth"]["accounts"] = accounts;
-    genesis["app_state"]["bank"] = bank;
+    //genesis["app_state"]["auth"]["accounts"] = accounts;
+    //genesis["app_state"]["bank"] = bank;
     let genesis_s = genesis.to_string();
     let genesis_s = genesis_s.replace("\"stake\"", "\"anom\"");
 
     //info!("genesis: {genesis_s}");
 
     FileOptions::write_str(&genesis_file_path, &genesis_s).await?;
-    FileOptions::write_str("/logs/interchain_security_cd_genesis.json", &genesis_s).await?;
+
+    let addr: &String = &cosmovisor_get_addr("validator").await?;
+    let addr = &reprefix_bech32(addr, "cosmos").unwrap();
+    sh_cosmovisor("add-genesis-account", &[addr, &nom(2.0e6)]).await?;
+    // TODO I have no idea why this works, it seems add-genesis-account is setting
+    // it all up and allowing the consumer chain to produce blocks
+    /*let _ = sh_cosmovisor("gentx", &[
+        addr,
+        &nom(1.0e6),
+        "--chain-id",
+        chain_id,
+        "--min-self-delegation",
+        &token18(225.0e3, ""),
+    ])
+    .await;*/
+    //sh_cosmovisor("collect-gentxs", &[]).await?;
+
+    FileOptions::write_str(
+        "/logs/interchain_security_cd_genesis.json",
+        &FileOptions::read_to_string(&genesis_file_path).await?,
+    )
+    .await?;
 
     // we used same keys for consumer as producer, need to copy them over or else
     // the node will not be a working validator for itself
@@ -396,6 +419,8 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
         &nm_onomyd.recv::<String>().await?,
     )
     .await?;
+
+    //sleep(TIMEOUT).await;
 
     let mut cosmovisor_runner =
         cosmovisor_start("interchain_security_cd_runner.log", true, None).await?;
