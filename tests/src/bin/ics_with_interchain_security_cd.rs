@@ -308,8 +308,6 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     )
     .await?;
 
-    //info!("ccvconsumer_state:\n{ccvconsumer_state}\n\n");
-
     nm_hermes.send::<String>(&mnemonic).await?;
 
     // send to consumer
@@ -317,14 +315,7 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 
     let genesis_s =
         FileOptions::read_to_string(&format!("{daemon_home}/config/genesis.json")).await?;
-    //info!("genesis: {genesis_s}");
     let genesis: Value = serde_json::from_str(&genesis_s)?;
-    nm_consumer
-        .send::<String>(&genesis["app_state"]["auth"]["accounts"].to_string())
-        .await?;
-    nm_consumer
-        .send::<String>(&genesis["app_state"]["bank"].to_string())
-        .await?;
     nm_consumer
         .send::<String>(
             &FileOptions::read_to_string(&format!("{daemon_home}/config/node_key.json")).await?,
@@ -359,16 +350,9 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
     sh_cosmovisor("init --overwrite", &[chain_id]).await?;
     let genesis_file_path = format!("{daemon_home}/config/genesis.json");
 
-    // we need both the initial consumer state and the accounts, plus we just copy
-    // over the bank (or else we need some kind of funding) for the test to work
+    // we need the initial consumer state
     let ccvconsumer_state_s: String = nm_onomyd.recv().await?;
     let ccvconsumer_state: Value = serde_json::from_str(&ccvconsumer_state_s)?;
-
-    let accounts_s: String = nm_onomyd.recv().await?;
-    let accounts: Value = serde_json::from_str(&accounts_s)?;
-
-    let bank_s: String = nm_onomyd.recv().await?;
-    let bank: Value = serde_json::from_str(&bank_s)?;
 
     // add `ccvconsumer_state` to genesis
 
@@ -376,30 +360,19 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
 
     let mut genesis: Value = serde_json::from_str(&genesis_s)?;
     genesis["app_state"]["ccvconsumer"] = ccvconsumer_state;
-    //genesis["app_state"]["auth"]["accounts"] = accounts;
-    //genesis["app_state"]["bank"] = bank;
     let genesis_s = genesis.to_string();
-    let genesis_s = genesis_s.replace("\"stake\"", "\"anom\"");
 
-    //info!("genesis: {genesis_s}");
+    // I will name the token "native" because it won't be staked in the normal sense
+    let genesis_s = genesis_s.replace("\"stake\"", "\"native\"");
 
     FileOptions::write_str(&genesis_file_path, &genesis_s).await?;
 
     let addr: &String = &cosmovisor_get_addr("validator").await?;
+    // use "cosmos" prefix on the consumer chain so that we don't have to modify it
     let addr = &reprefix_bech32(addr, "cosmos").unwrap();
-    sh_cosmovisor("add-genesis-account", &[addr, &nom(2.0e6)]).await?;
-    // TODO I have no idea why this works, it seems add-genesis-account is setting
-    // it all up and allowing the consumer chain to produce blocks
-    /*let _ = sh_cosmovisor("gentx", &[
-        addr,
-        &nom(1.0e6),
-        "--chain-id",
-        chain_id,
-        "--min-self-delegation",
-        &token18(225.0e3, ""),
-    ])
-    .await;*/
-    //sh_cosmovisor("collect-gentxs", &[]).await?;
+
+    // we need some native token in the bank, and don't need gentx
+    sh_cosmovisor("add-genesis-account", &[addr, &token18(2.0e6, "native")]).await?;
 
     FileOptions::write_str(
         "/logs/interchain_security_cd_genesis.json",
@@ -419,8 +392,6 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
         &nm_onomyd.recv::<String>().await?,
     )
     .await?;
-
-    //sleep(TIMEOUT).await;
 
     let mut cosmovisor_runner =
         cosmovisor_start("interchain_security_cd_runner.log", true, None).await?;
