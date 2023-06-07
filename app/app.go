@@ -92,10 +92,10 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	ibcprovider "github.com/cosmos/interchain-security/x/ccv/provider"
-	ibcproviderclient "github.com/cosmos/interchain-security/x/ccv/provider/client"
-	ibcproviderkeeper "github.com/cosmos/interchain-security/x/ccv/provider/keeper"
-	providertypes "github.com/cosmos/interchain-security/x/ccv/provider/types"
+	ibcprovider "github.com/cosmos/interchain-security/v2/x/ccv/provider"
+	ibcproviderclient "github.com/cosmos/interchain-security/v2/x/ccv/provider/client"
+	ibcproviderkeeper "github.com/cosmos/interchain-security/v2/x/ccv/provider/keeper"
+	providertypes "github.com/cosmos/interchain-security/v2/x/ccv/provider/types"
 
 	v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
 	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
@@ -412,9 +412,11 @@ func New( // nolint:funlen // app new cosmos func
 		app.SlashingKeeper,
 		app.AccountKeeper,
 		app.EvidenceKeeper,
+		app.DistrKeeper,
+		app.BankKeeper,
 		authtypes.FeeCollectorName,
 	)
-	providerModule := ibcprovider.NewAppModule(&app.ProviderKeeper)
+	providerModule := ibcprovider.NewAppModule(&app.ProviderKeeper, app.GetSubspace(providertypes.ModuleName))
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()

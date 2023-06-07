@@ -4,7 +4,7 @@ RUN go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@latest
 ENV PATH=$PATH:/root/go/bin
 
 # without the leading 'v'
-ENV ICS_VERSION=1.2.0
+ENV ICS_VERSION=2.0.0-rc1
 ENV DAEMON_NAME="interchain-security-cd"
 ENV DAEMON_HOME="/root/.interchain-security-c"
 ENV CONSUMER_CURRENT_VERSION=v07-Theta

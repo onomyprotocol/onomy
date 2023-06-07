@@ -291,11 +291,11 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         format!("{{\"@type\":\"/cosmos.crypto.ed25519.PubKey\",\"key\":\"{tendermint_key}\"}}");
 
     // do this before getting the consumer-genesis
-    sh_cosmovisor(
+    /*sh_cosmovisor(
         "tx provider assign-consensus-key",
         &[[consumer_id, tendermint_key.as_str()].as_slice(), gas_args].concat(),
     )
-    .await?;
+    .await?;*/
 
     wait_for_height(STD_TRIES, STD_DELAY, 5).await?;
 
@@ -357,6 +357,8 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
     let genesis_s = FileOptions::read_to_string(&genesis_file_path).await?;
 
     let mut genesis: Value = serde_json::from_str(&genesis_s)?;
+    // under some circumstances the chain_id is set to `test-chain-[random]` and we need to explicitly set it
+    genesis["chain_id"] = chain_id.into();
     genesis["app_state"]["ccvconsumer"] = ccvconsumer_state;
     let genesis_s = genesis.to_string();
 
