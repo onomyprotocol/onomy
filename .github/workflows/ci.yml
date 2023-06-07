@@ -36,6 +36,8 @@ jobs:
         # make all-in-docker
         run: |
           cargo r --bin onomyd_only
+          cargo r --bin ics_with_interchain_security_cd
+          cargo r --bin clean
 
   rustfmt:
     name: Rustfmt
