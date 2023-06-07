@@ -5,7 +5,7 @@ ENV PATH=$PATH:/root/go/bin
 
 ENV DAEMON_NAME="onomyd"
 ENV DAEMON_HOME="/root/.onomy"
-ENV ONOMY_CURRENT_VERSION=v1.1.0
+ENV ONOMY_CURRENT_VERSION=v1.1.1
 
 ADD ./dockerfile_resources/$DAEMON_NAME $DAEMON_HOME/cosmovisor/genesis/$ONOMY_CURRENT_VERSION/bin/$DAEMON_NAME
 

@@ -8,7 +8,7 @@ ENV DAEMON_HOME="/root/.onomy"
 # the previous version
 ENV ONOMY_CURRENT_VERSION=v1.0.3.5
 # the version that currently is implemented by this repository's state
-ENV ONOMY_UPGRADE_VERSION=v1.1.0
+ENV ONOMY_UPGRADE_VERSION=v1.1.1
 
 # note that one has to go under `genesis/` and the other under `upgrades/`
 ADD https://github.com/onomyprotocol/onomy/releases/download/$ONOMY_CURRENT_VERSION/$DAEMON_NAME $DAEMON_HOME/cosmovisor/genesis/$ONOMY_CURRENT_VERSION/bin/$DAEMON_NAME

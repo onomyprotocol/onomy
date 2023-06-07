@@ -101,7 +101,7 @@ import (
 	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
 	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
 	v1_0_3_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.5"
-	v1_1_0 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.0"
+	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -782,7 +782,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_5.Name, v1_0_3_5.UpgradeHandler)
 	// we need to have the reference to `app` which is why we need this `func` here
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v1_1_0.Name,
+		v1_1_1.Name,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			for moduleName, eachModule := range app.mm.Modules {
 				fromVM[moduleName] = eachModule.ConsensusVersion()
@@ -808,7 +808,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case v1_1_0.Name:
+	case v1_1_1.Name:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			// TODO not sure if we need the StoreKey
 			Added: []string{providertypes.ModuleName, providertypes.StoreKey},
