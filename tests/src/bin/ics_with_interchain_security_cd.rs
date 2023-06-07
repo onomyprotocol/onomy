@@ -3,7 +3,8 @@ use std::time::Duration;
 use log::info;
 use onomy_test_lib::{
     cosmovisor::{
-        cosmovisor_get_addr, cosmovisor_start, onomyd_setup, sh_cosmovisor, wait_for_height,
+        cosmovisor_get_addr, cosmovisor_start, fast_block_times, onomyd_setup, sh_cosmovisor,
+        wait_for_height,
     },
     hermes::{create_channel_pair, create_connection_pair, sh_hermes},
     json_inner, onomy_std_init, reprefix_bech32,
@@ -376,6 +377,8 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
         &FileOptions::read_to_string(&genesis_file_path).await?,
     )
     .await?;
+
+    fast_block_times(daemon_home).await?;
 
     // we used same keys for consumer as producer, need to copy them over or else
     // the node will not be a working validator for itself
