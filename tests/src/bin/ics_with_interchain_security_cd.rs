@@ -291,11 +291,11 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         format!("{{\"@type\":\"/cosmos.crypto.ed25519.PubKey\",\"key\":\"{tendermint_key}\"}}");
 
     // do this before getting the consumer-genesis
-    /*sh_cosmovisor(
+    sh_cosmovisor(
         "tx provider assign-consensus-key",
         &[[consumer_id, tendermint_key.as_str()].as_slice(), gas_args].concat(),
     )
-    .await?;*/
+    .await?;
 
     wait_for_height(STD_TRIES, STD_DELAY, 5).await?;
 
