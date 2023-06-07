@@ -6,7 +6,7 @@ use onomy_test_lib::{
         cosmovisor_get_addr, cosmovisor_start, onomyd_setup, sh_cosmovisor, wait_for_height,
     },
     hermes::{create_channel_pair, create_connection_pair, sh_hermes},
-    json_inner, nom, onomy_std_init, reprefix_bech32,
+    json_inner, onomy_std_init, reprefix_bech32,
     super_orchestrator::{
         docker::{Container, ContainerNetwork},
         net_message::NetMessenger,
@@ -145,30 +145,18 @@ async fn hermes_runner() -> Result<()> {
     let b_chain = "onomy";
     let a_chain = "interchain-security-c";
     // a client is already created because of the ICS setup
-    //let _market_client_pair = create_client_pair(a_chain, b_chain).await?;
+    //let client_pair = create_client_pair(a_chain, b_chain).await?;
     // create one client and connection pair that will be used for IBC transfer and
     // ICS communication
-    let market_connection_pair = create_connection_pair(a_chain, b_chain).await?;
+    let connection_pair = create_connection_pair(a_chain, b_chain).await?;
 
-    // market<->onomy transfer<->transfer
-    let market_transfer_channel_pair = create_channel_pair(
-        a_chain,
-        &market_connection_pair.0,
-        "transfer",
-        "transfer",
-        false,
-    )
-    .await?;
+    // a_chain<->b_chain transfer<->transfer
+    let transfer_channel_pair =
+        create_channel_pair(a_chain, &connection_pair.0, "transfer", "transfer", false).await?;
 
-    // market<->onomy consumer<->provider
-    let market_ics_channel_pair = create_channel_pair(
-        a_chain,
-        &market_connection_pair.0,
-        "consumer",
-        "provider",
-        true,
-    )
-    .await?;
+    // a_chain<->b_chain consumer<->provider
+    let ics_channel_pair =
+        create_channel_pair(a_chain, &connection_pair.0, "consumer", "provider", true).await?;
 
     let hermes_log = FileOptions::write2("/logs", "hermes_runner.log");
     let mut hermes_runner = Command::new("hermes start", &[])
@@ -181,25 +169,38 @@ async fn hermes_runner() -> Result<()> {
 
     sleep(Duration::from_secs(5)).await;
 
-    sh_hermes(
-        "query packet acks --chain onomy --port transfer --channel",
-        &[&market_transfer_channel_pair.0],
-    )
+    // check all channels on both sides
+    sh_hermes("query packet acks --chain", &[
+        b_chain,
+        "--port",
+        "transfer",
+        "--channel",
+        &transfer_channel_pair.0,
+    ])
     .await?;
-    sh_hermes(
-        "query packet acks --chain interchain-security-c --port transfer --channel",
-        &[&market_transfer_channel_pair.1],
-    )
+    sh_hermes("query packet acks --chain", &[
+        a_chain,
+        "--port",
+        "transfer",
+        "--channel",
+        &transfer_channel_pair.1,
+    ])
     .await?;
-    sh_hermes(
-        "query packet acks --chain onomy --port provider --channel",
-        &[&market_ics_channel_pair.0],
-    )
+    sh_hermes("query packet acks --chain", &[
+        b_chain,
+        "--port",
+        "provider",
+        "--channel",
+        &ics_channel_pair.0,
+    ])
     .await?;
-    sh_hermes(
-        "query packet acks --chain interchain-security-c --port consumer --channel",
-        &[&market_ics_channel_pair.1],
-    )
+    sh_hermes("query packet acks --chain", &[
+        a_chain,
+        "--port",
+        "consumer",
+        "--channel",
+        &ics_channel_pair.1,
+    ])
     .await?;
 
     //hermes tx ft-transfer --timeout-seconds 10 --dst-chain interchain-security-c
@@ -214,6 +215,7 @@ async fn hermes_runner() -> Result<()> {
 }
 
 async fn onomyd_runner(args: &Args) -> Result<()> {
+    let consumer_id = "interchain-security-c";
     let daemon_home = args.daemon_home.as_ref().map_add_err(|| ())?;
     let mut nm_hermes = NetMessenger::connect(STD_TRIES, STD_DELAY, "hermes:26000")
         .await
@@ -230,29 +232,31 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     let proposal_id = "1";
 
     // TODO we think we will make the redistribution fraction 0 and either make a
-    // native "stake" or IBC NOM as the gas denom (may take a gov proposal for
+    // native "native" or IBC NOM as the gas denom (may take a gov proposal for
     // bootstrap)
 
     // `json!` doesn't like large literals beyond i32
-    let proposal_s = r#"{
+    let proposal_s = &format!(
+        r#"{{
         "title": "Propose the addition of a new chain",
         "description": "add consumer chain",
-        "chain_id": "interchain-security-c",
-        "initial_height": {
+        "chain_id": "{consumer_id}",
+        "initial_height": {{
             "revision_number": 0,
             "revision_height": 1
-        },
+        }},
         "genesis_hash": "Z2VuX2hhc2g=",
         "binary_hash": "YmluX2hhc2g=",
         "spawn_time": "2023-05-18T01:15:49.83019476-05:00",
-        "consumer_redistribution_fraction": "0.75",
+        "consumer_redistribution_fraction": "0.0",
         "blocks_per_distribution_transmission": 1000,
         "historical_entries": 10000,
         "ccv_timeout_period": 2419200000000000,
         "transfer_timeout_period": 3600000000000,
         "unbonding_period": 1728000000000000,
         "deposit": "2000000000000000000000anom"
-    }"#;
+    }}"#
+    );
     // we will just place the file under the config folder
     let proposal_file_path = format!("{daemon_home}/config/consumer_add_proposal.json");
     FileOptions::write_str(&proposal_file_path, proposal_s)
@@ -295,17 +299,18 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 
     // do this before getting the consumer-genesis
     sh_cosmovisor(
-        "tx provider assign-consensus-key interchain-security-c",
-        &[[tendermint_key.as_str()].as_slice(), gas_args].concat(),
+        "tx provider assign-consensus-key",
+        &[[consumer_id, tendermint_key.as_str()].as_slice(), gas_args].concat(),
     )
     .await?;
 
     wait_for_height(STD_TRIES, STD_DELAY, 5).await?;
 
-    let ccvconsumer_state = sh_cosmovisor(
-        "query provider consumer-genesis interchain-security-c -o json",
-        &[],
-    )
+    let ccvconsumer_state = sh_cosmovisor("query provider consumer-genesis", &[
+        consumer_id,
+        "-o",
+        "json",
+    ])
     .await?;
 
     nm_hermes.send::<String>(&mnemonic).await?;
@@ -313,9 +318,6 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     // send to consumer
     nm_consumer.send::<String>(&ccvconsumer_state).await?;
 
-    let genesis_s =
-        FileOptions::read_to_string(&format!("{daemon_home}/config/genesis.json")).await?;
-    let genesis: Value = serde_json::from_str(&genesis_s)?;
     nm_consumer
         .send::<String>(
             &FileOptions::read_to_string(&format!("{daemon_home}/config/node_key.json")).await?,
@@ -330,7 +332,9 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 
     // wait for consumer to be online
     nm_consumer.recv::<()>().await?;
+    // notify hermes to connect the chains
     nm_hermes.send::<()>(&()).await?;
+    // when hermes is done
     nm_hermes.recv::<()>().await?;
 
     //cosmovisor("tx ibc-transfer transfer", &[port, channel, receiver,
@@ -375,7 +379,7 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
     sh_cosmovisor("add-genesis-account", &[addr, &token18(2.0e6, "native")]).await?;
 
     FileOptions::write_str(
-        "/logs/interchain_security_cd_genesis.json",
+        &format!("/logs/{chain_id}_genesis.json"),
         &FileOptions::read_to_string(&genesis_file_path).await?,
     )
     .await?;
@@ -394,7 +398,7 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
     .await?;
 
     let mut cosmovisor_runner =
-        cosmovisor_start("interchain_security_cd_runner.log", true, None).await?;
+        cosmovisor_start(&format!("{chain_id}d_runner.log"), true, None).await?;
 
     // signal that we have started
     nm_onomyd.send::<()>(&()).await?;
