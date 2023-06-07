@@ -31,13 +31,6 @@ async fn main() -> Result<()> {
             _ => format!("entry_name \"{s}\" is not recognized").map_add_err(|| ()),
         }
     } else {
-        // TODO
-        sh(
-            "cp ./../onomy_workspace0/interchain-security/interchain-security-cd \
-             ./tests/dockerfiles/dockerfile_resources/interchain-security-cd",
-            &[],
-        )
-        .await?;
         sh("make build", &[]).await?;
         // copy to dockerfile resources (docker cannot use files from outside cwd)
         sh(
@@ -209,7 +202,6 @@ async fn hermes_runner() -> Result<()> {
 
     nm_onomyd.send::<()>(&()).await?;
 
-    sleep(TIMEOUT).await;
     hermes_runner.terminate().await?;
     Ok(())
 }
@@ -336,11 +328,12 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     nm_hermes.send::<()>(&()).await?;
     // when hermes is done
     nm_hermes.recv::<()>().await?;
+    // finish
+    nm_consumer.send::<()>(&()).await?;
 
     //cosmovisor("tx ibc-transfer transfer", &[port, channel, receiver,
     // amount]).await?;
 
-    sleep(TIMEOUT).await;
     cosmovisor_runner.terminate().await?;
     Ok(())
 }
@@ -403,7 +396,8 @@ async fn interchain_security_cd_runner(args: &Args) -> Result<()> {
     // signal that we have started
     nm_onomyd.send::<()>(&()).await?;
 
-    sleep(TIMEOUT).await;
+    nm_onomyd.recv::<()>().await?;
+
     cosmovisor_runner.terminate().await?;
     Ok(())
 }
