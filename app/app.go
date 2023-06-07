@@ -27,6 +27,7 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -93,6 +94,9 @@ import (
 	gravitykeeper "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/keeper"
 	gravitytypes "github.com/onomyprotocol/cosmos-gravity-bridge/module/x/gravity/types"
 	v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
+	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
+	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
+	v1_0_3_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.5"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -326,6 +330,9 @@ func New( // nolint:funlen // app new cosmos func
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_1.Name, v1_0_1.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3.Name, v1_0_3.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_4.Name, v1_0_3_4.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_5.Name, v1_0_3_5.UpgradeHandler)
 
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
@@ -373,6 +380,7 @@ func New( // nolint:funlen // app new cosmos func
 		&app.AccountKeeper,
 		&app.DistrKeeper,
 		&app.GovKeeper,
+		&app.MintKeeper,
 		&app.StakingKeeper,
 	)
 
@@ -447,19 +455,7 @@ func New( // nolint:funlen // app new cosmos func
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
-		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, feegrant.ModuleName,
-	)
-	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, gravitytypes.ModuleName, daotypes.ModuleName,
-	)
-
-	// NOTE: The genutils module must occur after staking so that pools are
-	// properly initialized with tokens from genesis accounts.
-	// NOTE: Capability module must occur first so that it can initialize any capabilities
-	// so that other modules that want to create or claim capabilities afterwards in InitChain
-	// can do so safely.
-	app.mm.SetOrderInitGenesis(
+		upgradetypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
@@ -468,12 +464,63 @@ func New( // nolint:funlen // app new cosmos func
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
 		minttypes.ModuleName,
-		crisistypes.ModuleName,
 		ibchost.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		gravitytypes.ModuleName,
+		crisistypes.ModuleName,
+		paramstypes.ModuleName,
+		vestingtypes.ModuleName,
+		feegrant.ModuleName,
+		daotypes.ModuleName,
+	)
+	app.mm.SetOrderEndBlockers(
+		upgradetypes.ModuleName,
+		capabilitytypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
+		distrtypes.ModuleName,
+		stakingtypes.ModuleName,
+		slashingtypes.ModuleName,
+		govtypes.ModuleName,
+		minttypes.ModuleName,
+		ibchost.ModuleName,
+		genutiltypes.ModuleName,
+		evidencetypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		gravitytypes.ModuleName,
+		crisistypes.ModuleName,
+		paramstypes.ModuleName,
+		vestingtypes.ModuleName,
+		feegrant.ModuleName,
+		daotypes.ModuleName,
+	)
+
+	// NOTE: The genutils module must occur after staking so that pools are
+	// properly initialized with tokens from genesis accounts.
+	// NOTE: Capability module must occur first so that it can initialize any capabilities
+	// so that other modules that want to create or claim capabilities afterwards in InitChain
+	// can do so safely.
+	app.mm.SetOrderInitGenesis(
+		upgradetypes.ModuleName,
+		capabilitytypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
+		distrtypes.ModuleName,
+		stakingtypes.ModuleName,
+		slashingtypes.ModuleName,
+		govtypes.ModuleName,
+		minttypes.ModuleName,
+		ibchost.ModuleName,
+		genutiltypes.ModuleName,
+		evidencetypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		gravitytypes.ModuleName,
+		crisistypes.ModuleName,
+		paramstypes.ModuleName,
+		vestingtypes.ModuleName,
+		feegrant.ModuleName,
 		daotypes.ModuleName,
 	)
 

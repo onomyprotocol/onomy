@@ -22,6 +22,7 @@ type (
 		accountKeeper      types.AccountKeeper
 		distributionKeeper types.DistributionKeeper
 		govKeeper          types.GovKeeper
+		mintKeeper         types.MintKeeper
 		stakingKeeper      types.StakingKeeper
 	}
 )
@@ -36,6 +37,7 @@ func NewKeeper(
 	accountKeeper types.AccountKeeper,
 	distributionKeeper types.DistributionKeeper,
 	govKeeper types.GovKeeper,
+	mintKeeper types.MintKeeper,
 	stakingKeeper types.StakingKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
@@ -57,6 +59,7 @@ func NewKeeper(
 		accountKeeper:      accountKeeper,
 		distributionKeeper: distributionKeeper,
 		govKeeper:          govKeeper,
+		mintKeeper:         mintKeeper,
 		stakingKeeper:      stakingKeeper,
 	}
 }

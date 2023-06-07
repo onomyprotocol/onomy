@@ -236,7 +236,7 @@ func replaceStringInFile(filePath, from, to string) error {
 		return err
 	}
 	output := bytes.ReplaceAll(input, []byte(from), []byte(to))
-	return ioutil.WriteFile(filePath, output, 0666) // nolint:gomnd
+	return ioutil.WriteFile(filePath, output, 0o666) // nolint:gomnd
 }
 
 func replaceGenesysSettings(filePath, settingPath string, newValue json.RawMessage) error {
@@ -259,7 +259,7 @@ func replaceGenesysSettings(filePath, settingPath string, newValue json.RawMessa
 		return err
 	}
 
-	return ioutil.WriteFile(filePath, output, 0666) // nolint:gomnd
+	return ioutil.WriteFile(filePath, output, 0o666) // nolint:gomnd
 }
 
 func replaceJSONInJSONmap(object map[string]json.RawMessage, settingPath []string, newValue json.RawMessage) error {

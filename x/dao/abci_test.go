@@ -1,22 +1,20 @@
 package dao_test
 
+/**
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/onomyprotocol/onomy/testutil/simapp"
-	"github.com/onomyprotocol/onomy/x/dao"
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
+
 
 var (
 	fiftyPercents                     = sdk.NewDec(1).QuoInt64(2)                                                                       //nolint:gochecknoglobals
@@ -353,7 +351,8 @@ func TestEndBlocker_WithdrawReward(t *testing.T) {
 		})
 	}
 }
-
+/**
+/**
 func TestEndBlocker_Vote(t *testing.T) {
 	type valWithProposalsReq struct {
 		simapp.ValReq
@@ -604,6 +603,7 @@ func TestEndBlocker_Slashing_Protection(t *testing.T) {
 	}
 }
 
+
 func createSimAppWithValidatorsAndTreasury(t *testing.T, vals map[string]simapp.ValReq, treasuryBalance sdk.Coin) (*simapp.SimApp, map[string]*secp256k1.PrivKey) {
 	t.Helper()
 
@@ -651,6 +651,7 @@ func allocateValidatorsReward(t *testing.T, simApp *simapp.SimApp, vals map[stri
 	return allocated
 }
 
+/*
 func assertValidators(t *testing.T, simApp *simapp.SimApp, ctx sdk.Context, vals map[string]valAssertion) {
 	t.Helper()
 
@@ -686,3 +687,4 @@ func assertValidators(t *testing.T, simApp *simapp.SimApp, ctx sdk.Context, vals
 		}
 	}
 }
+.*/

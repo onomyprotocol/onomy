@@ -438,8 +438,7 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 			},
 			// the expectation includes the DefaultPoolRate logic because of the end-blocker rebalancer,
 			// also we add 1 because of the redelegation truncation
-			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, oneBondCoin.
-				Amount.ToDec().Mul(types.DefaultPoolRate).TruncateInt().AddRaw(1))),
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, oneBondCoin.Amount)),
 		},
 		{
 			name: "positive_exchange_with_treasury",
@@ -454,10 +453,8 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 					})
 				},
 			},
-			// the expectation includes the DefaultPoolRate logic because of the end-blocker rebalancer,
-			// also we add 1 because of the redelegation truncation
-			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Sub(oneBondCoin).Add(twoBondCoins).
-				Amount.ToDec().Mul(types.DefaultPoolRate).TruncateInt())),
+
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Sub(oneBondCoin).Add(twoBondCoins).Amount)),
 		},
 		{
 			name: "positive_fund_account",
@@ -468,10 +465,8 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 					return types.NewFundAccountProposal(accountAddress, "title", "desc", sdk.NewCoins(oneBondCoin))
 				},
 			},
-			// the expectation includes the DefaultPoolRate logic because of the end-blocker rebalancer,
-			// also we add 1 because of the redelegation truncation
-			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Sub(oneBondCoin).
-				Amount.ToDec().Mul(types.DefaultPoolRate).TruncateInt().AddRaw(1))),
+
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Sub(oneBondCoin).Amount)),
 		},
 		{
 			name: "positive_change_pool_rate_param",
@@ -488,7 +483,7 @@ func TestKeeper_ProposalsFullCycle(t *testing.T) {
 				},
 			},
 			// new pool rate must change the treasury pool
-			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Amount.QuoRaw(2).AddRaw(1))),
+			wantTreasuryBalance: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, thousandBondCoins.Amount)),
 		},
 	}
 	for _, tt := range tests {

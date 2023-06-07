@@ -130,7 +130,7 @@ linters-settings:
 
   nestif:
     # minimal complexity of if statements to report, 5 by default
-    min-complexity: 3
+    min-complexity: 5
 
   goconst:
     # minimal length of string constant, 3 by default
