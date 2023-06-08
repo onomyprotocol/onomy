@@ -247,7 +247,8 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         "ccv_timeout_period": 2419200000000000,
         "transfer_timeout_period": 3600000000000,
         "unbonding_period": 1728000000000000,
-        "deposit": "2000000000000000000000anom"
+        "deposit": "2000000000000000000000anom",
+        "provider_reward_denoms": []
     }}"#
     );
     // we will just place the file under the config folder

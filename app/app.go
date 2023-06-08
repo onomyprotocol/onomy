@@ -167,14 +167,15 @@ var (
 
 	// module account permissions.
 	maccPerms = map[string][]string{ // nolint:gochecknoglobals // cosmos-sdk application style
-		authtypes.FeeCollectorName:     nil,
-		daotypes.ModuleName:            {authtypes.Minter},
-		distrtypes.ModuleName:          nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		authtypes.FeeCollectorName:        nil,
+		daotypes.ModuleName:               {authtypes.Minter},
+		distrtypes.ModuleName:             nil,
+		minttypes.ModuleName:              {authtypes.Minter},
+		stakingtypes.BondedPoolName:       {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:    {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:               {authtypes.Burner},
+		ibctransfertypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
+		providertypes.ConsumerRewardsPool: nil,
 	}
 
 	// module accounts that are allowed to receive tokens.
@@ -412,6 +413,8 @@ func New( // nolint:funlen // app new cosmos func
 		app.SlashingKeeper,
 		app.AccountKeeper,
 		app.EvidenceKeeper,
+		app.DistrKeeper,
+		app.BankKeeper,
 		authtypes.FeeCollectorName,
 	)
 	providerModule := ibcprovider.NewAppModule(&app.ProviderKeeper)
@@ -660,6 +663,9 @@ func (app *OnomyApp) BlockedAddrs() map[string]bool {
 	for acc := range maccPerms {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
 	}
+
+	// For ICS multiden fix
+	delete(blockedAddrs, authtypes.NewModuleAddress(providertypes.ConsumerRewardsPool).String())
 
 	return blockedAddrs
 }

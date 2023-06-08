@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/cosmos/cosmos-sdk v0.45.15
 	github.com/cosmos/ibc-go/v4 v4.2.0
-	github.com/cosmos/interchain-security v1.2.0
+	github.com/cosmos/interchain-security v1.1.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
@@ -151,6 +151,7 @@ replace (
 	//github.com/cosmos/cosmos-sdk => ../onomy-sdk
 	// v0.45.15-ics-onomy
 	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230601224256-db2b1a72fd43
+	github.com/cosmos/interchain-security => github.com/cosmos/interchain-security v1.1.0-multiden
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.27
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
