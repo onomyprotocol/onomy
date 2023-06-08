@@ -412,6 +412,8 @@ func New( // nolint:funlen // app new cosmos func
 		app.SlashingKeeper,
 		app.AccountKeeper,
 		app.EvidenceKeeper,
+		app.DistrKeeper,
+		app.BankKeeper,
 		authtypes.FeeCollectorName,
 	)
 	providerModule := ibcprovider.NewAppModule(&app.ProviderKeeper)
