@@ -1,5 +1,7 @@
 use clap::Parser;
-use onomy_test_lib::{super_orchestrator::{ctrlc_init, docker_helpers::auto_exec_i, std_init, stacked_errors::Result}};
+use onomy_test_lib::super_orchestrator::{
+    ctrlc_init, docker_helpers::auto_exec_i, stacked_errors::Result, std_init,
+};
 
 /// Runs auto_exec_i
 #[derive(Parser, Debug)]
