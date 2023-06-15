@@ -1,0 +1,20 @@
+# this was made for rustfmt 1.4.37-nightly (fdf65053 2021-09-07)
+
+condense_wildcard_suffixes = true # better
+error_on_line_overflow = true # be more strict
+error_on_unformatted = true # be more strict
+format_code_in_doc_comments = true # needed
+format_macro_bodies = true # changed
+format_macro_matchers = true # changed
+format_strings = true # better
+ignore = []
+imports_granularity = "Crate" # changed
+match_arm_blocks = true # needed
+newline_style = "Unix" # prevents `\r\n` being accidentally introduced
+overflow_delimited_expr = true # preferred
+reorder_impl_items = true # better
+group_imports = "StdExternalCrate" # promotes consistency
+trailing_semicolon = false # the keyword is explicit enough
+unstable_features = true
+use_field_init_shorthand = true # better
+wrap_comments = true # enforce the default comment_width
