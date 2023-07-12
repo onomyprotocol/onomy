@@ -1,21 +1,24 @@
 use onomy_test_lib::{
+    dockerfiles::onomy_std_cosmos_daemon,
     super_orchestrator::{
-        docker::{Container, ContainerNetwork},
+        docker::{Container, ContainerNetwork, Dockerfile},
         sh,
         stacked_errors::Result,
     },
     Args, TIMEOUT,
 };
 
+pub fn dockerfile_onomyd() -> String {
+    onomy_std_cosmos_daemon("onomyd", ".onomy", "v1.1.1", "onomyd")
+}
+
 /// Useful for running simple container networks that have a standard format and
 /// don't need extra build or volume arguments.
-pub async fn container_runner(
-    args: &Args,
-    dockerfiles_and_entry_names: &[(&str, &str)],
-) -> Result<()> {
+pub async fn container_runner(args: &Args, name_and_contents: &[(&str, &str)]) -> Result<()> {
+    let logs_dir = "./tests/logs";
+    let dockerfiles_dir = "./tests/dockerfiles";
     let bin_entrypoint = &args.bin_name;
     let container_target = "x86_64-unknown-linux-gnu";
-    let logs_dir = "./tests/logs";
 
     // build internal runner
     sh("cargo build --release --bin", &[
@@ -27,25 +30,24 @@ pub async fn container_runner(
 
     let mut cn = ContainerNetwork::new(
         "test",
-        dockerfiles_and_entry_names
+        name_and_contents
             .iter()
-            .map(|(dockerfile, entry_name)| {
+            .map(|(name, contents)| {
                 Container::new(
-                    entry_name,
-                    Some(&format!("./tests/dockerfiles/{dockerfile}.dockerfile")),
-                    None,
-                    &[(logs_dir, "/logs")],
+                    name,
+                    Dockerfile::Contents(contents.to_string()),
                     Some(&format!(
                         "./target/{container_target}/release/{bin_entrypoint}"
                     )),
-                    &["--entry-name", entry_name],
+                    &["--entry-name", name],
                 )
             })
             .collect(),
-        // TODO
+        Some(dockerfiles_dir),
         true,
         logs_dir,
-    )?;
+    )?
+    .add_common_volumes(&[(logs_dir, "/logs")]);
     cn.run_all(true).await?;
     cn.wait_with_timeout_all(true, TIMEOUT).await.unwrap();
     Ok(())
