@@ -8,11 +8,11 @@ use onomy_test_lib::{
         get_delegations_to, get_staking_pool, get_treasury, get_treasury_inflation_annual,
         sh_cosmovisor, sh_cosmovisor_no_dbg, sh_cosmovisor_tx, wait_for_num_blocks,
     },
-    json_inner, onomy_std_init, reprefix_bech32,
+    onomy_std_init, reprefix_bech32,
     setups::onomyd_setup,
     super_orchestrator::{
         sh,
-        stacked_errors::{MapAddError, Result},
+        stacked_errors::{Error, Result, StackableErr},
         FileOptions,
     },
     token18, yaml_str_to_json_value, Args, ONOMY_IBC_NOM, TIMEOUT,
@@ -26,35 +26,48 @@ async fn main() -> Result<()> {
     if let Some(ref s) = args.entry_name {
         match s.as_str() {
             "onomyd" => onomyd_runner(&args).await,
-            _ => format!("entry_name \"{s}\" is not recognized").map_add_err(|| ()),
+            _ => Err(Error::from(format!("entry_name \"{s}\" is not recognized"))),
         }
     } else {
-        sh("make build", &[]).await?;
+        sh("make build", &[]).await.stack()?;
         // copy to dockerfile resources (docker cannot use files from outside cwd)
         sh(
             "cp ./onomyd ./tests/dockerfiles/dockerfile_resources/onomyd",
             &[],
         )
-        .await?;
-        container_runner(&args, &[("onomyd", &dockerfile_onomyd())]).await
+        .await
+        .stack()?;
+        container_runner(&args, &[("onomyd", &dockerfile_onomyd())])
+            .await
+            .stack()
     }
 }
 
 async fn onomyd_runner(args: &Args) -> Result<()> {
-    let daemon_home = args.daemon_home.as_ref().map_add_err(|| ())?;
-    onomyd_setup(daemon_home).await?;
-    let mut cosmovisor_runner = cosmovisor_start("onomyd_runner.log", None).await?;
+    let daemon_home = args.daemon_home.as_ref().stack()?;
+    onomyd_setup(daemon_home).await.stack()?;
+    let mut cosmovisor_runner = cosmovisor_start("onomyd_runner.log", None).await.stack()?;
 
-    let addr = &cosmovisor_get_addr("validator").await?;
-    let valoper_addr = &reprefix_bech32(addr, "onomyvaloper").unwrap();
+    let addr = &cosmovisor_get_addr("validator").await.stack()?;
+    let valoper_addr = &reprefix_bech32(addr, "onomyvaloper").stack()?;
+    let tmp = sh_cosmovisor("tendermint show-address", &[])
+        .await
+        .stack()?;
+    let valcons_addr = tmp.trim();
+    info!("address: {addr}");
     info!("valoper address: {valoper_addr}");
+    info!("valcons address: {valcons_addr}");
+    //sleep(TIMEOUT).await;
 
-    // make sure DAO is not delegating
-    let delegations = yaml_str_to_json_value(&get_delegations_to(valoper_addr).await?)?;
-    assert_eq!(
-        json_inner(&delegations["delegation_responses"][0]["balance"]["amount"]),
-        token18(1.0e6, "")
-    );
+    // get valcons bech32 and pub key
+    // cosmovisor run query tendermint-validator-set
+    let valcons_set = sh_cosmovisor("query tendermint-validator-set", &[])
+        .await
+        .stack()?;
+    info!("{valcons_set}");
+
+    // get mapping of cons pub keys and valoper addr
+    // cosmovisor run query staking validators
 
     sh_cosmovisor_tx(
         &format!(
@@ -63,28 +76,37 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         ),
         &[],
     )
-    .await?;
-    sh_cosmovisor("query staking validators", &[]).await?;
+    .await
+    .stack()?;
+    sh_cosmovisor("query staking validators", &[])
+        .await
+        .stack()?;
 
-    info!("{}", get_apr_annual(valoper_addr).await?);
+    info!("{}", get_apr_annual(valoper_addr).await.stack()?);
 
-    info!("{}", get_delegations_to(valoper_addr).await?);
-    info!("{:?}", get_staking_pool().await?);
-    info!("{}", get_treasury().await?);
-    info!("{}", get_treasury_inflation_annual().await?);
-    info!("{}", get_apr_annual(valoper_addr).await?);
+    info!("{}", get_delegations_to(valoper_addr).await.stack()?);
+    info!("{:?}", get_staking_pool().await.stack()?);
+    info!("{}", get_treasury().await.stack()?);
+    info!("{}", get_treasury_inflation_annual().await.stack()?);
+    info!("{}", get_apr_annual(valoper_addr).await.stack()?);
 
-    wait_for_num_blocks(1).await?;
-    info!("{}", get_apr_annual(valoper_addr).await?);
+    wait_for_num_blocks(1).await.stack()?;
+    info!("{}", get_apr_annual(valoper_addr).await.stack()?);
 
-    sh_cosmovisor_tx(
+    sh(
         &format!(
-            "bank send {addr} onomy1a69w3hfjqere4crkgyee79x2mxq0w2pfj9tu2m 1337anom --fees \
-             1000000anom -y -b block"
+            "cosmovisor run tx bank send {addr} onomy1a69w3hfjqere4crkgyee79x2mxq0w2pfj9tu2m \
+             1337anom --fees 1000000anom -y -b block"
         ),
         &[],
     )
-    .await?;
+    .await
+    .stack()?;
+
+    //cosmovisor run tx staking delegate onomyvaloper
+    // 10000000000000000000000ibc/
+    // 0EEDE4D6082034D6CD465BD65761C305AACC6FCA1246F87D6A3C1F5488D18A7B --gas auto
+    // --gas-adjustment 1.3 -y -b block
 
     let test_crisis_denom = ONOMY_IBC_NOM;
     let test_deposit = token18(2000.0, "anom");
@@ -109,17 +131,22 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         ),
         "1anom",
     )
-    .await?;
-    wait_for_num_blocks(1).await?;
+    .await
+    .stack()?;
+    wait_for_num_blocks(1).await.stack()?;
     // just running this for debug, param querying is weird because it is json
     // inside of yaml, so we will instead test the exported genesis
-    sh_cosmovisor("query params subspace crisis ConstantFee", &[]).await?;
+    sh_cosmovisor("query params subspace crisis ConstantFee", &[])
+        .await
+        .stack()?;
 
     sleep(Duration::ZERO).await;
-    cosmovisor_runner.terminate(TIMEOUT).await?;
+    cosmovisor_runner.terminate(TIMEOUT).await.stack()?;
     // test that exporting works
-    let exported = sh_cosmovisor_no_dbg("export", &[]).await?;
-    FileOptions::write_str("/logs/onomyd_export.json", &exported).await?;
+    let exported = sh_cosmovisor_no_dbg("export", &[]).await.stack()?;
+    FileOptions::write_str("/logs/onomyd_export.json", &exported)
+        .await
+        .stack()?;
     let exported = yaml_str_to_json_value(&exported)?;
     assert_eq!(
         exported["app_state"]["crisis"]["constant_fee"]["denom"],
