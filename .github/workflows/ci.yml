@@ -37,7 +37,7 @@ jobs:
         run: |
           go test ./...
           cargo r --bin onomyd_only
-          cargo r --bin ics_with_interchain_security_cd
+          cargo r --bin ics_cdd
           cargo r --bin chain_upgrade
           cargo r --bin clean
 

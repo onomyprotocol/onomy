@@ -9,7 +9,7 @@ use onomy_test_lib::{
         sh_cosmovisor, sh_cosmovisor_no_dbg, sh_cosmovisor_tx, wait_for_num_blocks,
     },
     onomy_std_init, reprefix_bech32,
-    setups::onomyd_setup,
+    setups::{onomyd_setup, CosmosSetupOptions},
     super_orchestrator::{
         sh,
         stacked_errors::{Error, Result, StackableErr},
@@ -45,7 +45,9 @@ async fn main() -> Result<()> {
 
 async fn onomyd_runner(args: &Args) -> Result<()> {
     let daemon_home = args.daemon_home.as_ref().stack()?;
-    onomyd_setup(daemon_home).await.stack()?;
+    let mut options = CosmosSetupOptions::new();
+    options.high_staking_level = true;
+    onomyd_setup(daemon_home, Some(options)).await.stack()?;
     let mut cosmovisor_runner = cosmovisor_start("onomyd_runner.log", None).await.stack()?;
 
     let addr = &cosmovisor_get_addr("validator").await.stack()?;
@@ -82,16 +84,18 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         .await
         .stack()?;
 
-    info!("{}", get_apr_annual(valoper_addr).await.stack()?);
+    let apr0 = get_apr_annual(valoper_addr, 6311520.0).await.stack()?;
+    info!("APR: {apr0}");
+    wait_for_num_blocks(1).await.stack()?;
+    let apr1 = get_apr_annual(valoper_addr, 6311520.0).await.stack()?;
+    info!("APR: {apr1}");
+    assert!(apr1 < apr0);
+    assert!(apr1 < 0.14);
 
     info!("{}", get_delegations_to(valoper_addr).await.stack()?);
     info!("{:?}", get_staking_pool().await.stack()?);
     info!("{}", get_treasury().await.stack()?);
     info!("{}", get_treasury_inflation_annual().await.stack()?);
-    info!("{}", get_apr_annual(valoper_addr).await.stack()?);
-
-    wait_for_num_blocks(1).await.stack()?;
-    info!("{}", get_apr_annual(valoper_addr).await.stack()?);
 
     sh(
         &format!(
