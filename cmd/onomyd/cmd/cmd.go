@@ -4,6 +4,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/server"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
@@ -21,6 +23,10 @@ func NewRootCmd() (*cobra.Command, cosmoscmd.EncodingConfig) {
 		app.Name,
 		app.ModuleBasics,
 		app.New,
+	)
+
+	rootCmd.AddCommand(
+		server.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler),
 	)
 
 	return rootCmd, encodingConfig
