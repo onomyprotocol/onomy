@@ -102,6 +102,7 @@ import (
 	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
 	v1_0_3_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.5"
 	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
+	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -800,6 +801,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		},
 	)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_1_2.Name, v1_1_2.UpgradeHandler)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {

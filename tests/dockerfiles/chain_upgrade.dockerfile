@@ -8,8 +8,7 @@ ENV DAEMON_HOME="/root/.onomy"
 # the previous version
 ENV ONOMY_CURRENT_VERSION=v1.1.1
 # the version that currently is implemented by this repository's state
-# TODO this is currently the same because we removed support for the gravity module from onomy_tests
-ENV ONOMY_UPGRADE_VERSION=v1.1.1
+ENV ONOMY_UPGRADE_VERSION=v1.1.2
 ENV ONOMY_UPGRADE_DIR_NAME=$ONOMY_UPGRADE_VERSION
 
 # note that one has to go under `genesis/` and the other under `upgrades/`
