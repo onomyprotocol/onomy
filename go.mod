@@ -152,7 +152,7 @@ replace (
 	// are anomolous build errors unless a hash from an accepted merge commit specifically is used.
 	//github.com/cosmos/cosmos-sdk => ../onomy-sdk
 	// v0.45.16-ics-onomy
-	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230608164016-6a3986f84e54
+	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230822174525-3949f4f75a37
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.28
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2

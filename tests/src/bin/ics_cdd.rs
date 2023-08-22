@@ -225,7 +225,7 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
             .stack()
             .stack()?;
 
-    let mnemonic = onomyd_setup(daemon_home).await.stack()?;
+    let mnemonic = onomyd_setup(daemon_home, None).await.stack()?;
     // send mnemonic to hermes
     nm_hermes.send::<String>(&mnemonic).await.stack()?;
 
