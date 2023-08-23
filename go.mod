@@ -145,14 +145,7 @@ require (
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
-	// How to update: run `go get github.com/onomyprotocol/onomy-sdk@[commit hash here]`, look
-	// at the warning for something in the format v...-[date]-[hash beginning], and paste that
-	// below, next time `go mod tidy` is run it should work. Note that the v prefix may be wrong,
-	// but as long as the hash is correct it is good. Additionally: for some reason it seems there
-	// are anomolous build errors unless a hash from an accepted merge commit specifically is used.
-	//github.com/cosmos/cosmos-sdk => ../onomy-sdk
-	// v0.45.16-ics-onomy
-	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.44.6-0.20230822174525-3949f4f75a37
+	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.45.16-onomy-dev
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.28
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
