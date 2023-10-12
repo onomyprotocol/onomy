@@ -12,6 +12,6 @@ path = "src/lib/common.rs"
 clap = { version = "4", features = ["derive"] }
 log = "0.4"
 #onomy_test_lib = { path = "./../../onomy_tests/onomy_test_lib" }
-onomy_test_lib = { git = "https://github.com/pendulum-labs/onomy_tests", rev = "47b5a635b8a57b3ce8c72092b4eef89ccddce167" }
+onomy_test_lib = { git = "https://github.com/pendulum-labs/onomy_tests", rev = "88fe8dd808a0a81880f605a86527f259202a3436" }
 serde_json = "1.0"
 tokio = "1"

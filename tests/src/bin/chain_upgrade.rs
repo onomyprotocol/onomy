@@ -5,7 +5,7 @@ use onomy_test_lib::{
         get_treasury, get_treasury_inflation_annual, sh_cosmovisor, wait_for_height,
     },
     nom, onomy_std_init,
-    setups::onomyd_setup,
+    setups::{onomyd_setup, CosmosSetupOptions},
     super_orchestrator::{
         docker::{Container, ContainerNetwork, Dockerfile},
         sh,
@@ -66,37 +66,43 @@ async fn container_runner(args: &Args) -> Result<()> {
         true,
         logs_dir,
     )
-    .stack()?
-    .add_common_volumes(&[(logs_dir, "/logs")]);
+    .stack()?;
+    cn.add_common_volumes(&[(logs_dir, "/logs")]);
+    let uuid = cn.uuid_as_string();
+    cn.add_common_entrypoint_args(&["--uuid", &uuid]);
     cn.run_all(true).await.stack()?;
     cn.wait_with_timeout_all(true, TIMEOUT).await.stack()?;
+    cn.terminate_all().await;
     Ok(())
 }
 
 async fn onomyd_runner(args: &Args) -> Result<()> {
-    let onomy_current_version = args.onomy_current_version.as_ref().stack()?;
-    let onomy_upgrade_version = args.onomy_upgrade_version.as_ref().stack()?;
+    let current_version = args.current_version.as_ref().stack()?;
+    let upgrade_version = args.upgrade_version.as_ref().stack()?;
     let daemon_home = args.daemon_home.as_ref().stack()?;
 
-    info!("current version: {onomy_current_version}, upgrade version: {onomy_upgrade_version}");
+    info!("current version: {current_version}, upgrade version: {upgrade_version}");
 
-    onomyd_setup(daemon_home, None).await.stack()?;
+    onomyd_setup(CosmosSetupOptions::new(daemon_home))
+        .await
+        .stack()?;
+
     let mut cosmovisor_runner = cosmovisor_start("onomyd_runner.log", None).await.stack()?;
 
     assert_eq!(
         sh_cosmovisor("version", &[]).await.stack()?.trim(),
-        onomy_current_version
+        current_version
     );
 
     let upgrade_prepare_start = get_block_height().await.stack()?;
     let upgrade_height = &format!("{}", upgrade_prepare_start + 4);
 
-    let description = &format!("\"upgrade {onomy_upgrade_version}\"");
+    let description = &format!("\"upgrade {upgrade_version}\"");
 
     cosmovisor_gov_proposal(
         "software-upgrade",
         &[
-            onomy_upgrade_version,
+            upgrade_version,
             "--title",
             description,
             "--description",
@@ -119,11 +125,11 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     // tested after it as been tagged in the main repo.
     let version = sh_cosmovisor("version", &[]).await.stack()?;
     let version = version.trim();
-    if version != onomy_upgrade_version {
+    if version != upgrade_version {
         warn!("WARNING version after upgrade is {version}");
     }
     // asserting that the versions have changed provides most of the same guarantees
-    assert_ne!(onomy_current_version, version);
+    assert_ne!(current_version, version);
 
     info!("{:?}", get_staking_pool().await.stack()?);
     info!("{}", get_treasury().await.stack()?);

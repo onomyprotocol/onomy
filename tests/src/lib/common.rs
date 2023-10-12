@@ -3,13 +3,13 @@ use onomy_test_lib::{
     super_orchestrator::{
         docker::{Container, ContainerNetwork, Dockerfile},
         sh,
-        stacked_errors::Result,
+        stacked_errors::{Result, StackableErr},
     },
     Args, TIMEOUT,
 };
 
 pub fn dockerfile_onomyd() -> String {
-    onomy_std_cosmos_daemon("onomyd", ".onomy", "v1.1.1", "onomyd")
+    onomy_std_cosmos_daemon("onomyd", ".onomy", "v1.1.2", "onomyd")
 }
 
 /// Useful for running simple container networks that have a standard format and
@@ -46,9 +46,13 @@ pub async fn container_runner(args: &Args, name_and_contents: &[(&str, &str)]) -
         Some(dockerfiles_dir),
         true,
         logs_dir,
-    )?
-    .add_common_volumes(&[(logs_dir, "/logs")]);
+    )
+    .stack()?;
+    cn.add_common_volumes(&[(logs_dir, "/logs")]);
+    let uuid = cn.uuid_as_string();
+    cn.add_common_entrypoint_args(&["--uuid", &uuid]);
     cn.run_all(true).await?;
     cn.wait_with_timeout_all(true, TIMEOUT).await.unwrap();
+    cn.terminate_all().await;
     Ok(())
 }

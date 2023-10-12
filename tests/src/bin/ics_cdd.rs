@@ -14,7 +14,9 @@ use onomy_test_lib::{
         HermesChainConfig, IbcPair,
     },
     onomy_std_init, reprefix_bech32,
-    setups::{cosmovisor_add_consumer, marketd_setup, onomyd_setup, test_proposal},
+    setups::{
+        cosmovisor_add_consumer, marketd_setup, onomyd_setup, test_proposal, CosmosSetupOptions,
+    },
     super_orchestrator::{
         docker::{Container, ContainerNetwork, Dockerfile},
         net_message::NetMessenger,
@@ -95,17 +97,6 @@ async fn container_runner(args: &Args) -> Result<()> {
         .await
         .stack()?;
 
-    // prepare hermes config
-    write_hermes_config(
-        &[
-            HermesChainConfig::new("onomy", "onomy", false, "anom", true),
-            HermesChainConfig::new(CONSUMER_ID, CONSUMER_ACCOUNT_PREFIX, true, "anative", true),
-        ],
-        &format!("{dockerfiles_dir}/dockerfile_resources"),
-    )
-    .await
-    .stack()?;
-
     let entrypoint = Some(format!(
         "./target/{container_target}/release/{bin_entrypoint}"
     ));
@@ -150,10 +141,39 @@ async fn container_runner(args: &Args) -> Result<()> {
         true,
         logs_dir,
     )
-    .stack()?
-    .add_common_volumes(&[(logs_dir, "/logs")]);
+    .stack()?;
+    cn.add_common_volumes(&[(logs_dir, "/logs")]);
+    let uuid = cn.uuid_as_string();
+    cn.add_common_entrypoint_args(&["--uuid", &uuid]);
+
+    // prepare hermes config
+    write_hermes_config(
+        &[
+            HermesChainConfig::new(
+                "onomy",
+                &format!("onomyd_{uuid}"),
+                "onomy",
+                false,
+                "anom",
+                true,
+            ),
+            HermesChainConfig::new(
+                CONSUMER_ID,
+                &format!("{}_{}", consumer_binary_name(), uuid),
+                CONSUMER_ACCOUNT_PREFIX,
+                true,
+                "anative",
+                true,
+            ),
+        ],
+        &format!("{dockerfiles_dir}/dockerfile_resources"),
+    )
+    .await
+    .stack()?;
+
     cn.run_all(true).await.stack()?;
     cn.wait_with_timeout_all(true, TIMEOUT).await.stack()?;
+    cn.terminate_all().await;
     Ok(())
 }
 
@@ -216,16 +236,22 @@ async fn hermes_runner(args: &Args) -> Result<()> {
 async fn onomyd_runner(args: &Args) -> Result<()> {
     let consumer_id = CONSUMER_ID;
     let daemon_home = args.daemon_home.as_ref().stack()?;
-    let mut nm_hermes = NetMessenger::connect(STD_TRIES, STD_DELAY, "hermes:26000")
+    let mut nm_hermes =
+        NetMessenger::connect(STD_TRIES, STD_DELAY, &format!("hermes_{}:26000", args.uuid))
+            .await
+            .stack()?;
+    let mut nm_consumer = NetMessenger::connect(
+        STD_TRIES,
+        STD_DELAY,
+        &format!("{}_{}:26001", consumer_binary_name(), args.uuid),
+    )
+    .await
+    .stack()
+    .stack()?;
+
+    let mnemonic = onomyd_setup(CosmosSetupOptions::new(daemon_home))
         .await
         .stack()?;
-    let mut nm_consumer =
-        NetMessenger::connect(STD_TRIES, STD_DELAY, &format!("{consumer_id}d:26001"))
-            .await
-            .stack()
-            .stack()?;
-
-    let mnemonic = onomyd_setup(daemon_home, None).await.stack()?;
     // send mnemonic to hermes
     nm_hermes.send::<String>(&mnemonic).await.stack()?;
 
@@ -281,13 +307,13 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         .cosmovisor_ibc_transfer(
             "validator",
             &reprefix_bech32(addr, CONSUMER_ACCOUNT_PREFIX).stack()?,
-            &token18(100.0e3, ""),
+            &token18(1.0e3, ""),
             "anom",
         )
         .await
         .stack()?;
     // it takes time for the relayer to complete relaying
-    wait_for_num_blocks(4).await.stack()?;
+    wait_for_num_blocks(5).await.stack()?;
     // notify consumer that we have sent NOM
     nm_consumer.send::<IbcPair>(&ibc_pair).await.stack()?;
 
@@ -337,7 +363,7 @@ async fn consumer(args: &Args) -> Result<()> {
 
     // get keys
     let node_key = nm_onomyd.recv::<String>().await.stack()?;
-    // we used same keys for consumer as producer, need to copy them over or else
+    // we used same keys for consumer as provider, need to copy them over or else
     // the node will not be a working validator for itself
     FileOptions::write_str(&format!("{daemon_home}/config/node_key.json"), &node_key)
         .await
@@ -361,7 +387,7 @@ async fn consumer(args: &Args) -> Result<()> {
     // signal that we have started
     nm_onomyd.send::<()>(&()).await.stack()?;
 
-    // wait for producer to send us stuff
+    // wait for provider to send us stuff
     let ibc_pair = nm_onomyd.recv::<IbcPair>().await.stack()?;
     // get the name of the IBC NOM. Note that we can't do this on the onomyd side,
     // it has to be with respect to the consumer side
@@ -405,7 +431,7 @@ async fn consumer(args: &Args) -> Result<()> {
     info!("sending back to {}", test_addr);
 
     // avoid conflict with hermes relayer
-    wait_for_num_blocks(4).await.stack()?;
+    wait_for_num_blocks(5).await.stack()?;
 
     // send some IBC NOM back to origin chain using it as gas
     ibc_pair
@@ -413,7 +439,7 @@ async fn consumer(args: &Args) -> Result<()> {
         .cosmovisor_ibc_transfer("validator", test_addr, "5000", ibc_nom)
         .await
         .stack()?;
-    wait_for_num_blocks(4).await.stack()?;
+    wait_for_num_blocks(5).await.stack()?;
 
     let pubkey = sh_cosmovisor("tendermint show-validator", &[])
         .await
@@ -432,7 +458,7 @@ async fn consumer(args: &Args) -> Result<()> {
         "--min-self-delegation",
         "1",
         "--amount",
-        &token18(1.0e3, ONOMY_IBC_NOM),
+        &token18(500.0, ONOMY_IBC_NOM),
         "--fees",
         &format!("1000000{ONOMY_IBC_NOM}"),
         "--pubkey",
