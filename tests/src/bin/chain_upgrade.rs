@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use log::{info, warn};
 use onomy_test_lib::{
     cosmovisor::{
@@ -135,6 +137,9 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     info!("{}", get_treasury().await.stack()?);
     info!("{}", get_treasury_inflation_annual().await.stack()?);
 
-    cosmovisor_runner.terminate(TIMEOUT).await.stack()?;
+    cosmovisor_runner
+        .terminate(Duration::from_secs(10))
+        .await
+        .stack()?;
     Ok(())
 }
