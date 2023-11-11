@@ -8,8 +8,10 @@ use onomy_test_lib::{
     Args, TIMEOUT,
 };
 
+pub const ONOMYD_VERSION: &str = "v1.1.2";
+
 pub fn dockerfile_onomyd() -> String {
-    onomy_std_cosmos_daemon("onomyd", ".onomy", "v1.1.2", "onomyd")
+    onomy_std_cosmos_daemon("onomyd", ".onomy", ONOMYD_VERSION, "onomyd")
 }
 
 /// Useful for running simple container networks that have a standard format and
@@ -21,38 +23,34 @@ pub async fn container_runner(args: &Args, name_and_contents: &[(&str, &str)]) -
     let container_target = "x86_64-unknown-linux-gnu";
 
     // build internal runner
-    sh("cargo build --release --bin", &[
+    sh([
+        "cargo build --release --bin",
         bin_entrypoint,
         "--target",
         container_target,
     ])
     .await?;
 
-    let mut cn = ContainerNetwork::new(
-        "test",
-        name_and_contents
-            .iter()
-            .map(|(name, contents)| {
-                Container::new(
-                    name,
-                    Dockerfile::Contents(contents.to_string()),
-                    Some(&format!(
-                        "./target/{container_target}/release/{bin_entrypoint}"
-                    )),
-                    &["--entry-name", name],
+    let mut containers = vec![];
+    for (name, contents) in name_and_contents {
+        containers.push(
+            Container::new(name, Dockerfile::contents(contents))
+                .external_entrypoint(
+                    format!("./target/{container_target}/release/{bin_entrypoint}"),
+                    ["--entry-name", name],
                 )
-            })
-            .collect(),
-        Some(dockerfiles_dir),
-        true,
-        logs_dir,
-    )
-    .stack()?;
-    cn.add_common_volumes(&[(logs_dir, "/logs")]);
+                .await
+                .stack()?,
+        );
+    }
+
+    let mut cn =
+        ContainerNetwork::new("test", containers, Some(dockerfiles_dir), true, logs_dir).stack()?;
+    cn.add_common_volumes([(logs_dir, "/logs")]);
     let uuid = cn.uuid_as_string();
-    cn.add_common_entrypoint_args(&["--uuid", &uuid]);
-    cn.run_all(true).await?;
-    cn.wait_with_timeout_all(true, TIMEOUT).await.unwrap();
+    cn.add_common_entrypoint_args(["--uuid", &uuid]);
+    cn.run_all(true).await.stack()?;
+    cn.wait_with_timeout_all(true, TIMEOUT).await.stack()?;
     cn.terminate_all().await;
     Ok(())
 }

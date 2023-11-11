@@ -1,3 +1,5 @@
+//! based from onomy_tests/tests/src/bin/ics_with_iscd.rs
+
 use std::time::Duration;
 
 use common::dockerfile_onomyd;
@@ -5,7 +7,7 @@ use log::info;
 use onomy_test_lib::{
     cosmovisor::{
         cosmovisor_bank_send, cosmovisor_get_addr, cosmovisor_get_balances, cosmovisor_start,
-        set_minimum_gas_price, sh_cosmovisor, sh_cosmovisor_no_dbg, sh_cosmovisor_tx,
+        set_minimum_gas_price, sh_cosmovisor, sh_cosmovisor_no_debug, sh_cosmovisor_tx,
         wait_for_num_blocks,
     },
     dockerfiles::{dockerfile_hermes, onomy_std_cosmos_daemon_with_arbitrary},
@@ -21,12 +23,12 @@ use onomy_test_lib::{
         docker::{Container, ContainerNetwork, Dockerfile},
         net_message::NetMessenger,
         remove_files_in_dir, sh,
-        stacked_errors::{Error, Result, StackableErr},
-        FileOptions, STD_DELAY, STD_TRIES,
+        stacked_errors::{ensure, ensure_eq, Error, Result, StackableErr},
+        FileOptions,
     },
     token18, u64_array_bigints,
     u64_array_bigints::u256,
-    Args, ONOMY_IBC_NOM, TIMEOUT,
+    Args, ONOMY_IBC_NOM, STD_DELAY, STD_TRIES, TIMEOUT,
 };
 use tokio::time::sleep;
 
@@ -65,14 +67,11 @@ async fn main() -> Result<()> {
             _ => Err(Error::from(format!("entry_name \"{s}\" is not recognized"))),
         }
     } else {
-        sh("make build", &[]).await.stack()?;
+        sh(["make build"]).await.stack()?;
         // copy to dockerfile resources (docker cannot use files from outside cwd)
-        sh(
-            "cp ./onomyd ./tests/dockerfiles/dockerfile_resources/onomyd",
-            &[],
-        )
-        .await
-        .stack()?;
+        sh(["cp ./onomyd ./tests/dockerfiles/dockerfile_resources/onomyd"])
+            .await
+            .stack()?;
         container_runner(&args).await.stack()
     }
 }
@@ -84,7 +83,8 @@ async fn container_runner(args: &Args) -> Result<()> {
     let container_target = "x86_64-unknown-linux-gnu";
 
     // build internal runner with `--release`
-    sh("cargo build --release --bin", &[
+    sh([
+        "cargo build --release --bin",
         bin_entrypoint,
         "--target",
         container_target,
@@ -97,54 +97,51 @@ async fn container_runner(args: &Args) -> Result<()> {
         .await
         .stack()?;
 
-    let entrypoint = Some(format!(
-        "./target/{container_target}/release/{bin_entrypoint}"
-    ));
-    let entrypoint = entrypoint.as_deref();
+    let entrypoint = &format!("./target/{container_target}/release/{bin_entrypoint}");
 
     let mut cn = ContainerNetwork::new(
         "test",
         vec![
             Container::new(
                 "hermes",
-                Dockerfile::Contents(dockerfile_hermes("__tmp_hermes_config.toml")),
-                entrypoint,
-                &["--entry-name", "hermes"],
-            ),
-            Container::new(
-                "onomyd",
-                Dockerfile::Contents(dockerfile_onomyd()),
-                entrypoint,
-                &["--entry-name", "onomyd"],
+                Dockerfile::contents(dockerfile_hermes("__tmp_hermes_config.toml")),
             )
-            .volumes(&[(
-                "./tests/resources/keyring-test",
-                "/root/.onomy/keyring-test",
-            )]),
+            .external_entrypoint(entrypoint, ["--entry-name", "hermes"])
+            .await
+            .stack()?,
+            Container::new("onomyd", Dockerfile::contents(dockerfile_onomyd()))
+                .external_entrypoint(entrypoint, ["--entry-name", "onomyd"])
+                .await
+                .stack()?
+                .volume(
+                    "./tests/resources/keyring-test",
+                    "/root/.onomy/keyring-test",
+                ),
             Container::new(
                 &consumer_binary_name(),
-                Dockerfile::Contents(onomy_std_cosmos_daemon_with_arbitrary(
+                Dockerfile::contents(onomy_std_cosmos_daemon_with_arbitrary(
                     &consumer_binary_name(),
                     &consumer_directory(),
                     CONSUMER_VERSION,
                     INTERCHAIN_SECURTY_CDD,
                 )),
-                entrypoint,
-                &["--entry-name", "consumer"],
             )
-            .volumes(&[(
+            .external_entrypoint(entrypoint, ["--entry-name", "consumer"])
+            .await
+            .stack()?
+            .volume(
                 "./tests/resources/keyring-test",
-                &format!("/root/{}/keyring-test", consumer_directory()),
-            )]),
+                format!("/root/{}/keyring-test", consumer_directory()),
+            ),
         ],
         Some(dockerfiles_dir),
         true,
         logs_dir,
     )
     .stack()?;
-    cn.add_common_volumes(&[(logs_dir, "/logs")]);
+    cn.add_common_volumes([(logs_dir, "/logs")]);
     let uuid = cn.uuid_as_string();
-    cn.add_common_entrypoint_args(&["--uuid", &uuid]);
+    cn.add_common_entrypoint_args(["--uuid", &uuid]);
 
     // prepare hermes config
     write_hermes_config(
@@ -179,7 +176,7 @@ async fn container_runner(args: &Args) -> Result<()> {
 
 async fn hermes_runner(args: &Args) -> Result<()> {
     let hermes_home = args.hermes_home.as_ref().stack()?;
-    let mut nm_onomyd = NetMessenger::listen_single_connect("0.0.0.0:26000", TIMEOUT)
+    let mut nm_onomyd = NetMessenger::listen("0.0.0.0:26000", TIMEOUT)
         .await
         .stack()?;
 
@@ -189,16 +186,12 @@ async fn hermes_runner(args: &Args) -> Result<()> {
     FileOptions::write_str("/root/.hermes/mnemonic.txt", &mnemonic)
         .await
         .stack()?;
-    sh_hermes(
-        "keys add --chain onomy --mnemonic-file /root/.hermes/mnemonic.txt",
-        &[],
-    )
-    .await
-    .stack()?;
-    sh_hermes(
-        &format!("keys add --chain {CONSUMER_ID} --mnemonic-file /root/.hermes/mnemonic.txt"),
-        &[],
-    )
+    sh_hermes(["keys add --chain onomy --mnemonic-file /root/.hermes/mnemonic.txt"])
+        .await
+        .stack()?;
+    sh_hermes([format!(
+        "keys add --chain {CONSUMER_ID} --mnemonic-file /root/.hermes/mnemonic.txt"
+    )])
     .await
     .stack()?;
 
@@ -326,7 +319,7 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     // recieve round trip signal
     nm_consumer.recv::<()>().await.stack()?;
     // check that the IBC NOM converted back to regular NOM
-    assert_eq!(
+    ensure_eq!(
         cosmovisor_get_balances("onomy1gk7lg5kd73mcr8xuyw727ys22t7mtz9gh07ul3")
             .await
             .stack()?["anom"],
@@ -340,7 +333,7 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 
     FileOptions::write_str(
         "/logs/onomyd_export.json",
-        &sh_cosmovisor_no_dbg("export", &[]).await.stack()?,
+        &sh_cosmovisor_no_debug(["export"]).await.stack()?,
     )
     .await
     .stack()?;
@@ -351,7 +344,7 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 async fn consumer(args: &Args) -> Result<()> {
     let daemon_home = args.daemon_home.as_ref().stack()?;
     let chain_id = CONSUMER_ID;
-    let mut nm_onomyd = NetMessenger::listen_single_connect("0.0.0.0:26001", TIMEOUT)
+    let mut nm_onomyd = NetMessenger::listen("0.0.0.0:26001", TIMEOUT)
         .await
         .stack()?;
     // we need the initial consumer state
@@ -392,9 +385,9 @@ async fn consumer(args: &Args) -> Result<()> {
     // get the name of the IBC NOM. Note that we can't do this on the onomyd side,
     // it has to be with respect to the consumer side
     let ibc_nom = &ibc_pair.a.get_ibc_denom("anom").await.stack()?;
-    assert_eq!(ibc_nom, ONOMY_IBC_NOM);
+    ensure_eq!(ibc_nom, ONOMY_IBC_NOM);
     let balances = cosmovisor_get_balances(addr).await.stack()?;
-    assert!(balances.contains_key(ibc_nom));
+    ensure!(balances.contains_key(ibc_nom));
 
     // we have IBC NOM, shut down, change gas in app.toml, restart
     cosmovisor_runner.terminate(TIMEOUT).await.stack()?;
@@ -418,7 +411,7 @@ async fn consumer(args: &Args) -> Result<()> {
     cosmovisor_bank_send(addr, dst_addr, "5000", ibc_nom)
         .await
         .stack()?;
-    assert_eq!(
+    ensure_eq!(
         cosmovisor_get_balances(dst_addr).await.stack()?[ibc_nom],
         u256!(5000)
     );
@@ -439,13 +432,12 @@ async fn consumer(args: &Args) -> Result<()> {
         .cosmovisor_ibc_transfer("validator", test_addr, "5000", ibc_nom)
         .await
         .stack()?;
-    wait_for_num_blocks(5).await.stack()?;
+    wait_for_num_blocks(6).await.stack()?;
 
-    let pubkey = sh_cosmovisor("tendermint show-validator", &[])
-        .await
-        .stack()?;
+    let pubkey = sh_cosmovisor(["tendermint show-validator"]).await.stack()?;
     let pubkey = pubkey.trim();
-    sh_cosmovisor_tx("staking", &[
+    sh_cosmovisor_tx([
+        "staking",
         "create-validator",
         "--commission-max-change-rate",
         "0.01",
@@ -514,17 +506,17 @@ async fn consumer(args: &Args) -> Result<()> {
 
     cosmovisor_runner.terminate(TIMEOUT).await.stack()?;
 
-    let exported = sh_cosmovisor_no_dbg("export", &[]).await.stack()?;
+    let exported = sh_cosmovisor_no_debug(["export"]).await.stack()?;
     FileOptions::write_str(&format!("/logs/{chain_id}_export.json"), &exported)
         .await
         .stack()?;
     /*let exported = yaml_str_to_json_value(&exported).stack()?;
-    assert_eq!(
-        exported["app_state"]["crisis"]["constant_fee"]["denom"],
+    ensure_eq!(
+        stacked_get!(exported["app_state"]["crisis"]["constant_fee"]["denom"]),
         test_crisis_denom
     );
-    assert_eq!(
-        exported["app_state"]["crisis"]["constant_fee"]["amount"],
+    ensure_eq!(
+        stacked_get!(exported["app_state"]["crisis"]["constant_fee"]["amount"]),
         "1337"
     );*/
 

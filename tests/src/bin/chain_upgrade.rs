@@ -1,4 +1,4 @@
-use std::time::Duration;
+//! based from onomy_tests/tests/src/bin/onomy_upgrade.rs
 
 use log::{info, warn};
 use onomy_test_lib::{
@@ -11,10 +11,9 @@ use onomy_test_lib::{
     super_orchestrator::{
         docker::{Container, ContainerNetwork, Dockerfile},
         sh,
-        stacked_errors::{Error, Result, StackableErr},
-        STD_DELAY, STD_TRIES,
+        stacked_errors::{ensure_eq, ensure_ne, Error, Result, StackableErr},
     },
-    Args, TIMEOUT,
+    Args, STD_DELAY, STD_TRIES, TIMEOUT,
 };
 
 #[tokio::main]
@@ -27,14 +26,11 @@ async fn main() -> Result<()> {
             _ => Err(Error::from(format!("entry_name \"{s}\" is not recognized"))),
         }
     } else {
-        sh("make build", &[]).await.stack()?;
+        sh(["make build"]).await.stack()?;
         // copy to dockerfile resources (docker cannot use files from outside cwd)
-        sh(
-            "cp ./../onomy/onomyd ./tests/dockerfiles/dockerfile_resources/onomyd",
-            &[],
-        )
-        .await
-        .stack()?;
+        sh(["cp ./../onomy/onomyd ./tests/dockerfiles/dockerfile_resources/onomyd"])
+            .await
+            .stack()?;
         container_runner(&args).await
     }
 }
@@ -46,7 +42,8 @@ async fn container_runner(args: &Args) -> Result<()> {
     let container_target = "x86_64-unknown-linux-gnu";
 
     // build internal runner
-    sh("cargo build --release --bin", &[
+    sh([
+        "cargo build --release --bin",
         bin_entrypoint,
         "--target",
         container_target,
@@ -58,20 +55,22 @@ async fn container_runner(args: &Args) -> Result<()> {
         "test",
         vec![Container::new(
             "onomyd",
-            Dockerfile::Path(format!("{dockerfiles_dir}/chain_upgrade.dockerfile")),
-            Some(&format!(
-                "./target/{container_target}/release/{bin_entrypoint}"
-            )),
-            &["--entry-name", "onomyd"],
-        )],
+            Dockerfile::path(format!("{dockerfiles_dir}/chain_upgrade.dockerfile")),
+        )
+        .external_entrypoint(
+            format!("./target/{container_target}/release/{bin_entrypoint}"),
+            ["--entry-name", "onomyd"],
+        )
+        .await
+        .stack()?],
         None,
         true,
         logs_dir,
     )
     .stack()?;
-    cn.add_common_volumes(&[(logs_dir, "/logs")]);
+    cn.add_common_volumes([(logs_dir, "/logs")]);
     let uuid = cn.uuid_as_string();
-    cn.add_common_entrypoint_args(&["--uuid", &uuid]);
+    cn.add_common_entrypoint_args(["--uuid", &uuid]);
     cn.run_all(true).await.stack()?;
     cn.wait_with_timeout_all(true, TIMEOUT).await.stack()?;
     cn.terminate_all().await;
@@ -91,8 +90,8 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 
     let mut cosmovisor_runner = cosmovisor_start("onomyd_runner.log", None).await.stack()?;
 
-    assert_eq!(
-        sh_cosmovisor("version", &[]).await.stack()?.trim(),
+    ensure_eq!(
+        sh_cosmovisor(["version"]).await.stack()?.trim(),
         current_version
     );
 
@@ -125,21 +124,18 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     // Ideally we would just compare the version to `onomy_upgrade_version`, but
     // development and merge squashing messes up the tags. This should be manually
     // tested after it as been tagged in the main repo.
-    let version = sh_cosmovisor("version", &[]).await.stack()?;
+    let version = sh_cosmovisor(["version"]).await.stack()?;
     let version = version.trim();
     if version != upgrade_version {
         warn!("WARNING version after upgrade is {version}");
     }
-    // asserting that the versions have changed provides most of the same guarantees
-    assert_ne!(current_version, version);
+    // ensuring that the versions have changed provides most of the same guarantees
+    ensure_ne!(current_version, version);
 
     info!("{:?}", get_staking_pool().await.stack()?);
     info!("{}", get_treasury().await.stack()?);
     info!("{}", get_treasury_inflation_annual().await.stack()?);
 
-    cosmovisor_runner
-        .terminate(Duration::from_secs(10))
-        .await
-        .stack()?;
+    cosmovisor_runner.terminate(TIMEOUT).await.stack()?;
     Ok(())
 }
