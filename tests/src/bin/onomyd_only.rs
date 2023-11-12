@@ -1,4 +1,4 @@
-//! based from onomy_tests/tests/src/bin/onomyd_only.r
+//! based from onomy_tests/tests/src/bin/onomyd_only.rs
 
 use std::time::Duration;
 
