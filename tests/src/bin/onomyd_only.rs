@@ -2,7 +2,7 @@
 
 use std::time::Duration;
 
-use common::{container_runner, dockerfile_onomyd};
+use common::container_runner;
 use log::info;
 use onomy_test_lib::{
     cosmovisor::{
@@ -10,8 +10,9 @@ use onomy_test_lib::{
         get_delegations_to, get_staking_pool, get_treasury, get_treasury_inflation_annual,
         sh_cosmovisor, sh_cosmovisor_no_debug, sh_cosmovisor_tx, wait_for_num_blocks,
     },
+    dockerfiles::dockerfile_onomyd,
     onomy_std_init, reprefix_bech32,
-    setups::{onomyd_setup, CosmosSetupOptions},
+    setups::{cosmovisor_setup, CosmosSetupOptions},
     super_orchestrator::{
         sh,
         stacked_errors::{ensure, ensure_eq, Error, Result, StackableErr},
@@ -45,9 +46,9 @@ async fn main() -> Result<()> {
 
 async fn onomyd_runner(args: &Args) -> Result<()> {
     let daemon_home = args.daemon_home.as_ref().stack()?;
-    let mut options = CosmosSetupOptions::new(daemon_home);
+    let mut options = CosmosSetupOptions::onomy(daemon_home);
     options.high_staking_level = true;
-    onomyd_setup(options).await.stack()?;
+    cosmovisor_setup(options).await.stack()?;
     let mut cosmovisor_runner = cosmovisor_start("onomyd_runner.log", None).await.stack()?;
 
     let addr = &cosmovisor_get_addr("validator").await.stack()?;

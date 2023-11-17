@@ -7,7 +7,7 @@ use onomy_test_lib::{
         get_treasury, get_treasury_inflation_annual, sh_cosmovisor, wait_for_height,
     },
     nom, onomy_std_init,
-    setups::{onomyd_setup, CosmosSetupOptions},
+    setups::{cosmovisor_setup, CosmosSetupOptions},
     super_orchestrator::{
         docker::{Container, ContainerNetwork, Dockerfile},
         sh,
@@ -84,7 +84,7 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 
     info!("current version: {current_version}, upgrade version: {upgrade_version}");
 
-    onomyd_setup(CosmosSetupOptions::new(daemon_home))
+    cosmovisor_setup(CosmosSetupOptions::onomy(daemon_home))
         .await
         .stack()?;
 
@@ -94,6 +94,9 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
         sh_cosmovisor(["version"]).await.stack()?.trim(),
         current_version
     );
+
+    //sh(&format!("cosmovisor add-upgrade v1.1.2 /logs/onomyd --upgrade-height
+    // 10"), &[]).await.stack()?;
 
     let upgrade_prepare_start = get_block_height().await.stack()?;
     let upgrade_height = &format!("{}", upgrade_prepare_start + 4);
