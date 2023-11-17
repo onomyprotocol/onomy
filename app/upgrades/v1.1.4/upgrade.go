@@ -1,5 +1,5 @@
-// Package v1_1_3 is contains chain upgrade of the corresponding version.
-package v1_1_3 //nolint:revive,stylecheck // app version
+// Package v1_1_4 is contains chain upgrade of the corresponding version.
+package v1_1_4 //nolint:revive,stylecheck // app version
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -8,7 +8,7 @@ import (
 )
 
 // Name is migration name.
-const Name = "v1.1.3"
+const Name = "v1.1.4"
 
 // UpgradeHandler is an x/upgrade handler.
 func UpgradeHandler(_ sdk.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {

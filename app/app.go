@@ -106,7 +106,7 @@ import (
 	v1_0_3_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.5"
 	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
 	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
-	v1_1_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.3"
+	v1_1_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.4"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -818,7 +818,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 		},
 	)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_1_2.Name, v1_1_2.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_1_3.Name, v1_1_3.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_1_4.Name, v1_1_4.UpgradeHandler)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
@@ -837,7 +837,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{providertypes.ModuleName, providertypes.StoreKey},
 		}
-	case v1_1_3.Name:
+	case v1_1_4.Name:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{authz.ModuleName, authzkeeper.StoreKey},
 		}
