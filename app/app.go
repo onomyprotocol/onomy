@@ -30,6 +30,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -102,6 +105,8 @@ import (
 	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
 	v1_0_3_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.5"
 	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
+	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
+	v1_1_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.4"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -156,6 +161,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
+		authzmodule.AppModuleBasic{},
 		ibc.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
@@ -240,6 +246,7 @@ type OnomyApp struct {
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
+	AuthzKeeper      authzkeeper.Keeper
 	ProviderKeeper   ibcproviderkeeper.Keeper
 
 	// make scoped keepers public for test purposes
@@ -283,7 +290,7 @@ func New( // nolint:funlen // app new cosmos func
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, authzkeeper.StoreKey,
 		providertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -321,6 +328,11 @@ func New( // nolint:funlen // app new cosmos func
 	// fee-pool to receive tokens from the consumer chain
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.BlockedAddrs(),
+	)
+	app.AuthzKeeper = authzkeeper.NewKeeper(
+		keys[authzkeeper.StoreKey],
+		appCodec,
+		app.BaseApp.MsgServiceRouter(),
 	)
 	stakingKeeper := stakingkeeper.NewKeeper(
 		appCodec, keys[stakingtypes.StoreKey], app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName),
@@ -469,6 +481,7 @@ func New( // nolint:funlen // app new cosmos func
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		transferModule,
 		dao.NewAppModule(appCodec, app.DaoKeeper),
 		providerModule,
@@ -493,6 +506,7 @@ func New( // nolint:funlen // app new cosmos func
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		crisistypes.ModuleName,
+		authz.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
@@ -514,6 +528,7 @@ func New( // nolint:funlen // app new cosmos func
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		crisistypes.ModuleName,
+		authz.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
@@ -539,6 +554,7 @@ func New( // nolint:funlen // app new cosmos func
 		ibchost.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
+		authz.ModuleName,
 		ibctransfertypes.ModuleName,
 		crisistypes.ModuleName,
 		paramstypes.ModuleName,
@@ -569,6 +585,7 @@ func New( // nolint:funlen // app new cosmos func
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		dao.NewAppModule(appCodec, app.DaoKeeper),
@@ -800,6 +817,8 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		},
 	)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_1_2.Name, v1_1_2.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_1_4.Name, v1_1_4.UpgradeHandler)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
@@ -816,8 +835,11 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case v1_1_1.Name:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			// TODO not sure if we need the StoreKey
 			Added: []string{providertypes.ModuleName, providertypes.StoreKey},
+		}
+	case v1_1_4.Name:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{authz.ModuleName, authzkeeper.StoreKey},
 		}
 	default:
 		// no store upgrades

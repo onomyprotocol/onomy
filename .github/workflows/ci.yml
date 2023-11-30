@@ -35,10 +35,10 @@ jobs:
         # TODO there is some unused stuff we need to fix or remove
         # make all-in-docker
         run: |
+          cargo r --bin chain_upgrade
           go test ./...
           cargo r --bin onomyd_only
-          cargo r --bin ics_with_interchain_security_cd
-          cargo r --bin chain_upgrade
+          cargo r --bin ics_cdd
           cargo r --bin clean
 
   rustfmt:
