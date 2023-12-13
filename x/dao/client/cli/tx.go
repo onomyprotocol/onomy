@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -23,6 +24,11 @@ type proposalGeneric struct {
 	Deposit     string
 }
 
+func addTxFlags(cmd *cobra.Command) *cobra.Command {
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
 // GetTxCmd returns the transaction commands for this module.
 func GetTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -33,9 +39,9 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdFundTreasuryProposal())
-	cmd.AddCommand(CmdExchangeWithTreasuryProposal())
-	cmd.AddCommand(CmdFundAccountProposal())
+	cmd.AddCommand(addTxFlags(CmdFundTreasuryProposal()))
+	cmd.AddCommand(addTxFlags(CmdExchangeWithTreasuryProposal()))
+	cmd.AddCommand(addTxFlags((CmdFundAccountProposal())))
 
 	return cmd
 }
