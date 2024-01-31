@@ -46,7 +46,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=onomy \
 	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
-BUILD_FLAGS := -ldflags '$(ldflags)' -gcflags="all=-N -l"
+BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)' -gcflags="all=-N -l"
 
 .PHONY: all
 all: lint proto-lint test install
