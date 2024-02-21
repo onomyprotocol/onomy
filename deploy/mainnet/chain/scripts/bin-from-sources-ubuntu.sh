@@ -29,6 +29,7 @@ echo "--------------installing golang---------------------------"
 curl https://dl.google.com/go/go1.22.0.linux-amd64.tar.gz --output $HOME/go.tar.gz
 sudo tar -C /usr/local -xzf $HOME/go.tar.gz
 rm $HOME/go.tar.gz
+mkdir -p $HOME/go/bin
 export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
