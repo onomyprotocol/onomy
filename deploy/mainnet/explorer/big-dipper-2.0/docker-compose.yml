@@ -1,0 +1,80 @@
+version: '3.6'
+services:
+  hasura:
+    # docker build -t onomy/hasura-graphql-engine:latest . -f hasura.Dockerfile
+    image: onomy/hasura-graphql-engine:latest
+    container_name: onomy-hasura-graphql-engine
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - "postgres"
+    environment:
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+      ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
+      HASURA_GRAPHQL_DATABASE_URL: postgres://root:xonomy@postgres:5432/postgres
+      ## enable the console served by server
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
+      ## enable debugging mode. It is recommended to disable this in production
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      ## uncomment next line to set an admin secret
+      HASURA_GRAPHQL_ADMIN_SECRET: xonomy
+      ## action url to refer to action API
+      ACTION_BASE_URL: http://bdjuno:3000
+
+  postgres:
+    image: postgres:13.1
+    container_name: onomy-bdjuno-postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=xonomy
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - APP_DB_USER=docker
+      - APP_DB_PASS=docker
+      - APP_DB_NAME=docker
+    volumes:
+      - ./db/initdb:/docker-entrypoint-initdb.d/
+      - ./db/pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+
+  bdjuno:
+    # docker build -t onomy/bdjuno:latest .
+    image: onomy/bdjuno:latest
+    container_name: onomy-bdjuno
+    depends_on:
+      - "postgres"
+    restart: always
+    command: bdjuno start --home /root/.bdjuno
+    volumes:
+      - .bdjuno:/root/.bdjuno
+
+  big-dipper-2:
+    image: onomy/big-dipper-2-mainnet:latest
+    restart: always
+    container_name: onomy-otrust-mainnet
+    ports:
+      - 80:3000
+
+  nodeexporter:
+    image: prom/node-exporter:v1.3.1
+    container_name: nodeexporter
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - '9100:9100'

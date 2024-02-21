@@ -1,0 +1,153 @@
+global:
+  scrape_interval: 5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 5s # Evaluate rules every 15 seconds. The default is every 1 minute.
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+rule_files:
+  - "alerts/alert.rules"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'localhost:9090' ]
+
+  - job_name: 'cosmos'
+    static_configs:
+      - targets: [ "34.174.65.182:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-cappuccinode'
+      - targets: [ "34.28.250.29:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-full1'
+      - targets: [ "35.224.118.71:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-full2'
+      - targets: [ "34.31.76.30:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-jedi'
+      - targets: [ "34.133.228.142:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-sentry1'
+      - targets: [ "34.83.58.197:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-sentry2'
+      - targets: [ "34.174.240.142:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-sentry3'
+      - targets: [ "34.73.221.3:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-pendulum'
+      - targets: [ "35.184.202.80:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-seed1'
+      - targets: [ "35.247.95.86:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-seed2'
+      - targets: [ "34.82.46.134:26660" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-the-tao'
+
+  - job_name: 'node'
+    static_configs:
+      # self node
+      - targets: [ "nodeexporter:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'monitoring'
+      # cosmos nodes
+      - targets: [ "34.174.65.182:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-cappuccinode'
+      - targets: [ "34.28.250.29:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-full1'
+      - targets: [ "35.224.118.71:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-full2'
+      - targets: [ "34.31.76.30:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-jedi'
+      - targets: [ "34.133.228.142:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-sentry1'
+      - targets: [ "34.83.58.197:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-sentry2'
+      - targets: [ "34.174.240.142:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-sentry3'
+      - targets: [ "34.73.221.3:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-pendulum'
+      - targets: [ "35.184.202.80:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-seed1'
+      - targets: [ "35.247.95.86:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-seed2'
+      - targets: [ "34.82.46.134:9100" ]
+        labels:
+          environment: mainnet
+          instance: 'mainnet-the-tao'
+#      # eth nodes
+#      - targets: [ "44.212.108.161:9100" ]
+#        labels:
+#          environment: mainnet
+#          instance: 'eth-mainnet-2'
+#      # misc
+#      - targets: [ "54.85.207.1:9100" ]
+#        labels:
+#          environment: mainnet
+#          instance: 'explorer'
+#        
+#  - job_name: 'geth'
+#    metrics_path: /debug/metrics/prometheus
+#    scheme: http
+#    static_configs:
+#      - targets: [ "44.212.108.161:6060" ]
+#        labels:
+#          environment: mainnet
+#          instance: 'eth-mainnet-2'
+
+#  - job_name: 'eth-orchestrator'
+#    metrics_path: /metrics
+#    scheme: http
+#    static_configs:
+#      - targets: [ "34.174.65.182:6631" ]
+#        labels:
+#          environment: mainnet
+#          instance: 'mainnet-cappuccinode'
+#      - targets: [ "34.31.76.30:6631" ]
+#        labels:
+#          environment: mainnet
+#          instance: 'mainnet-jedi'
+#      - targets: [ "34.82.46.134:6631" ]
+#        labels:
+#          environment: mainnet
+#          instance: 'mainnet-the-tao'

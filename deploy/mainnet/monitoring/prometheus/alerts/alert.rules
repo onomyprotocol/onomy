@@ -1,0 +1,203 @@
+groups:
+  - name: Cosmos Monitoring
+    rules:
+    - alert: InstanceDown
+      # Condition for alerting
+      expr: up == 0
+      for: 3m
+      # Annotation - additional informational labels to store more information
+      annotations:
+        title: 'Instance {{ $labels.instance }} down'
+        description: '{{ $labels.job }} on {{ $labels.instance }} has been down for more than 3 minutes'
+      # Labels - additional labels to be attached to the alert
+      labels:
+        severity: 'critical'
+
+    - alert: NodeFilesystemReadonly
+      expr: node_filesystem_readonly{fstype!~"rootfs|nfs4|ramfs"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        service: node_exporter
+      annotations:
+        description: 'Filesystem "{{ $labels.mountpoint }}" on "{{ $labels.instance }}" is read-only.'
+
+    - alert: NodeDiskFull4H
+      expr: predict_linear(node_filesystem_free_bytes{fstype!~"rootfs|nfs4|tmpfs"}[4h], 4 * 3600) < 0
+      for: 5m
+      labels:
+        severity: major
+        service: node_exporter
+      annotations:
+        description: 'Filesystem "{{ $labels.mountpoint }}" on "{{ $labels.instance }}" will be out of diskspace within 4 hours.'
+
+    - alert: NodeDiskFull1H
+      expr: predict_linear(node_filesystem_free_bytes{fstype!~"rootfs|nfs4|tmpfs"}[4h], 3600) < 0
+      for: 5m
+      labels:
+        severity: critical
+        service: node_exporter
+      annotations:
+        description: 'Filesystem "{{ $labels.mountpoint }}" on "{{ $labels.instance }}" will be out of diskspace within 1 hour.'
+
+    - alert: NodeDiskFull
+      expr: node_filesystem_avail_bytes/node_filesystem_size_bytes < 0.01
+      for: 5m
+      labels:
+        severity: critical
+        service: node_exporter
+      annotations:
+        description: 'Filesystem "{{ $labels.mountpoint }}" on "{{ $labels.instance }}" is out of diskspace (< 1% free).'
+
+    - alert: NodeInodeFull4H
+      expr: predict_linear(node_filesystem_files_free{fstype!~"rootfs|nfs4|tmpfs"}[4h], 4 * 3600) < 0
+      for: 5m
+      labels:
+        severity: major
+        service: node_exporter
+      annotations:
+        description: 'Filesystem "{{ $labels.mountpoint }}" on "{{ $labels.instance }}" will be out of inode numbers within 4 hours.'
+
+    - alert: NodeInodeFull1H
+      expr: predict_linear(node_filesystem_files_free{fstype!~"rootfs|nfs4|tmpfs"}[4h], 3600) < 0
+      for: 5m
+      labels:
+        severity: critical
+        service: node_exporter
+      annotations:
+        description: 'Filesystem "{{ $labels.mountpoint }}" on "{{ $labels.instance }}" will be out of inode numbers within 1 hour.'
+
+    - alert: NodeInodeFull
+      expr: node_filesystem_files_free/node_filesystem_files < 0.01
+      for: 5m
+      labels:
+        severity: critical
+        service: node_exporter
+      annotations:
+        description: 'Filesystem "{{ $labels.mountpoint }}" on "{{ $labels.instance }}" out of inodes (< 1% free).'
+
+    - alert: NodeOutOfMemory
+      expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+      for: 2m
+      labels:
+        severity: major
+        service: node_exporter
+      annotations:
+        description: 'Node memory is filling up < 10% left\n  VALUE = {{ $value }}\n LABELS: {{ $labels.instance }}'
+
+    - alert: NodeHighCPULoad
+      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
+      for: 0m
+      labels:
+        severity: major
+        service: node_exporter
+      annotations:
+        description: 'CPU load is > 80%\n  VALUE = {{ $value }}\n LABELS: {{ $labels.instance }}'
+
+    - alert: NodeTimeOutOfSync
+      expr: node_timex_sync_status{} != 1
+      for: 5m
+      labels:
+        severity: major
+        service: node_exporter
+      annotations:
+        description: 'Time on instance "{{ $labels.instance }}" not in sync with NTP.'
+
+    - alert: NodeTextfileCollectorDown
+      expr: time() - node_textfile_mtime_seconds{} > 3000
+      for: 5m
+      labels:
+        severity: major
+        service: node_exporter
+      annotations:
+        description: 'Node-exporter textfile collector for file "{{ $labels.file }}" on "{{ $labels.instance }}" has been down for 5 minutes.'
+
+    - alert: NodeTextfileScrapingError
+      expr: node_textfile_scrape_error != 0
+      for: 5m
+      labels:
+        severity: major
+        service: node_exporter
+      annotations:
+        description: 'Node-exporter textfile collector scraping error on "{{ $labels.instance }}".'
+
+    - alert: DegradedSyncing
+      expr: rate(tendermint_consensus_latest_block_height{job="cosmos"}[5m]) < 0.1
+      for: 5m
+      labels:
+        severity: major
+        service: cosmos-monitoring
+      annotations:
+        description: 'Degraded syncing on {{ $labels.instance }}'
+
+    - alert: TooFewPeers
+      expr: tendermint_p2p_peers{job="cosmos"} < 3
+      for: 5m
+      labels:
+        severity: major
+        service: cosmos-monitoring
+      annotations:
+        description: 'P2P Peers on {{ $labels.instance }} is lower than threshold (3)'
+    
+    - alert: NodeStall
+      expr: (tendermint_consensus_height{chain_id="$chain_id", instance="$instance"} == bool tendermint_consensus_latest_block_height{chain_id="$chain_id",instance="$instance"}) == 1
+      for: 5m
+      labels:
+        severity: major
+        service: cosmos-monitoring
+      annotations:
+        description: 'Syncing appears to be stalled on {{ $labels.instance }}'
+    
+    - alert: ChainHalt
+      expr: rate(tendermint_consensus_height{job="cosmos"}[5m]) == 0
+      for: 1m
+      labels:
+        severity: critical
+        service: cosmos-monitoring
+      annotations:
+        description: 'Chain appears to be halted'
+
+    - alert: ValidatorMissing
+      expr: tendermint_consensus_missing_validators{job="cosmos"} > 0
+      for: 30s
+      labels:
+        severity: critical
+        service: cosmos-monitoring
+      annotations:
+        description: 'Validator is missing'
+
+    - alert: EthOrchestratorEthereumHalt
+      expr: rate(orchestrator_information{gauge="latest_eth_block",job="eth-orchestrator"}[15m]) == 0
+      for: 1m
+      labels:
+        severity: critical
+        service: cosmos-monitoring
+      annotations:
+        description: 'Eth orchestrator on {{ $labels.instance }} is halt on the same eth block'
+
+    - alert: EthOrchestratorCosmosHalt
+      expr: rate(orchestrator_information{gauge="latest_cosmos_block",job="eth-orchestrator"}[3m]) == 0
+      for: 1m
+      labels:
+        severity: critical
+        service: cosmos-monitoring
+      annotations:
+        description: 'Eth orchestrator on {{ $labels.instance }} is halt on the same cosmos block'
+
+    - alert: EthOrchestratorErrorsRate
+      expr: rate(orchestrator_errors_count_total{job="eth-orchestrator"}[5m]) * 5 * 60 > 5
+      for: 1m
+      labels:
+        severity: major
+        service: cosmos-monitoring
+      annotations:
+        description: 'Eth orchestrator on {{ $labels.instance }} errors count for the last 5min > 5'
+
+    - alert: EthOrchestratorWarningsRate
+      expr: rate(orchestrator_warnings_count_total{job="eth-orchestrator"}[5m]) * 5 * 60 > 10
+      for: 1m
+      labels:
+        severity: major
+        service: cosmos-monitoring
+      annotations:
+        description: 'Eth orchestrator on {{ $labels.instance }} warnings count for the last 5min > 10'

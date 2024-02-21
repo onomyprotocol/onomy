@@ -1,0 +1,17 @@
+# Orchestrator configuration options
+[orchestrator]
+relayer_enabled = true
+
+# Relayer configuration options
+[relayer]
+batch_request_mode = "EveryBatch"
+
+[relayer.valset_relaying_mode]
+mode = "EveryValset"
+
+[relayer.batch_relaying_mode]
+mode = "EveryBatch"
+
+[metrics]
+metrics_enabled = true
+metrics_bind = "0.0.0.0:6631"

@@ -1,0 +1,105 @@
+version: '3'
+
+services:
+  validator1:
+    # docker build -t onomy/mainnet-node:local .
+
+    # docker exec -it onomy-mainnet-validator1 bash
+    # export GPG_TTY=$(tty)
+
+    # in case of errors with pass try:
+    # rm ~/.gnupg/S.*  &&  gpg-connect-agent reloadagent /bye # remove cache && restart gpg agent
+
+    # copy genesis to seed
+    # docker cp onomy-mainnet-validator1:/root/.onomy/config/genesis.json .
+    # docker exec -i onomy-mainnet-seed1 sh -c 'cat > /root/.onomy/config/genesis.json' < ./genesis.json
+
+    image: onomy/mainnet-node:local
+    restart: always
+    container_name: onomy-mainnet-validator1
+    volumes:
+      - .:/root/mainnet
+    command: "sleep 100000000"
+    ports:
+      # onomy
+      - 26656:26656
+      - 26657:26657
+      - 26660:26660 # prometheus
+      - 1317:1317 # swagger
+      - 61278:61278
+      - 9191:9191
+      - 9100:9100 # node exporter
+      - 6631:6631 # eth orchestrator metrics
+
+  sentry1:
+    # docker exec -it onomy-mainnet-sentry1 bash
+    # export GPG_TTY=$(tty)
+    image: onomy/mainnet-node:local
+    restart: always
+    container_name: onomy-mainnet-sentry1
+    volumes:
+      - .:/root/mainnet
+    command: "sleep 100000000"
+  sentry2:
+    # docker exec -it onomy-mainnet-sentry2 bash
+    # export GPG_TTY=$(tty)
+    image: onomy/mainnet-node:local
+    restart: always
+    container_name: onomy-mainnet-sentry2
+    volumes:
+      - .:/root/mainnet
+    command: "sleep 100000000"
+  seed1:
+    # docker exec -it onomy-mainnet-seed1 bash
+    # export GPG_TTY=$(tty)
+    image: onomy/mainnet-node:local
+    restart: always
+    container_name: onomy-mainnet-seed1
+    volumes:
+      - .:/root/mainnet
+    command: "sleep 100000000"
+  seed2:
+    # docker exec -it onomy-mainnet-seed2 bash
+    # export GPG_TTY=$(tty)
+    image: onomy/mainnet-node:local
+    restart: always
+    container_name: onomy-mainnet-seed2
+    volumes:
+      - .:/root/mainnet
+    command: "sleep 100000000"
+  validator2:
+    # docker exec -it onomy-mainnet-validator2 bash
+    # export GPG_TTY=$(tty)
+    image: onomy/mainnet-node:local
+    restart: always
+    container_name: onomy-mainnet-validator2
+    volumes:
+      - .:/root/mainnet
+    command: "sleep 100000000"
+  fullnode1:
+    # docker exec -it onomy-mainnet-fullnode1 bash
+    # export GPG_TTY=$(tty)
+    image: onomy/mainnet-node:local
+    restart: always
+    container_name: onomy-mainnet-fullnode1
+    volumes:
+      - .:/root/mainnet
+    command: "sleep 100000000"
+  fullnode2:
+    # docker exec -it onomy-mainnet-fullnode2 bash
+    # export GPG_TTY=$(tty)
+    image: onomy/mainnet-node:local
+    restart: always
+    container_name: onomy-mainnet-fullnode2
+    volumes:
+      - .:/root/mainnet
+    command: "sleep 100000000"
+  fullnode3:
+    # docker exec -it onomy-mainnet-fullnode3 bash
+    # export GPG_TTY=$(tty)
+    image: onomy/mainnet-node:local
+    restart: always
+    container_name: onomy-mainnet-fullnode3
+    volumes:
+      - .:/root/mainnet
+    command: "sleep 100000000"

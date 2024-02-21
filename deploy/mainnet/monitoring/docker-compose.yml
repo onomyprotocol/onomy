@@ -1,0 +1,76 @@
+version: "3.5"
+
+networks:
+  cosmos-monitoring:
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    volumes:
+      - ./data/prometheus:/prometheus
+      - ./prometheus:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    networks:
+      - cosmos-monitoring
+
+  # default login credentials: admin/admin
+  grafana:
+    image: grafana/grafana:latest
+    env_file: ./grafana/grafana.conf
+    container_name: grafana
+    restart: always
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+    ports:
+      - 80:3000
+    networks:
+      - cosmos-monitoring
+
+  nodeexporter:
+    image: prom/node-exporter:v1.3.1
+    container_name: nodeexporter
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - '9100:9100'
+    networks:
+      - cosmos-monitoring
+
+  alert-bot:
+    environment:
+      - DISCORD_WEBHOOK=https://discord.com/api/webhooks/1047927250110128229/uy7OJYXolSK-E0dkXbKwabLaDjpZdnMfrLGWWbTAcI8-rstrhmYG7ev0dlx7SsgIsECj
+    image: benjojo/alertmanager-discord:latest
+    networks:
+      - cosmos-monitoring
+    restart: always
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    networks:
+      - cosmos-monitoring
+    volumes:
+      - ./data/alertmanager:/data
+      - ./prometheus/alert_manager:/etc/alertmanager
+    command: [
+        '--storage.path=/data',
+        '--config.file=/etc/alertmanager/alertmanager.yml',
+        '--log.level=debug',
+    ]
+    restart: always
+    hostname: 'alertmanager'
