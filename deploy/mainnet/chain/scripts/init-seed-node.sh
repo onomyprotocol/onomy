@@ -20,6 +20,8 @@ ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 read -r -p "Enter a name for your node [onomy-seed]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-seed}
 
+ONOMY_SEEDS_IPS="35.184.202.80, 35.247.95.86"
+
 ONOMY_SEEDS_IPS=
 read -r -p "Optionally enter seeds ips, ip1,ip2:" ONOMY_SEEDS_IPS
 
