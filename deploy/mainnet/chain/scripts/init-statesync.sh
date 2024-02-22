@@ -38,8 +38,5 @@ crudini --set $ONOMY_NODE_CONFIG statesync enable true
 crudini --set $ONOMY_NODE_CONFIG statesync rpc_servers "\"$statesync_nodes\""
 crudini --set $ONOMY_NODE_CONFIG statesync trust_height $blk_height
 crudini --set $ONOMY_NODE_CONFIG statesync trust_hash "\"$blk_hash\""
-crudini --set $ONOMY_NODE_CONFIG statesync discovery_time "\"60s\""
-crudini --set $ONOMY_NODE_CONFIG statesync chunk_request_timeout "\"60s\""
-crudini --set $ONOMY_NODE_CONFIG statesync chunk_fetchers "\"10\""
 
 echo "Setup for statesync is complete"
