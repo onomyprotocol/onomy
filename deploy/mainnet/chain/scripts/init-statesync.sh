@@ -10,33 +10,16 @@ ONOMY_HOME_CONFIG="$ONOMY_HOME/config"
 # Config file for onomy node
 ONOMY_NODE_CONFIG="$ONOMY_HOME_CONFIG/config.toml"
 # App config file for onomy node
-# Statysync servers default IPs
-ONOMY_STATESYNC_SERVERS_DEFAULT_IPS="rpc-mainnet.onomy.io:443,35.224.118.71:26657"
 
-statesync_nodes=
-blk_height=
-blk_hash=
+LATEST_HEIGHT=$(curl -s "https://rpc-mainnet.onomy.io:443/block" | jq -r .result.block.header.height);
+BLOCK_HEIGHT=$(($LATEST_HEIGHT - 2000)) 
+TRUST_HASH=$(curl -s "https://rpc-mainnet.onomy.io:443/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash)
 
-
-read -r -p "Enter IPs of statesync nodes (at least 2) [$ONOMY_STATESYNC_SERVERS_DEFAULT_IPS]:" statesync_ips
-statesync_ips=${statesync_ips:-$ONOMY_STATESYNC_SERVERS_DEFAULT_IPS}
-for statesync_ip in ${statesync_ips//,/ } ; do
-  latest_height=$(curl -s http://$statesync_ip/block | jq -r .result.block.header.height);
-  trusted_height=$((latest_height - 2000));
-
-  blk_details=$(curl -s http://$statesync_ip/block?height=$trusted_height | jq -r '.result.block.header.height + "\n" + .result.block_id.hash')
-  blk_height=$(echo $blk_details | cut -d$' ' -f1)
-
-  blk_hash=$(echo $blk_details | cut -d$' ' -f2)
-  statesync_nodes="$statesync_nodes$statesync_ip,"
-done
-
-echo "Setting up trusted block number $blk_height and hash $blk_hash"
-
-# Change statesync settings
 crudini --set $ONOMY_NODE_CONFIG statesync enable true
-crudini --set $ONOMY_NODE_CONFIG statesync rpc_servers "\"$statesync_nodes\""
-crudini --set $ONOMY_NODE_CONFIG statesync trust_height $blk_height
-crudini --set $ONOMY_NODE_CONFIG statesync trust_hash "\"$blk_hash\""
+crudini --set $ONOMY_NODE_CONFIG statesync rpc_servers "https://rpc-mainnet.onomy.io:443,http://35.224.118.71:26657"
+crudini --set $ONOMY_NODE_CONFIG statesync trust_height $BLOCK_HEIGHT
+crudini --set $ONOMY_NODE_CONFIG statesync trust_hash "\"$TRUST_HASH\""
+crudini --set $ONOMY_NODE_CONFIG p2p seeds "211535f9b799bcc8d46023fa180f3359afd4c1d3@44.213.44.5:26656,00ce2f84f6b91639a7cedb2239e38ffddf9e36de@44.195.221.88:26656,cd9a47cebe8eef076a5795e1b8460a8e0b2384e5@3.210.0.126:26656,60194df601164a8b5852087d442038e392bf7470@180.131.222.74:26656,0dbe561f30862f386456734f12f431e534a3139c@34.133.228.142:26656,4737740b63d6ba9ebe93e8cc6c0e9197c426e9f4@195.189.96.106:52756"
+crudini --set $ONOMY_NODE_CONFIG p2p persistent_peers "211535f9b799bcc8d46023fa180f3359afd4c1d3@44.213.44.5:26656,00ce2f84f6b91639a7cedb2239e38ffddf9e36de@44.195.221.88:26656,cd9a47cebe8eef076a5795e1b8460a8e0b2384e5@3.210.0.126:26656,60194df601164a8b5852087d442038e392bf7470@180.131.222.74:26656,0dbe561f30862f386456734f12f431e534a3139c@34.133.228.142:26656,4737740b63d6ba9ebe93e8cc6c0e9197c426e9f4@195.189.96.106:52756,00ce2f84f6b91639a7cedb2239e38ffddf9e36de@44.195.221.88:26656"
 
 echo "Setup for statesync is complete"
