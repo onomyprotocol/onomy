@@ -22,9 +22,6 @@ ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-seed}
 
 ONOMY_SEEDS_IPS="35.184.202.80, 35.247.95.86"
 
-ONOMY_SEEDS_IPS=
-read -r -p "Optionally enter seeds ips, ip1,ip2 [$ONOMY_SEEDS_IPS]:" ONOMY_SEEDS_IPS
-
 default_ip=$(hostname -I | awk '{print $1}')
 read -r -p "Enter your ip address [$default_ip]:" ip
 ip=${ip:-$default_ip}
