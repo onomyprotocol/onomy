@@ -75,4 +75,6 @@ echo "export DAEMON_HOME=$ONOMY_HOME/" >> ~/.bashrc
 echo "export DAEMON_NAME=onomyd" >> ~/.bashrc
 echo "export DAEMON_RESTART_AFTER_UPGRADE=true" >> ~/.bashrc
 source $HOME/.bashrc
+ulimit -S -n 65536
+
 echo "Onomy binaries are installed successfully."
