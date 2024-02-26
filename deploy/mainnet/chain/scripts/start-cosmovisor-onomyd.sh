@@ -8,4 +8,4 @@ if [ "$(ulimit -n)" -lt 65535 ]; then
     exit 1
 fi
 
-$HOME/.onomy/bin/cosmovisor start
+cosmovisor start
