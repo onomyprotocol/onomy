@@ -11,7 +11,7 @@
 * Install dependencies from source code
 
     ```
-    ./bin.sh
+    source ./bin-ubuntu.sh
     ```
 
 * Init seed node
