@@ -3,7 +3,7 @@ set -eu
 
 echo "Starting onomy node"
 
-source ~/.profile
+source $HOME/.profile
 
 if [ "$(ulimit -n)" -lt 65535 ]; then
     echo "Fail ulimit: $(ulimit -n) < 65535"
