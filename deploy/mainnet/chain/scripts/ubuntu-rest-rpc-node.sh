@@ -27,8 +27,8 @@ sudo chown -R ubuntu:ubuntu ~/.onomy/config/
 IPTABLES_CONFIG=/etc/iptables/rules.v4
 if test -f "$IPTABLES_CONFIG"; then
   # Oracle Cloud Ubuntu Firewall Config
-  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT/' $IPTABLES_CONFIG
-  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT/' $IPTABLES_CONFIG
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 1317 -j ACCEPT/' $IPTABLES_CONFIG
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26657 -j ACCEPT/' $IPTABLES_CONFIG
   sudo iptables-restore < $IPTABLES_CONFIG
 fi
 
