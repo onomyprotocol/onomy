@@ -14,4 +14,4 @@ ONOMY_NODE_CONFIG="$ONOMY_HOME_CONFIG/config.toml"
 ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/app.toml"
 
 crudini --set $ONOMY_NODE_CONFIG rpc cors_allowed_origins "[\"*\"]"
-crudini --set $ONOMY_APP_CONFIG api enabled-unsafe-cors true
+# crudini --set $ONOMY_APP_CONFIG api enabled-unsafe-cors true

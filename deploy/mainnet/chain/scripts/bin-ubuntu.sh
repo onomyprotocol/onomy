@@ -16,9 +16,6 @@ mkdir -p $ONOMY_HOME/logs
 mkdir -p $ONOMY_HOME/cosmovisor/genesis/bin
 mkdir -p $ONOMY_HOME/cosmovisor/upgrades/
 
-echo "-----------installing dependencies---------------"
-sudo apt install -y crudini jq
-
 echo "----------------------installing onomy---------------"
 curl -LO https://github.com/onomyprotocol/onomy/releases/download/$ONOMY_VERSION/onomyd
 mv onomyd $ONOMY_HOME/cosmovisor/genesis/bin/onomyd

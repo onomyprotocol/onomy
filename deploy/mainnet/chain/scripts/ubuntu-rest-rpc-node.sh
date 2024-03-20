@@ -11,8 +11,9 @@ git checkout scripts
 
 cd ~/onomy/deploy/mainnet/chain/scripts/
 source bin-ubuntu.sh
-./init-seed-node.sh
+./init-full-node.sh
 #./init-statesync.sh
+./allow-cors.sh
 ./expose-metrics.sh
 ./ubuntu-ulimits.sh
 ./autostake.sh
@@ -26,12 +27,10 @@ sudo chown -R ubuntu:ubuntu ~/.onomy/config/
 IPTABLES_CONFIG=/etc/iptables/rules.v4
 if test -f "$IPTABLES_CONFIG"; then
   # Oracle Cloud Ubuntu Firewall Config
-  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26656 -j ACCEPT/' $IPTABLES_CONFIG
-  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26657 -j ACCEPT/' $IPTABLES_CONFIG
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT/' $IPTABLES_CONFIG
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT/' $IPTABLES_CONFIG
   sudo iptables-restore < $IPTABLES_CONFIG
 fi
 
-echo "Completed seed node setup"
-# Get seed id to share
-echo "seed=$(onomyd tendermint show-node-id)@$(hostname -I | awk '{print $1}'):26656"
+echo "Completed rest/rpc node setup"
 cosmovisor status
