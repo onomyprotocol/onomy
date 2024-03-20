@@ -17,7 +17,7 @@ mkdir -p $ONOMY_HOME/cosmovisor/genesis/bin
 mkdir -p $ONOMY_HOME/cosmovisor/upgrades/
 
 echo "-----------installing dependencies---------------"
-sudo apt install build-essential crudini jq
+sudo apt install -y crudini jq
 
 echo "----------------------installing onomy---------------"
 curl -LO https://github.com/onomyprotocol/onomy/releases/download/$ONOMY_VERSION/onomyd
@@ -44,10 +44,9 @@ export PATH=$PATH:$ONOMY_HOME/bin
 chmod +x $ONOMY_HOME/cosmovisor/genesis/bin/*
 export PATH=$PATH:$ONOMY_HOME/cosmovisor/genesis/bin
 
-echo "export PATH=$PATH" >> ~/.profile
-
 # set the cosmovisor environments
 echo "export DAEMON_HOME=$ONOMY_HOME/" >> ~/.profile
+echo "export PATH=\$PATH:\$DAEMON_HOME/cosmovisor/genesis/bin" >> ~/.profile
 echo "export DAEMON_NAME=onomyd" >> ~/.profile
 echo "export DAEMON_RESTART_AFTER_UPGRADE=true" >> ~/.profile
 
