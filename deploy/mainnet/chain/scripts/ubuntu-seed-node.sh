@@ -24,11 +24,15 @@ echo '* soft nofile 94000' | sudo tee -a /etc/security/limits.conf
 # Service setup
 sudo ./add-service.sh cosmovisor-onomyd ${PWD}/start-cosmovisor-onomyd.sh
 sudo ./add-service.sh node-exporter ${PWD}/start-node-exporter.sh
-    
+
 # Oracle Cloud Ubuntu Firewall Config
-sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26656 -j ACCEPT/' /etc/iptables/rules.v4
-sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26657 -j ACCEPT/' /etc/iptables/rules.v4
-sudo iptables-restore < /etc/iptables/rules.v4
+IPTABLES_CONFIG=/etc/iptables/rules.v4
+if test -f "$IPTABLES_CONFIG"; then
+  # Oracle Cloud Ubuntu Firewall Config
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26656 -j ACCEPT/' /etc/iptables/rules.v4
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26657 -j ACCEPT/' /etc/iptables/rules.v4
+  sudo iptables-restore < /etc/iptables/rules.v4
+fi
     
 echo "Completed node setup"
 # Get seed id to share
