@@ -13,8 +13,8 @@ SNAP_URL="http://snapshots.autostake.com/lyIs25DaSWMSm8evWKHGQrb/onomy-mainnet-1
 curl $SNAP_URL | lz4 -d | tar -xvf -
 
 # AutoStake addrbook
-cd $ONOMY_HOME/config
-curl http://snapshots.autostake.com/lyIs25DaSWMSm8evWKHGQrb/onomy-mainnet-1/addrbook.json --output addrbook.json
+cd $ONOMY_HOME/config/
+curl http://snapshots.autostake.com/lyIs25DaSWMSm8evWKHGQrb/onomy-mainnet-1/addrbook.json --output $ONOMY_HOME/config/addrbook.json
 
 # AutoStake State-Sync RPC
 STATESYNC_RPC="https://onomy-mainnet-rpc.autostake.com:443"

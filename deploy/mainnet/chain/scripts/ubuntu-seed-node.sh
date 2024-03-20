@@ -36,6 +36,8 @@ if test -f "$IPTABLES_CONFIG"; then
   sudo iptables-restore < $IPTABLES_CONFIG
 fi
 
+sudo chown -R ubuntu:ubuntu ~/.onomy/config/
+
 echo "Completed node setup"
 # Get seed id to share
 echo "seed=$(onomyd tendermint show-node-id)@$(hostname -I | awk '{print $1}'):26656"
