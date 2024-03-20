@@ -29,9 +29,9 @@ sudo ./add-service.sh node-exporter ${PWD}/start-node-exporter.sh
 IPTABLES_CONFIG=/etc/iptables/rules.v4
 if test -f "$IPTABLES_CONFIG"; then
   # Oracle Cloud Ubuntu Firewall Config
-  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26656 -j ACCEPT/' /etc/iptables/rules.v4
-  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26657 -j ACCEPT/' /etc/iptables/rules.v4
-  sudo iptables-restore < /etc/iptables/rules.v4
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26656 -j ACCEPT/' $IPTABLES_CONFIG
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 26657 -j ACCEPT/' $IPTABLES_CONFIG
+  sudo iptables-restore < $IPTABLES_CONFIG
 fi
     
 echo "Completed node setup"
