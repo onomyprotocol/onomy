@@ -1,5 +1,6 @@
 #!/bin/bash
 
+sudo apt update && sudo apt upgrade -y
 sudo apt install -y tmux vim crudini jq git liblz4-tool
 git clone https://github.com/onomyprotocol/onomy ~/onomy
 

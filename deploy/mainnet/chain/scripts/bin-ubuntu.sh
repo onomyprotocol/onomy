@@ -46,7 +46,7 @@ export PATH=$PATH:$ONOMY_HOME/cosmovisor/genesis/bin
 
 # set the cosmovisor environments
 echo "export DAEMON_HOME=$ONOMY_HOME/" >> ~/.profile
-echo "export PATH=\$PATH:\$DAEMON_HOME/cosmovisor/genesis/bin" >> ~/.profile
+echo "export PATH=\$PATH:\$DAEMON_HOME/cosmovisor/genesis/bin:\$DAEMON_HOME/bin" >> ~/.profile
 echo "export DAEMON_NAME=onomyd" >> ~/.profile
 echo "export DAEMON_RESTART_AFTER_UPGRADE=true" >> ~/.profile
 
