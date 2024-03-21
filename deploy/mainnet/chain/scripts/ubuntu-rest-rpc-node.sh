@@ -1,5 +1,8 @@
 #!/bin/bash
 
+USER=$(whoami)
+GROUP=$(id -gn)
+
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y tmux vim crudini jq git liblz4-tool
 git clone https://github.com/onomyprotocol/onomy ~/onomy
@@ -21,7 +24,7 @@ source bin-ubuntu.sh
 # Service setup
 sudo ./add-service.sh cosmovisor-onomyd ${PWD}/start-cosmovisor-onomyd.sh
 sudo ./add-service.sh node-exporter ${PWD}/start-node-exporter.sh
-sudo chown -R ubuntu:ubuntu ~/.onomy/config/
+sudo chown -R $USER:$GROUP ~/.onomy/config/
 
 # Oracle Cloud Ubuntu Firewall Config
 IPTABLES_CONFIG=/etc/iptables/rules.v4
