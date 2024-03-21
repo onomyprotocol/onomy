@@ -12,6 +12,9 @@ rm -r data/*
 SNAP_URL="http://snapshots.autostake.com/lyIs25DaSWMSm8evWKHGQrb/onomy-mainnet-1/latest.tar.lz4"
 curl $SNAP_URL | lz4 -d | tar -xvf -
 
+# Restore the priv_validator_state.json from backup
+cp priv_validator_state.json.backup data/priv_validator_state.json
+
 # AutoStake addrbook
 cd $ONOMY_HOME/config/
 curl http://snapshots.autostake.com/lyIs25DaSWMSm8evWKHGQrb/onomy-mainnet-1/addrbook.json --output $ONOMY_HOME/config/addrbook.json
