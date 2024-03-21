@@ -42,5 +42,6 @@ sudo systemctl daemon-reload
 sudo systemctl start hermes.service
 sudo systemctl enable hermes.service
 sudo systemctl status hermes.service --no-pager
+hermes health-check
 sudo journalctl -u hermes.service -n 10 --no-pager
 
