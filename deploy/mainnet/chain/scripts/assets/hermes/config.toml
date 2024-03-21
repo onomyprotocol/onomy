@@ -47,9 +47,9 @@ list = [
 
 [[chains]]
 id = 'osmosis-1'
-rpc_addr = 'https://rpc.osmosis.zone'
-grpc_addr = 'https://grpc.osmosis.zone'
-event_source = { mode = 'push', url = 'wss://rpc.osmosis.zone/websocket', batch_delay = '500ms' }
+rpc_addr = 'http://rpc.osmosis.mainnet.onomy.io'
+grpc_addr = 'http://grpc.osmosis.mainnet.onomy.io'
+event_source = { mode = 'push', url = 'ws://rpc.osmosis.mainnet.onomy.io/websocket', batch_delay = '500ms' }
 rpc_timeout = '15s'
 account_prefix = 'osmo'
 key_name = 'osmosis-1'
