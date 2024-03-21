@@ -17,13 +17,27 @@ ONOMY_NODE_CONFIG="$ONOMY_HOME_CONFIG/config.toml"
 # Chain ID flag
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
 # Seeds IPs
-ONOMY_SEEDS_DEFAULT_IPS="a.seed.mainnet.onomy.io,b.seed.mainnet.onomy.io"
+ONOMY_SEEDS_DEFAULT_IPS="35.184.202.80,35.247.95.86"
+
+
 
 read -r -p "Enter a name for your node [onomy-sentry]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-sentry}
 
 read -r -p "Enter seeds ips [$ONOMY_SEEDS_DEFAULT_IPS]:" ONOMY_SEEDS_IPS
 ONOMY_SEEDS_IPS=${ONOMY_SEEDS_IPS:-$ONOMY_SEEDS_DEFAULT_IPS}
+
+ONOMY_VALIDATOR_ID=
+while [[ $ONOMY_VALIDATOR_ID = "" ]]; do
+   read -r -p "Enter node id of an existing validator:" ONOMY_VALIDATOR_ID
+done
+
+ONOMY_VALIDATOR_IP=
+while [[ $ONOMY_VALIDATOR_IP = "" ]]; do
+   read -r -p "Enter Hostname/IP Address of the validator node:" ONOMY_VALIDATOR_IP
+done
+
+ONOMY_VALIDATOR_PEER="$ONOMY_VALIDATOR_ID@$ONOMY_VALIDATOR_IP:26656"
 
 default_ip=$(hostname -I | awk '{print $1}')
 read -r -p "Enter your ip address [$default_ip]:" ip
@@ -71,5 +85,11 @@ crudini --set $ONOMY_NODE_CONFIG rpc laddr "\"tcp://$ONOMY_HOST:26657\""
 # sentry specific config
 # pex	true - by default
 crudini --set $ONOMY_NODE_CONFIG p2p pex true
+# persistent_peers	validator node, optionally other sentry nodes (nodeid@ip:port)
+crudini --set $ONOMY_NODE_CONFIG p2p persistent_peers "\"$ONOMY_VALIDATOR_PEER\""
+# private_peer_ids	validator node ID
+crudini --set $ONOMY_NODE_CONFIG p2p private_peer_ids "\"$ONOMY_VALIDATOR_ID\""
+# unconditional_peer_ids	validator node ID, optionally sentry node IDs
+crudini --set $ONOMY_NODE_CONFIG p2p unconditional_peer_ids "\"$ONOMY_VALIDATOR_ID\""
 
 echo "The initialisation of $ONOMY_NODE_NAME is done"
