@@ -10,13 +10,13 @@ ONOMY_SENTRY_DEFAULT_IPS="a.sentry.mainnet.onomy.io,b.sentry.mainnet.onomy.io"
 read -r -p "Enter a name for your node [onomy-sentry]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-sentry}
 
-read -r -p "Enter sentry ips [$ONOMY_SENTRY_DEFAULT_IPS]:" ONOMY_SENTRYS_IPS
+read -r -p "Enter sentry ips [$ONOMY_SENTRY_DEFAULT_IPS]:" ONOMY_SENTRY_IPS
 ONOMY_SENTRY_IPS=${ONOMY_SENTRY_IPS:-$ONOMY_SENTRY_DEFAULT_IPS}
 
 ONOMY_SENTRYS=
 ONOMY_SENTRY_RPCS=
 ONOMY_SENTRY_IDS=
-for sentryIP in ${ONOMY_SENTRYS_IPS//,/ } ; do
+for sentryIP in ${ONOMY_SENTRY_IPS//,/ } ; do
   wget $sentryIP:26657/status? -O $ONOMY_HOME/sentry_status.json
   sentryID=$(jq -r .result.node_info.id $ONOMY_HOME/sentry_status.json)
 
