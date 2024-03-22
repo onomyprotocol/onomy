@@ -45,7 +45,7 @@ echo "Updating node config"
 crudini --set $ONOMY_NODE_CONFIG p2p addr_book_strict true
 crudini --set $ONOMY_NODE_CONFIG p2p external_address "\"\""
 #crudini --set $ONOMY_NODE_CONFIG p2p seeds "\"$ONOMY_SENTRYS\""
-crudini --set $ONOMY_NODE_CONFIG p2p seeds ""
+crudini --set $ONOMY_NODE_CONFIG p2p seeds "\"\""
 crudini --set $ONOMY_NODE_CONFIG p2p persistent_peers "\"$ONOMY_SENTRYS\""
 crudini --set $ONOMY_NODE_CONFIG p2p unconditional_peer_ids "\"$ONOMY_SENTRY_IDS\""
 crudini --set $ONOMY_NODE_CONFIG p2p pex false
