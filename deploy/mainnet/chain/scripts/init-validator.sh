@@ -1,4 +1,6 @@
 #!/bin/bash
+USER=$(whoami)
+GROUP=$(id -gn)
 ONOMY_HOME=$HOME/.onomy
 CHAINID="onomy-mainnet-1"
 ONOMY_HOME_CONFIG="$ONOMY_HOME/config"
@@ -62,6 +64,9 @@ crudini --set $ONOMY_APP_CONFIG api enable false
 crudini --set $ONOMY_APP_CONFIG rosetta enable false
 crudini --set $ONOMY_APP_CONFIG grpc enable false
 crudini --set $ONOMY_APP_CONFIG grpc-web enable false
-# create home directory
-#
+
+sudo ./add-service.sh cosmovisor-onomyd ${PWD}/start-cosmovisor-onomyd.sh
+sudo ./add-service.sh node-exporter ${PWD}/start-node-exporter.sh
+sudo chown -R $USER:$GROUP ~/.onomy/config/
+
 echo "The initial setup of $ONOMY_NODE_NAME is done"
