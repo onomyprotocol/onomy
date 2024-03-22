@@ -11,9 +11,10 @@ read -r -p "Enter a name for your node [onomy-sentry]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-sentry}
 
 read -r -p "Enter sentry ips [$ONOMY_SENTRY_DEFAULT_IPS]:" ONOMY_SENTRYS_IPS
-ONOMY_SENTRY_IPS=${ONOMY_SENTRYS_IPS:-$ONOMY_SENTRYS_DEFAULT_IPS}
+ONOMY_SENTRY_IPS=${ONOMY_SENTRY_IPS:-$ONOMY_SENTRY_DEFAULT_IPS}
 
 ONOMY_SENTRYS=
+ONOMY_SENTRY_RPCS=
 ONOMY_SENTRY_IDS=
 for sentryIP in ${ONOMY_SENTRYS_IPS//,/ } ; do
   wget $sentryIP:26657/status? -O $ONOMY_HOME/sentry_status.json
@@ -28,6 +29,7 @@ for sentryIP in ${ONOMY_SENTRYS_IPS//,/ } ; do
   rm $ONOMY_HOME/sentry_status.json
 
   ONOMY_SENTRYS="$ONOMY_SENTRYS$sentryID@$sentryIP:26656,"
+  ONOMY_SENTRY_RPCS="${ONOMY_SENTRY_RPCS}http://$sentryIP:26657,"
   ONOMY_SENTRY_IDS="$ONOMY_SENTRY_IDS$sentryID,"
 done
 
@@ -50,7 +52,11 @@ crudini --set $ONOMY_NODE_CONFIG p2p persistent_peers "\"$ONOMY_SENTRYS\""
 crudini --set $ONOMY_NODE_CONFIG p2p unconditional_peer_ids "\"$ONOMY_SENTRY_IDS\""
 crudini --set $ONOMY_NODE_CONFIG p2p pex false
 crudini --set $ONOMY_NODE_CONFIG rpc laddr "\"tcp://127.0.0.1:26657\""
-crudini --set $ONOMY_NODE_CONFIG statesync enable false
+crudini --set $ONOMY_NODE_CONFIG statesync enable true
+crudini --set $ONOMY_NODE_CONFIG statesync rpc_servers "\"$ONOMY_SENTRY_RPCS\""
+crudini --set $ONOMY_NODE_CONFIG statesync trust_height 6953812
+crudini --set $ONOMY_NODE_CONFIG statesync trust_hash "\"DE3ED360800652D73A4BB15695A494F573FEE392E1C246936D40046937DA98D8\""
+
 
 crudini --set $ONOMY_APP_CONFIG api enable false
 crudini --set $ONOMY_APP_CONFIG rosetta enable false
