@@ -5,7 +5,7 @@ ONOMY_HOME_CONFIG="$ONOMY_HOME/config"
 ONOMY_APP_CONFIG="$ONOMY_HOME_CONFIG/config.toml"
 ONOMY_NODE_CONFIG="$ONOMY_HOME_CONFIG/config.toml"
 ONOMY_CHAINID_FLAG="--chain-id $CHAINID"
-ONOMY_SENTRY_DEFAULT_IPS="a.sentry.mainnet.onomy.io,b.sentry.mainnet.onomy.io"
+ONOMY_SENTRY_DEFAULT_IPS="a.sentry.mainnet.onomy.io,b.sentry.mainnet.onomy.io,c.sentry.mainnet.onomy.io"
 
 read -r -p "Enter a name for your node [onomy-sentry]:" ONOMY_NODE_NAME
 ONOMY_NODE_NAME=${ONOMY_NODE_NAME:-onomy-sentry}
