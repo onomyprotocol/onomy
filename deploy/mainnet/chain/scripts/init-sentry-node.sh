@@ -67,6 +67,7 @@ crudini --set $ONOMY_NODE_CONFIG p2p addr_book_strict false
 crudini --set $ONOMY_NODE_CONFIG p2p external_address "\"tcp://$ip:26656\""
 crudini --set $ONOMY_NODE_CONFIG p2p seeds "\"$ONOMY_SEEDS\""
 crudini --set $ONOMY_NODE_CONFIG rpc laddr "\"tcp://$ONOMY_HOST:26657\""
+crudini --set $ONOMY_NODE_CONFIG statesync enable true
 
 # sentry specific config
 # pex	true - by default
