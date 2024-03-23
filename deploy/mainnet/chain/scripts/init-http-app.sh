@@ -11,6 +11,15 @@ sudo apt install docker.io docker-compose tmux vim
 sudo adduser ubuntu docker
 sudo docker network create caddy
 
+# Oracle Cloud Ubuntu Firewall Config
+IPTABLES_CONFIG=/etc/iptables/rules.v4
+if test -f "$IPTABLES_CONFIG"; then
+  # Oracle Cloud Ubuntu Firewall Config
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT/' $IPTABLES_CONFIG
+  sudo sed -i 's/22 -j ACCEPT/&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT/' $IPTABLES_CONFIG
+  sudo iptables-restore < $IPTABLES_CONFIG
+fi
+
 cd ~/
 echo "
 version: '3'
