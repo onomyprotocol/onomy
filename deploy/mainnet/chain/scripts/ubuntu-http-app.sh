@@ -7,7 +7,7 @@ ONOMY_APP_BCO_GQL_URL=https://api.thegraph.com/subgraphs/name/onomyprotocol/ogra
 CMC_API_KEY=
 
 sudo apt update && sudo apt upgrade -y
-sudo apt install docker.io docker-compose tmux vim
+sudo apt install -y docker.io docker-compose tmux vim
 sudo adduser ubuntu docker
 sudo docker network create caddy
 
