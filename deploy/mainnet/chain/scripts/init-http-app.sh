@@ -52,7 +52,7 @@ services:
       - caddy
     labels:
       caddy: $ONOMY_APP_DOMAIN
-      caddy.reverse_proxy: "{{upstreams http 4444}}"
+      caddy.reverse_proxy: \"{{upstreams http 4444}}\"
 
   watchtower:
     image: containrrr/watchtower:1.5.1
@@ -89,4 +89,5 @@ volumes:
 
 " > ~/docker-compose.yml
 
-sudo docker-compose up -d
+echo "reboot then run:"
+echo "docker-compose up -d"
