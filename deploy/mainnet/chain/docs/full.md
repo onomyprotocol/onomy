@@ -11,7 +11,8 @@
 * Install dependencies from source code
 
     ```
-    ./bin.sh
+    ./bin-ubuntu.sh
+    source ~/.profile
     ```
 
 * Init full node

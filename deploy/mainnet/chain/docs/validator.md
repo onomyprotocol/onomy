@@ -17,7 +17,8 @@ but only stakeholders may participate in validating the network.
 * Install dependencies from source code
 
     ```
-    ./bin.sh
+    ./bin-ubuntu.sh
+    source ~/.profile
     ```
 
 * Init password store to store private keys. Run the following script to setup a password store and gpg key.
