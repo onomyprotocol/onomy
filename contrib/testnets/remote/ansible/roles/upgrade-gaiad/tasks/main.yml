@@ -1,0 +1,29 @@
+---
+
+- name: Copy binary
+  copy:
+    src: "{{BINARY}}"
+    dest: /usr/bin/onomyd
+    mode: 0755
+  notify: restart onomyd
+
+- name: Copy new genesis.json file, if available
+  when: "GENESISFILE is defined and GENESISFILE != ''" 
+  copy:
+    src: "{{GENESISFILE}}"
+    dest: /home/onomyd/.onomy/config/genesis.json
+  notify: restart onomyd
+
+- name: Download genesis.json URL, if available
+  when: "GENESISURL is defined and GENESISURL != ''"
+  get_url:
+    url: "{{GENESISURL}}"
+    dest: /home/onomyd/.onomy/config/genesis.json
+    force: yes
+  notify: restart onomyd
+
+- name: Reset network
+  when: UNSAFE_RESET_ALL | default(false) | bool
+  command: "sudo -u onomyd onomyd unsafe-reset-all"
+  notify: restart onomyd
+

@@ -1,62 +1,127 @@
-![onomy-docs-2-w](https://user-images.githubusercontent.com/6096171/137114490-3fb1de9c-f74c-4979-9089-2f116e57bec2.jpeg)
+# Cosmos Hub (Onomy)
 
-# Overview
+![Banner!](https://miro.medium.com/max/2000/1*DHtmSfS_Efvuq8n2LAnhkA.png)
 
-Onomy is an application-specific blockchain built to power a decentralized exchange that converges Forex and Decentralized Finance.
+[![Project Status: Active -- The project has reached a stable, usable state and is being actively
+developed.](https://img.shields.io/badge/repo%20status-Active-green.svg)](https://www.repostatus.org/#active)
+[![License: Apache-2.0](https://img.shields.io/github/license/onomyprotocol/onomy-rebuild.svg)](https://github.com/onomyprotocol/onomy-rebuild/blob/main/LICENSE)
+[![Version](https://img.shields.io/github/v/release/onomyprotocol/onomy-rebuild.svg)](https://github.com/onomyprotocol/onomy-rebuild/releases/latest)
+[![Go Report Card](https://goreportcard.com/badge/github.com/onomyprotocol/onomy-rebuild)](https://goreportcard.com/report/github.com/onomyprotocol/onomy-rebuild)
+[![GoDoc](https://img.shields.io/badge/godoc-reference-blue?logo=go)](https://pkg.go.dev/github.com/onomyprotocol/onomy-rebuild)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=cosmos_onomy&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=cosmos_onomy)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cosmos_onomy&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=cosmos_onomy)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=cosmos_onomy&metric=coverage)](https://sonarcloud.io/summary/new_code?id=cosmos_onomy)
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/cosmosnetwork)
+[![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/cosmoshub)
 
-As a multi-chain ecosystem based on the Cosmos software development kit, it leverages the inter-blockchain communication protocol and implements bridges between blockchains like Ethereum, Avalanche, EVM chains, and others TBA.
+The Cosmos Hub is the first of an exploding number of interconnected blockchains that comprise the Cosmos Network.
 
-Users can easily manage assets from connected networks via Onomy Access (multi-chain wallet), efficiently trade digital assets on the decentralized Onomy Exchange supporting both AMM and orderbook trading (limit orders, stop loss, market), and mint decentralized stablecoins through the Onomy Reserve using NOM, the protocol token, as collateral.
+<br/>
 
-✨[Official Website](https://onomy.io/)
-✨[Telegram Discussion](https://t.me/onomyprotocol)
-✨[Telegram Ann](https://t.me/onomyannouncements)
-✨[Discord](https://discord.gg/u5qcykwJqV)
-✨[Twitter](https://twitter.com/OnomyProtocol)
-✨[Medium](https://medium.com/onomy-protocol) 
+## 🤔 — Why should you be interested in the Cosmos Hub
 
-# Mainnet
+___
 
-Join the Mainnet! You can find the documentation [here](docs/chain/mainnet.md)
+The Cosmos Hub is built using the [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) and compiled to a binary called `onomyd` (Onomy Daemon). The Cosmos Hub and other fully sovereign Cosmos SDK blockchains interact with one another using a protocol called [IBC](https://github.com/cosmos/ibc) that enables Inter-Blockchain Communication. In order to understand what the Cosmos Hub is you can read this [introductory explanation](https://hub.cosmos.network/main/hub-overview/overview.html).
 
-# Testnet
+<br/>
 
-Join the Testnet! You can find the documentation [here](docs/chain/testnet.md) 
+## ⚡ — Documentation & Introduction
 
-# Development
+___
 
-The development branch is **dev**. The branch might contain unstable changes.
+Cosmos Hub is a blockchain network that operates on Proof-of-Stake consensus. You can find an introduction to the Cosmos Hub and how to use the `onomyd` binary as a delegator, validator or node operator as well as how governance on the Cosmos Hub works in the [documentation](https://hub.cosmos.network/main/hub-overview/overview.html).
 
-All the changes should pass through the flow "**feature-branch**" -> "**Pull Request**" -> "**dev**".
+Alternatively, whether you're new to blockchain technology or interested in getting involved, the Cosmos Network [Course](https://tutorials.cosmos.network/academy/0-welcome/) will guide you through everything. The course walks you through the basics of blockchain technology, to staking, setting up your own node, and beyond.
 
-## Format code by the project rules
+<br/>
 
-```
-make format-in-docker
-```
+## 👤 — Node Operators
 
-## Run CI
+___
+If you're interested in running a node on the current Cosmos Hub, check out the docs to [Join the Cosmos Hub Mainnet](https://github.com/onomyprotocol/onomy-rebuild/blob/main/docs/hub-tutorials/join-mainnet.md).
 
-```
-make all-in-docker
-```
+<br/>
 
-## Build the project
+## 🗣️ — Validators
 
-Build artifact
-```
-make build
-```
+___
 
-Install
-```
-make install
-```
+If you want to participate and help secure Cosmos Hub, check out becoming a validator. Information on what a validator is and how to participate as one can be found at the [Validator FAQ](https://hub.cosmos.network/main/validators/validator-faq.html#). If you're running a validator node on the Cosmos Hub, reach out to a Janitor on the [Cosmos Developers Discord](https://discord.gg/cosmosnetwork) to join the `#cosmos-hub-validators-verified` channel.
 
-## Learn more about starport
+<br/>
 
-- [Starport](https://github.com/tendermint/starport)
-- [Starport Docs](https://docs.starport.network)
-- [Cosmos SDK documentation](https://docs.cosmos.network)
-- [Cosmos SDK Tutorials](https://tutorials.cosmos.network)
-- [Onomy Discord](https://discord.gg/u5qcykwJqV)
+## 👥 — Delegators
+
+___
+
+If you still want to participate on the Cosmos Hub, check out becoming a delegator. Information on what a delegator is and how to participate as one can be found at the [Delegator FAQ](https://hub.cosmos.network/main/delegators/delegator-faq.html).
+
+<br/>
+
+## 👥 — Testnet
+
+___
+
+To participate in or utilize the current Cosmos Hub testnet, take a look at the [cosmos/testnets](https://github.com/cosmos/testnets) repository. This testnet is for the Theta Upgrade expected in Q1 2022. For future upgrades of the Cosmos Hub take a look at the [roadmap](https://github.com/onomyprotocol/onomy-rebuild/blob/main/docs/roadmap/cosmos-hub-roadmap-2.0.md).
+
+<br/>
+
+## 🌐 — Roadmap
+
+___
+
+For an overview of upcoming changes to the Cosmos Hub take a look at the [Roadmap](https://github.com/onomyprotocol/onomy-rebuild/blob/main/docs/roadmap/cosmos-hub-roadmap-2.0.md).
+
+<br/>
+
+## 🗄️ — Archives & Genesis
+
+___
+
+With each version of the Cosmos Hub, the chain is restarted from a new Genesis state.
+Mainnet is currently running as `cosmoshub-4`. Archives of the state of `cosmoshub-1`, `cosmoshub-2`, and `cosmoshub-3` are available [here](./docs/resources/archives.md).
+
+If you are looking for historical genesis files and other data [`cosmos/mainnet`](http://github.com/cosmos/mainnet) is an excellent resource. Snapshots are also available at [cosmos.quicksync.io](https://cosmos.quicksync.io).
+
+<br/>
+
+## 🤝 — How to contribute
+
+___
+
+Check out [contributing.md](CONTRIBUTING.md) for our guidelines & policies for how we develop the Cosmos Hub. Thank you to all those who have contributed!
+
+<br/>
+
+## 💬 — Talk to us
+
+___
+
+We have active, helpful communities on Twitter, Discord, and Telegram.
+
+|    |    |
+| -- | -- |
+| Cosmos Developers Discord | <a href="https://discord.gg/cosmosnetwork"><img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" alt="Discord" height="30"/></a> |
+| Cosmos Twitter | <a href="https://twitter.com/cosmos"><img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white" alt="Tweet" height="30"/></a> |
+| Cosmos Gov Twitter | <a href="https://twitter.com/CosmosGov"><img src="https://img.shields.io/badge/Twitter-FEFEFE?style=for-the-badge&logo=twitter&logoColor=blue" alt="Tweet" height="30"/></a> |
+| Cosmos Telegram | <a href="https://t.me/cosmosproject"><img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram" height="30"/></a> |
+
+For updates on the Cosmos Hub team's activities follow us on the [Cosmos Hub Twitter](https://twitter.com/cosmoshub) account.
+
+<br/>
+
+## 👏 — Supporters
+
+___
+
+[![Stargazers repo roster for @onomyprotocol/onomy-rebuild](https://reporoster.com/stars/onomyprotocol/onomy-rebuild)](https://github.com/onomyprotocol/onomy-rebuild/stargazers)
+[![Forkers repo roster for @onomyprotocol/onomy-rebuild](https://reporoster.com/forks/onomyprotocol/onomy-rebuild)](https://github.com/onomyprotocol/onomy-rebuild/network/members)
+
+<br/>
+
+<p align="center"><a href="https://github.com/nastyox/Rando.js#nastyox"><img src="http://randojs.com/images/barsSmallTransparentBackground.gif" alt="Animated footer bars" width="100%"/></a></p>
+
+<br/>
+
+<p align="center"><a href="https://github.com/onomyprotocol/onomy-rebuild#"><img src="http://randojs.com/images/backToTopButtonTransparentBackground.png" alt="Back to top" height="29"/></a></p>

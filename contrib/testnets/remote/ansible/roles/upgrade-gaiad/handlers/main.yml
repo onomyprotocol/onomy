@@ -1,0 +1,5 @@
+---
+
+- name: restart onomyd
+  service: name=onomyd state=restarted
+

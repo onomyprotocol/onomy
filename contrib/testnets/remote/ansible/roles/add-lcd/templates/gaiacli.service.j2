@@ -1,0 +1,17 @@
+[Unit]
+Description=onomycli
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+User=onomyd
+Group=onomyd
+PermissionsStartOnly=true
+ExecStart=/usr/bin/onomycli rest-server --laddr {{GAIACLI_ADDRESS}}
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
+
