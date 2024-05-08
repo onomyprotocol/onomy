@@ -1,0 +1,27 @@
+//go:build upgrade_v9
+
+package v9
+
+import (
+	store "github.com/cosmos/cosmos-sdk/store/types"
+	ccvprovider "github.com/cosmos/interchain-security/v3/x/ccv/provider/types"
+
+	store "github.com/cosmos/cosmos-sdk/store/types"
+
+	"github.com/onomyprotocol/onomy-rebuild/app/upgrades"
+)
+
+const (
+	// UpgradeName defines the on-chain upgrade name.
+	UpgradeName = "v9-Lambda"
+)
+
+var Upgrade = upgrades.Upgrade{
+	UpgradeName:          UpgradeName,
+	CreateUpgradeHandler: CreateUpgradeHandler,
+	StoreUpgrades: store.StoreUpgrades{
+		Added: []string{
+			ccvprovider.ModuleName,
+		},
+	},
+}

@@ -1,0 +1,1 @@
+- Add onomyd snapshots command set ([\#2974](https://github.com/onomyprotocol/onomy-rebuild/pull/2974))

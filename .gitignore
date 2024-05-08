@@ -1,10 +1,54 @@
-/node_modules/
-release/
-/vendor/
-/.idea/
+# OS
+.DS_Store
+*.swp
+*.swo
+*.swl
+*.swm
+*.swn
+.vscode
+.idea
+
+# Build
+artifacts
+vendor
+build
+tools/bin/*
+examples/build/*
+docs/_build
+docs/node_modules
+docs/tutorial
+dist
+tools-stamp
+docs/node_modules
+
+# Data - ideally these don't exist
+baseapp/data/*
+client/lcd/keys/*
+cmd/onomycli/statik/statik.go
+mytestnet
+
+# Testing
+coverage.txt
+profile.out
+
+# Vagrant
+.vagrant/
+*.box
+*.log
+vagrant
+
+# IDE
+.idea/
 *.iml
-*.tar.gz
-onomyd
-/tmp-swagger-gen/
-/target
-Cargo.lock
+
+# Graphviz
+dependency-graph.png
+
+# Latex
+*.aux
+*.out
+*.synctex.gz
+contract_tests/*
+
+go.work.sum
+

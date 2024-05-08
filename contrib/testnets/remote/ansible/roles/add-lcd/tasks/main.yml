@@ -1,0 +1,15 @@
+---
+
+- name: Copy binary
+  copy:
+    src: "{{GAIACLI_BINARY}}"
+    dest: /usr/bin/onomycli
+    mode: 0755
+  notify: restart onomycli
+
+- name: Copy service
+  template:
+    src: onomycli.service.j2
+    dest: /etc/systemd/system/onomycli.service
+  notify: systemctl
+

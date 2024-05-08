@@ -1,0 +1,15 @@
+init_config:
+
+instances:
+- name: ssh
+  search_string: ['ssh', 'sshd']
+  thresholds:
+    critical: [1, 5]
+- name: onomyd
+  search_string: ['onomyd']
+  thresholds:
+    critical: [1, 1]
+- name: onomycli
+  search_string: ['onomycli']
+  thresholds:
+    critical: [1, 1]

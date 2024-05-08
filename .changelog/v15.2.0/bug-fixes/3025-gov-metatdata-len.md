@@ -1,0 +1,1 @@
+- Increase x/gov metadata fields length to 10200 ([\#3025](https://github.com/onomyprotocol/onomy-rebuild/pull/3025))
