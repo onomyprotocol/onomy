@@ -14,7 +14,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.19
+          go-version: ^1.21
         id: go
 
       - name: Checkout code
@@ -43,7 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: onomyd
+          asset_path: build/onomyd
           asset_name: onomyd
           asset_content_type: application/bin
 
@@ -59,6 +59,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: onomyd
+          asset_path: build/onomyd
           asset_name: onomyd-arm
           asset_content_type: application/bin
