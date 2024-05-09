@@ -100,7 +100,7 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 
     info!("{}", get_delegations_to(valoper_addr).await.stack()?);
     info!("{:?}", get_staking_pool().await.stack()?);
-    
+
     sh([format!(
         "cosmovisor run tx bank send {addr} onomy1a69w3hfjqere4crkgyee79x2mxq0w2pfj9tu2m 1337anom \
          --fees 1000000anom -y -b block"
