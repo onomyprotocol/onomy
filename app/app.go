@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -88,7 +87,6 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 	"github.com/spf13/cast"
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
-	"github.com/tendermint/starport/starport/pkg/openapiconsole"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
@@ -107,7 +105,6 @@ import (
 	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
 	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
 	v1_1_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.4"
-	"github.com/onomyprotocol/onomy/docs"
 )
 
 const (
@@ -716,9 +713,6 @@ func (app *OnomyApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIC
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register app's OpenAPI routes.
-	apiSvr.Router.Handle("/openapi/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/openapi/openapi.yml"))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
