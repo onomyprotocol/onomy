@@ -7,8 +7,8 @@ use log::info;
 use onomy_test_lib::{
     cosmovisor::{
         cosmovisor_get_addr, cosmovisor_gov_file_proposal, cosmovisor_start, get_apr_annual,
-        get_delegations_to, get_staking_pool, get_treasury, get_treasury_inflation_annual,
-        sh_cosmovisor, sh_cosmovisor_no_debug, sh_cosmovisor_tx, wait_for_num_blocks,
+        get_delegations_to, get_staking_pool, sh_cosmovisor, sh_cosmovisor_no_debug,
+        sh_cosmovisor_tx, wait_for_num_blocks,
     },
     dockerfiles::dockerfile_onomyd,
     onomy_std_init, reprefix_bech32,

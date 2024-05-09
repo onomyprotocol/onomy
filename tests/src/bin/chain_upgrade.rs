@@ -4,7 +4,7 @@ use log::{info, warn};
 use onomy_test_lib::{
     cosmovisor::{
         cosmovisor_gov_proposal, cosmovisor_start, get_block_height, get_staking_pool,
-        get_treasury, get_treasury_inflation_annual, sh_cosmovisor, wait_for_height,
+        sh_cosmovisor, wait_for_height,
     },
     nom, onomy_std_init,
     setups::{cosmovisor_setup, CosmosSetupOptions},
