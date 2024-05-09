@@ -136,8 +136,6 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
     ensure_ne!(current_version, version);
 
     info!("{:?}", get_staking_pool().await.stack()?);
-    info!("{}", get_treasury().await.stack()?);
-    info!("{}", get_treasury_inflation_annual().await.stack()?);
 
     cosmovisor_runner.terminate(TIMEOUT).await.stack()?;
     Ok(())
