@@ -8,7 +8,7 @@ use onomy_test_lib::{
     Args, TIMEOUT,
 };
 
-pub const ONOMYD_VERSION: &str = "v1.1.2";
+pub const ONOMYD_VERSION: &str = "v1.1.4";
 
 pub fn dockerfile_onomyd() -> String {
     onomy_std_cosmos_daemon("onomyd", ".onomy", ONOMYD_VERSION, "onomyd")

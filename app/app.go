@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -88,7 +87,6 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 	"github.com/spf13/cast"
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
-	"github.com/tendermint/starport/starport/pkg/openapiconsole"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
@@ -107,11 +105,6 @@ import (
 	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
 	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
 	v1_1_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.4"
-	"github.com/onomyprotocol/onomy/docs"
-	"github.com/onomyprotocol/onomy/x/dao"
-	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
-	daokeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
-	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 const (
@@ -131,8 +124,6 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.CancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
-		daoclient.FundTreasuryProposalHandler,
-		daoclient.ExchangeWithTreasuryProposalProposalHandler,
 		ibcproviderclient.ConsumerAdditionProposalHandler,
 		ibcproviderclient.ConsumerRemovalProposalHandler,
 		ibcproviderclient.EquivocationProposalHandler,
@@ -167,14 +158,12 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		dao.AppModuleBasic{},
 		ibcprovider.AppModuleBasic{},
 	)
 
 	// module account permissions.
 	maccPerms = map[string][]string{ // nolint:gochecknoglobals // cosmos-sdk application style
 		authtypes.FeeCollectorName:        nil,
-		daotypes.ModuleName:               {authtypes.Minter},
 		distrtypes.ModuleName:             nil,
 		minttypes.ModuleName:              {authtypes.Minter},
 		stakingtypes.BondedPoolName:       {authtypes.Burner, authtypes.Staking},
@@ -187,7 +176,6 @@ var (
 	// module accounts that are allowed to receive tokens.
 	allowedReceivingModAcc = map[string]bool{ // nolint:gochecknoglobals // cosmos-sdk application style
 		distrtypes.ModuleName: true,
-		daotypes.ModuleName:   true,
 		// provider chain note: the fee-pool is allowed to receive tokens
 		authtypes.FeeCollectorName: true,
 	}
@@ -253,8 +241,6 @@ type OnomyApp struct {
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
 	ScopedIBCProviderKeeper capabilitykeeper.ScopedKeeper
-
-	DaoKeeper daokeeper.Keeper
 
 	// mm is the module manager
 	mm           *module.Manager
@@ -382,19 +368,6 @@ func New( // nolint:funlen // app new cosmos func
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.DaoKeeper = *daokeeper.NewKeeper(
-		appCodec,
-		keys[daotypes.StoreKey],
-		keys[daotypes.MemStoreKey],
-		app.GetSubspace(daotypes.ModuleName),
-		&app.BankKeeper,
-		&app.AccountKeeper,
-		&app.DistrKeeper,
-		&app.GovKeeper,
-		&app.MintKeeper,
-		&app.StakingKeeper,
-	)
-
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
@@ -404,13 +377,6 @@ func New( // nolint:funlen // app new cosmos func
 			app.ProviderKeeper.Hooks(),
 		),
 	)
-
-	// protect the dao module form the slashing
-	app.StakingKeeper = *stakingKeeper.SetSlashingProtestedModules(func() map[string]struct{} {
-		return map[string]struct{}{
-			daotypes.ModuleName: {},
-		}
-	})
 
 	app.ProviderKeeper = ibcproviderkeeper.NewKeeper(
 		appCodec,
@@ -444,7 +410,6 @@ func New( // nolint:funlen // app new cosmos func
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(app.DaoKeeper)).
 		AddRoute(providertypes.RouterKey, ibcprovider.NewProviderProposalHandler(app.ProviderKeeper))
 
 	app.GovKeeper = govkeeper.NewKeeper(
@@ -483,7 +448,6 @@ func New( // nolint:funlen // app new cosmos func
 		params.NewAppModule(app.ParamsKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		transferModule,
-		dao.NewAppModule(appCodec, app.DaoKeeper),
 		providerModule,
 	)
 
@@ -510,7 +474,6 @@ func New( // nolint:funlen // app new cosmos func
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
-		daotypes.ModuleName,
 		providertypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
@@ -532,7 +495,6 @@ func New( // nolint:funlen // app new cosmos func
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
-		daotypes.ModuleName,
 		providertypes.ModuleName,
 	)
 
@@ -560,7 +522,6 @@ func New( // nolint:funlen // app new cosmos func
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
-		daotypes.ModuleName,
 		providertypes.ModuleName,
 	)
 
@@ -588,7 +549,6 @@ func New( // nolint:funlen // app new cosmos func
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		dao.NewAppModule(appCodec, app.DaoKeeper),
 	)
 	app.sm.RegisterStoreDecoders()
 
@@ -753,9 +713,6 @@ func (app *OnomyApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIC
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register app's OpenAPI routes.
-	apiSvr.Router.Handle("/openapi/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/openapi/openapi.yml"))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
@@ -787,7 +744,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(daotypes.ModuleName)
 	paramsKeeper.Subspace(providertypes.ModuleName)
 
 	return paramsKeeper

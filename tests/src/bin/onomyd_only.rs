@@ -7,8 +7,8 @@ use log::info;
 use onomy_test_lib::{
     cosmovisor::{
         cosmovisor_get_addr, cosmovisor_gov_file_proposal, cosmovisor_start, get_apr_annual,
-        get_delegations_to, get_staking_pool, get_treasury, get_treasury_inflation_annual,
-        sh_cosmovisor, sh_cosmovisor_no_debug, sh_cosmovisor_tx, wait_for_num_blocks,
+        get_delegations_to, get_staking_pool, sh_cosmovisor, sh_cosmovisor_no_debug,
+        sh_cosmovisor_tx, wait_for_num_blocks,
     },
     dockerfiles::dockerfile_onomyd,
     onomy_std_init, reprefix_bech32,
@@ -100,8 +100,6 @@ async fn onomyd_runner(args: &Args) -> Result<()> {
 
     info!("{}", get_delegations_to(valoper_addr).await.stack()?);
     info!("{:?}", get_staking_pool().await.stack()?);
-    info!("{}", get_treasury().await.stack()?);
-    info!("{}", get_treasury_inflation_annual().await.stack()?);
 
     sh([format!(
         "cosmovisor run tx bank send {addr} onomy1a69w3hfjqere4crkgyee79x2mxq0w2pfj9tu2m 1337anom \
