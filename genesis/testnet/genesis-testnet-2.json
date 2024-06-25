@@ -66,6 +66,12 @@
         "pub_key": null,
         "account_number": "5",
         "sequence": "0"
+      },{
+        "@type": "/cosmos.auth.v1beta1.BaseAccount",
+        "address": "onomy1tman8gcu0d8rn7md6q9qdxme0dp74yv3wqch6f",
+        "pub_key": null,
+        "account_number": "5",
+        "sequence": "0"
       }]
     },
     "authz": {
@@ -82,7 +88,7 @@
           "coins": [
             {
               "denom": "anom",
-              "amount": "20000000000000000000000000"
+              "amount": "100000000000000000000000000"
             }
           ]
         },
@@ -91,7 +97,7 @@
           "coins": [
             {
               "denom": "anom",
-              "amount": "20000000000000000000000000"
+              "amount": "100000000000000000000000000"
             }
           ]
         },
@@ -130,10 +136,39 @@
               "amount": "20000000000000000000000000"
             }
           ]
+        },
+        {
+          "address": "onomy1tman8gcu0d8rn7md6q9qdxme0dp74yv3wqch6f",
+          "coins": [
+            {
+              "denom": "anom",
+              "amount": "20000000000000000000000000"
+            }
+          ]
         }
       ],
       "supply": [],
-      "denom_metadata": []
+      "denom_metadata": [
+        {
+          "description": "NOM coin",
+          "denom_units": [
+            {
+              "denom": "anom",
+              "exponent": 0,
+              "aliases": []
+            },
+            {
+              "denom": "nom",
+              "exponent": 18,
+              "aliases": []
+            }
+          ],
+          "base": "anom",
+          "display": "nom",
+          "name": "NOM",
+          "symbol": "NOM"
+        }
+      ]
     },
     "capability": {
       "index": "1",
@@ -141,7 +176,7 @@
     },
     "crisis": {
       "constant_fee": {
-        "denom": "stake",
+        "denom": "anom",
         "amount": "1000"
       }
     },
@@ -152,14 +187,17 @@
         "max_proposal_rate": "0.050000000000000000",
         "max_val_commission": "0.100000000000000000"
       },
-      "treasury_balance": []
+      "treasury_balance": [{
+        "denom": "anom",
+        "amount": "100000000000000000000000000"
+      }]
     },
     "distribution": {
       "params": {
-        "community_tax": "0.020000000000000000",
+        "community_tax": "0",
         "base_proposer_reward": "0.010000000000000000",
         "bonus_proposer_reward": "0.040000000000000000",
-        "withdraw_addr_enabled": true
+        "withdraw_addr_enabled": false
       },
       "fee_pool": {
         "community_pool": []
@@ -190,8 +228,8 @@
       "deposit_params": {
         "min_deposit": [
           {
-            "denom": "stake",
-            "amount": "1000000000000000000"
+            "denom": "anom",
+            "amount": "500000000000000000000"
           }
         ],
         "max_deposit_period": "172800s"
@@ -244,7 +282,7 @@
         "annual_provisions": "0.000000000000000000"
       },
       "params": {
-        "mint_denom": "stake",
+        "mint_denom": "anom",
         "inflation_rate_change": "0.130000000000000000",
         "inflation_max": "0.200000000000000000",
         "inflation_min": "0.070000000000000000",
@@ -361,8 +399,8 @@
         "max_validators": 100,
         "max_entries": 7,
         "historical_entries": 10000,
-        "bond_denom": "stake",
-        "min_global_self_delegation": "0"
+        "bond_denom": "anom",
+        "min_global_self_delegation": "225000000000000000000000"
       },
       "last_total_power": "0",
       "last_validator_powers": [],
