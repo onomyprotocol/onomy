@@ -70,7 +70,7 @@
         "@type": "/cosmos.auth.v1beta1.BaseAccount",
         "address": "onomy1tman8gcu0d8rn7md6q9qdxme0dp74yv3wqch6f",
         "pub_key": null,
-        "account_number": "5",
+        "account_number": "6",
         "sequence": "0"
       }]
     },
