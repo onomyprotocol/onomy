@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2024-06-26T03:00:00Z",
+  "genesis_time": "2024-06-27T03:00:00Z",
   "chain_id": "onomy-testnet-2",
   "initial_height": "1",
   "consensus_params": {
@@ -235,7 +235,7 @@
               {
                 "@type": "/cosmos.staking.v1beta1.MsgCreateValidator",
                 "description": {
-                  "moniker": "master",
+                  "moniker": "tao",
                   "identity": "",
                   "website": "",
                   "security_contact": "",
@@ -251,7 +251,7 @@
                 "validator_address": "onomyvaloper1x6mlfjektdjgum6hfgfgcz57dl4s9dssgzfvwj",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "EWBAvgvLKjgb1mQBtXtSBhT0sbERZWl09GE4qZbjb3c="
+                  "key": "mO+d34E5b9ayKwf/8YZPr9FRVZQOFBoChf5CxD/NYBE="
                 },
                 "value": {
                   "denom": "anom",
@@ -259,7 +259,7 @@
                 }
               }
             ],
-            "memo": "ca3f8b0169cd71fe148b66b72221853996f371eb@10.0.0.161:26656",
+            "memo": "1902a52002e172de1f5b4676d44b926d7e737d96@10.0.0.161:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -287,7 +287,7 @@
             }
           },
           "signatures": [
-            "HbEb0fl/7ipSAamg/Drx4fKbbnA8hd8yKHXdGokbKecBKvtELe/dQcvs2bb63NIBE60XEaobMvGdQkp6yoKlJA=="
+            "gVkud6izWvDm1YAc/iqJq3Fph6ZB1dkyfkiK6Jg+OaUSGvAJ5Vt8UWKcDssRUl0jITYE+SLnP6BhZPQ9L5r+pQ=="
           ]
         }
       ]
@@ -456,11 +456,11 @@
     },
     "slashing": {
       "params": {
-        "signed_blocks_window": "100",
-        "min_signed_per_window": "0.500000000000000000",
+        "signed_blocks_window": "2500",
+        "min_signed_per_window": "0.250000000000000000",
         "downtime_jail_duration": "600s",
         "slash_fraction_double_sign": "0.050000000000000000",
-        "slash_fraction_downtime": "0.010000000000000000"
+        "slash_fraction_downtime": "0.000500000000000000"
       },
       "signing_infos": [],
       "missed_blocks": []
