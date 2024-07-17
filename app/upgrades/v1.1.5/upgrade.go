@@ -45,6 +45,8 @@ func CreateUpgradeHandler(
 			// unbond all delegations from account
 			forceUnbondTokens(ctx, addr, bk, sk)
 
+			forceFinishUnbonding(ctx, addr, bk, sk)
+
 			// send to dao module account
 			// vesting account should be able to send coins normaly after
 			// we converted it back to a base account
@@ -58,6 +60,25 @@ func CreateUpgradeHandler(
 
 		return mm.RunMigrations(ctx, configurator, vm)
 	}
+}
+
+func forceFinishUnbonding(ctx sdk.Context, delAddr string, bk *bankkeeper.BaseKeeper, sk *stakingkeeper.Keeper) error {
+	ubdQueue := sk.GetAllUnbondingDelegations(ctx, sdk.AccAddress(delAddr))
+	bondDenom := sk.BondDenom(ctx)
+	for _, ubd := range ubdQueue {
+		for _, entry := range ubd.Entries {
+			err := bk.UndelegateCoinsFromModuleToAccount(ctx, stakingtypes.NotBondedPoolName, sdk.AccAddress(delAddr), sdk.NewCoins(sdk.NewCoin(bondDenom, entry.Balance)))
+			if err != nil {
+				return err
+			}
+		}
+
+		// empty out all entries
+		ubd.Entries = []stakingtypes.UnbondingDelegationEntry{}
+		sk.SetUnbondingDelegation(ctx, ubd)
+	}
+
+	return nil
 }
 
 func forceUnbondTokens(ctx sdk.Context, delAddr string, bk *bankkeeper.BaseKeeper, sk *stakingkeeper.Keeper) error {
