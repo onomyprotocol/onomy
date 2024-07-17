@@ -33,26 +33,54 @@ func CreateUpgradeHandler(
 	return func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 		for _, addr := range burntAddrs {
 			// get target account
-			account := ak.GetAccount(ctx, sdk.AccAddress(addr))
+			account := ak.GetAccount(ctx, sdk.MustAccAddressFromBech32(addr))
 
 			// check that it's a vesting account type
-			vestAccount, ok := account.(*vesting.BaseVestingAccount)
+			continousVestAccount, ok := account.(*vesting.ContinuousVestingAccount)
 			if ok {
 				// overwrite vest account to a normal base account
-				ak.SetAccount(ctx, vestAccount.BaseAccount)
+				ak.SetAccount(ctx, continousVestAccount.BaseAccount)
+			}
+
+			periodicVestAccount, ok := account.(*vesting.PeriodicVestingAccount)
+			if ok {
+				// overwrite vest account to a normal base account
+				ak.SetAccount(ctx, periodicVestAccount.BaseAccount)
+			}
+
+			delayedVestAccount, ok := account.(*vesting.DelayedVestingAccount)
+			if ok {
+				// overwrite vest account to a normal base account
+				ak.SetAccount(ctx, delayedVestAccount.BaseAccount)
+			}
+
+			permanentLockedAccount, ok := account.(*vesting.PermanentLockedAccount)
+			if ok {
+				// overwrite vest account to a normal base account
+				ak.SetAccount(ctx, permanentLockedAccount.BaseAccount)
 			}
 
 			// unbond all delegations from account
-			forceUnbondTokens(ctx, addr, bk, sk)
+			err := forceUnbondTokens(ctx, addr, bk, sk)
+			if err != nil {
+				ctx.Logger().Error("Error force unbonding delegations")
+				return nil, err
+			}
 
-			forceFinishUnbonding(ctx, addr, bk, sk)
+			// finish all current unbonding entries
+			err = forceFinishUnbonding(ctx, addr, bk, sk)
+			if err != nil {
+				ctx.Logger().Error("Error force finishing unbonding delegations")
+				return nil, err
+			}
 
 			// send to dao module account
 			// vesting account should be able to send coins normaly after
 			// we converted it back to a base account
-			bal := bk.GetAllBalances(ctx, sdk.AccAddress(addr))
-			err := bk.SendCoinsFromAccountToModule(ctx, sdk.AccAddress(addr), daotypes.ModuleName, bal)
+			bal := bk.GetAllBalances(ctx, sdk.MustAccAddressFromBech32(addr))
+			err = bk.SendCoinsFromAccountToModule(ctx, sdk.MustAccAddressFromBech32(addr), daotypes.ModuleName, bal)
 			if err != nil {
+				ctx.Logger().Error("Error reallocating funds")
 				return nil, err
 			}
 		}
@@ -63,11 +91,12 @@ func CreateUpgradeHandler(
 }
 
 func forceFinishUnbonding(ctx sdk.Context, delAddr string, bk *bankkeeper.BaseKeeper, sk *stakingkeeper.Keeper) error {
-	ubdQueue := sk.GetAllUnbondingDelegations(ctx, sdk.AccAddress(delAddr))
+	ubdQueue := sk.GetAllUnbondingDelegations(ctx, sdk.MustAccAddressFromBech32(delAddr))
 	bondDenom := sk.BondDenom(ctx)
+
 	for _, ubd := range ubdQueue {
 		for _, entry := range ubd.Entries {
-			err := bk.UndelegateCoinsFromModuleToAccount(ctx, stakingtypes.NotBondedPoolName, sdk.AccAddress(delAddr), sdk.NewCoins(sdk.NewCoin(bondDenom, entry.Balance)))
+			err := bk.UndelegateCoinsFromModuleToAccount(ctx, stakingtypes.NotBondedPoolName, sdk.MustAccAddressFromBech32(delAddr), sdk.NewCoins(sdk.NewCoin(bondDenom, entry.Balance)))
 			if err != nil {
 				return err
 			}
@@ -82,7 +111,7 @@ func forceFinishUnbonding(ctx sdk.Context, delAddr string, bk *bankkeeper.BaseKe
 }
 
 func forceUnbondTokens(ctx sdk.Context, delAddr string, bk *bankkeeper.BaseKeeper, sk *stakingkeeper.Keeper) error {
-	delAccAddr := sdk.AccAddress(delAddr)
+	delAccAddr := sdk.MustAccAddressFromBech32(delAddr)
 	dels := sk.GetDelegatorDelegations(ctx, delAccAddr, 100)
 
 	for _, del := range dels {
