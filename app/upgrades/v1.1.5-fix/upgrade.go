@@ -3,6 +3,7 @@ package v1_1_5_fix //nolint:revive,stylecheck // app version
 
 import (
 	"fmt"
+	"slices"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
@@ -12,29 +13,20 @@ import (
 	"github.com/onomyprotocol/onomy/app/upgrades"
 )
 
+var targetIds = []uint64{uint64(3372), uint64(3374), uint64(3373)}
+
 func CreateFork(
 	sk *stakingkeeper.Keeper,
 	pk *ibcproviderkeeper.Keeper,
 	providerStoreKey sdk.StoreKey,
 ) upgrades.Fork {
 	forkLogic := func(ctx sdk.Context) {
-		toBeRemovedUbdIDs := map[uint64]bool{}
-		var consumerChainIDS []string
-		for _, chain := range pk.GetAllConsumerChains(ctx) {
-			consumerChainIDS = append(consumerChainIDS, chain.ChainId)
-		}
+		for _, id := range targetIds {
+			var consumerChainIDS []string
 
-		for _, chainID := range consumerChainIDS {
-			for _, ubdOpIndex := range pk.GetAllUnbondingOpIndexes(ctx, chainID) {
-				for _, id := range ubdOpIndex.UnbondingOpIds {
-					if _, found := sk.GetUnbondingType(ctx, id); !found {
-						toBeRemovedUbdIDs[id] = true
-					}
-				}
+			for _, chain := range pk.GetAllConsumerChains(ctx) {
+				consumerChainIDS = append(consumerChainIDS, chain.ChainId)
 			}
-		}
-
-		for id := range toBeRemovedUbdIDs {
 
 			if len(consumerChainIDS) == 0 {
 				break
@@ -57,12 +49,9 @@ func CreateFork(
 
 					newIds = append(newIds, ubdId)
 				}
-				if len(newIds) == 0 {
-					pk.DeleteUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID)
-				} else {
-					// filter out invalid ID
-					pk.SetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID, newIds)
-				}
+
+				// filter out invalid ID
+				pk.SetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID, newIds)
 			}
 
 			// remove ubd entries
@@ -75,7 +64,7 @@ func CreateFork(
 		// clear invalid mature ubd entries
 		ids := []uint64{}
 		for _, id := range pk.GetMaturedUnbondingOps(ctx) {
-			if toBeRemovedUbdIDs[id] {
+			if slices.Contains(targetIds, id) {
 				continue
 			}
 
