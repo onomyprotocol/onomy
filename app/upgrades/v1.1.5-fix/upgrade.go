@@ -31,29 +31,19 @@ func CreateFork(
 			if len(consumerChainIDS) == 0 {
 				break
 			}
-			valsetUpdateID := pk.GetValidatorSetUpdateId(ctx)
-
-			fmt.Println("consumer chain", consumerChainIDS, valsetUpdateID)
-
 			// Add to indexes
 			for _, consumerChainID := range consumerChainIDS {
 				ubdOpIds := pk.GetAllUnbondingOpIndexes(ctx, consumerChainID)
 				for _, ubdIds := range ubdOpIds {
-					fmt.Println("old", ubdIds)
-
 					newIds := []uint64{}
 
 					for _, ubdId := range ubdIds.UnbondingOpIds {
-						fmt.Println("should", ubdId, id)
 						if ubdId == id {
-							ctx.Logger().Info(fmt.Sprintf("filter out id %d", ubdId))
 							continue
 						}
 
 						newIds = append(newIds, ubdId)
 					}
-
-					fmt.Println("new", newIds)
 
 					// filter out invalid ID
 					pk.SetUnbondingOpIndex(ctx, consumerChainID, ubdIds.VscId, newIds)
@@ -64,17 +54,13 @@ func CreateFork(
 			_, found := pk.GetUnbondingOp(ctx, id)
 			if found {
 				pk.DeleteUnbondingOp(ctx, id)
-				ctx.Logger().Info(fmt.Sprintf("delete id %d", id))
 			}
 		}
 
 		// clear invalid mature ubd entries
 		ids := []uint64{}
 		for _, id := range pk.GetMaturedUnbondingOps(ctx) {
-			fmt.Println("should true", slices.Contains(targetIds, id))
-
 			if slices.Contains(targetIds, id) {
-				ctx.Logger().Info(fmt.Sprintf("filter matured id %d", id))
 				continue
 			}
 
@@ -94,7 +80,6 @@ func CreateFork(
 		// update mature ubd ids
 		store := ctx.KVStore(providerStoreKey)
 		store.Set(ibcprovidertypes.MaturedUnbondingOpsKey(), bz)
-		ctx.Logger().Info(fmt.Sprint("updated matured ids"))
 	}
 	return upgrades.Fork{
 		UpgradeName:    Name,
