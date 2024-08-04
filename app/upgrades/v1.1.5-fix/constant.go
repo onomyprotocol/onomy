@@ -6,5 +6,5 @@ const (
 
 	// UpgradeHeight defines the block height at which the Osmosis v3 upgrade is
 	// triggered.
-	UpgradeHeight = 712_000
+	UpgradeHeight = 8_928_294
 )
