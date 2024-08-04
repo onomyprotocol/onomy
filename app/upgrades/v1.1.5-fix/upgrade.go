@@ -65,9 +65,12 @@ func CreateUpgradeHandler(
 
 					newIds = append(newIds, ubdId)
 				}
-
-				// filter out invalid ID
-				pk.SetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID, newIds)
+				if len(newIds) == 0 {
+					pk.DeleteUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID)
+				} else {
+					// filter out invalid ID
+					pk.SetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID, newIds)
+				}
 			}
 
 			// remove ubd entries
