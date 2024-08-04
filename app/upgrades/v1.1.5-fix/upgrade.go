@@ -44,6 +44,7 @@ func CreateFork(
 
 				for _, ubdId := range ubdIds {
 					if ubdId == id {
+						ctx.Logger().Info("filter out id %d", ubdId)
 						continue
 					}
 
@@ -58,6 +59,7 @@ func CreateFork(
 			_, found := pk.GetUnbondingOp(ctx, id)
 			if found {
 				pk.DeleteUnbondingOp(ctx, id)
+				ctx.Logger().Info("delete id %d", id)
 			}
 		}
 
@@ -65,6 +67,7 @@ func CreateFork(
 		ids := []uint64{}
 		for _, id := range pk.GetMaturedUnbondingOps(ctx) {
 			if slices.Contains(targetIds, id) {
+				ctx.Logger().Info("filter matured id %d", id)
 				continue
 			}
 
@@ -84,6 +87,7 @@ func CreateFork(
 		// update mature ubd ids
 		store := ctx.KVStore(providerStoreKey)
 		store.Set(ibcprovidertypes.MaturedUnbondingOpsKey(), bz)
+		ctx.Logger().Info("updated matured ids")
 	}
 	return upgrades.Fork{
 		UpgradeName:    Name,

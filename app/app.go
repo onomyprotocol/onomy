@@ -648,6 +648,7 @@ func (app OnomyApp) GetBaseApp() *baseapp.BaseApp { return app.BaseApp }
 func (app *OnomyApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	for _, fork := range Forks {
 		if ctx.BlockHeight() == fork.UpgradeHeight {
+			ctx.Logger().Info("running fork name %s", fork.UpgradeName)
 			fork.BeginForkLogic(ctx)
 		}
 	}
