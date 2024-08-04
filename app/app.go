@@ -646,7 +646,9 @@ func (app OnomyApp) GetBaseApp() *baseapp.BaseApp { return app.BaseApp }
 
 // BeginBlocker application updates every begin block.
 func (app *OnomyApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+	fmt.Println(len(Forks))
 	for _, fork := range Forks {
+		fmt.Println("heyyyyy")
 		if ctx.BlockHeight() == fork.UpgradeHeight {
 			ctx.Logger().Info("running fork name %s", fork.UpgradeName)
 			fork.BeginForkLogic(ctx)
