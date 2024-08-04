@@ -28,11 +28,18 @@ func CreateUpgradeHandler(
 	return func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 		ids := []uint64{}
 		for _, id := range pk.GetMaturedUnbondingOps(ctx) {
-			// Attempt to complete unbonding in staking module
 			_, found := sk.GetUnbondingType(ctx, id)
 			if !found {
 				continue
 			}
+			ubd, found := sk.GetUnbondingDelegationByUnbondingID(ctx, id)
+			if !found {
+				continue
+			}
+			if len(ubd.Entries) == 0 {
+				continue
+			}
+
 			ids = append(ids, id)
 		}
 
