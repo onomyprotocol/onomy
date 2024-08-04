@@ -37,29 +37,27 @@ func CreateFork(
 
 			// Add to indexes
 			for _, consumerChainID := range consumerChainIDS {
-				ubdIds, ok := pk.GetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID)
-				if !ok {
-					fmt.Println("oh nooooooo")
-					continue
-				}
-				fmt.Println("old", ubdIds)
+				ubdOpIds := pk.GetAllUnbondingOpIndexes(ctx, consumerChainID)
+				for _, ubdIds := range ubdOpIds {
+					fmt.Println("old", ubdIds)
 
-				newIds := []uint64{}
+					newIds := []uint64{}
 
-				for _, ubdId := range ubdIds {
-					fmt.Println("should", ubdId, id)
-					if ubdId == id {
-						ctx.Logger().Info(fmt.Sprintf("filter out id %d", ubdId))
-						continue
+					for _, ubdId := range ubdIds.UnbondingOpIds {
+						fmt.Println("should", ubdId, id)
+						if ubdId == id {
+							ctx.Logger().Info(fmt.Sprintf("filter out id %d", ubdId))
+							continue
+						}
+
+						newIds = append(newIds, ubdId)
 					}
 
-					newIds = append(newIds, ubdId)
+					fmt.Println("new", newIds)
+
+					// filter out invalid ID
+					pk.SetUnbondingOpIndex(ctx, consumerChainID, ubdIds.VscId, newIds)
 				}
-
-				fmt.Println("new", newIds)
-
-				// filter out invalid ID
-				pk.SetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID, newIds)
 			}
 
 			// remove ubd entries
