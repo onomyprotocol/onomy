@@ -100,6 +100,7 @@ import (
 	ibcproviderkeeper "github.com/cosmos/interchain-security/x/ccv/provider/keeper"
 	providertypes "github.com/cosmos/interchain-security/x/ccv/provider/types"
 
+	"github.com/onomyprotocol/onomy/app/upgrades"
 	v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
 	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
 	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
@@ -108,6 +109,7 @@ import (
 	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
 	v1_1_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.4"
 	v1_1_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.5"
+	v1_1_5_fix "github.com/onomyprotocol/onomy/app/upgrades/v1.1.5-fix"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -192,6 +194,8 @@ var (
 		// provider chain note: the fee-pool is allowed to receive tokens
 		authtypes.FeeCollectorName: true,
 	}
+
+	Forks = []upgrades.Fork{}
 )
 
 var (
@@ -619,6 +623,7 @@ func New( // nolint:funlen // app new cosmos func
 	app.SetEndBlocker(app.EndBlocker)
 
 	app.setupUpgradeHandlers()
+	app.SetupForkLogic(v1_1_5_fix.CreateFork(&app.StakingKeeper, &app.ProviderKeeper, keys[providertypes.StoreKey]))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -641,6 +646,11 @@ func (app OnomyApp) GetBaseApp() *baseapp.BaseApp { return app.BaseApp }
 
 // BeginBlocker application updates every begin block.
 func (app *OnomyApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+	for _, fork := range Forks {
+		if ctx.BlockHeight() == fork.UpgradeHeight {
+			fork.BeginForkLogic(ctx)
+		}
+	}
 	return app.mm.BeginBlock(ctx, req)
 }
 
@@ -736,6 +746,10 @@ func (app *OnomyApp) GetMemKey(storeKey string) *sdk.MemoryStoreKey {
 func (app *OnomyApp) GetSubspace(moduleName string) paramstypes.Subspace {
 	subspace, _ := app.ParamsKeeper.GetSubspace(moduleName)
 	return subspace
+}
+
+func (app *OnomyApp) SetupForkLogic(fork upgrades.Fork) {
+	Forks = append(Forks, fork)
 }
 
 // RegisterAPIRoutes registers all application module routes with the provided
