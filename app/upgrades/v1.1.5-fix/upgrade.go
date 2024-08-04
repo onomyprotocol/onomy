@@ -44,6 +44,7 @@ func CreateFork(
 				newIds := []uint64{}
 
 				for _, ubdId := range ubdIds {
+					fmt.Println("should", ubdId, id)
 					if ubdId == id {
 						ctx.Logger().Info(fmt.Sprintf("filter out id %d", ubdId))
 						continue
@@ -69,6 +70,8 @@ func CreateFork(
 		// clear invalid mature ubd entries
 		ids := []uint64{}
 		for _, id := range pk.GetMaturedUnbondingOps(ctx) {
+			fmt.Println("should true", slices.Contains(targetIds, id))
+
 			if slices.Contains(targetIds, id) {
 				ctx.Logger().Info(fmt.Sprintf("filter matured id %d", id))
 				continue
