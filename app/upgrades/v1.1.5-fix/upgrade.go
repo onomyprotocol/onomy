@@ -33,12 +33,13 @@ func CreateFork(
 			}
 			valsetUpdateID := pk.GetValidatorSetUpdateId(ctx)
 
-			fmt.Println("consumer chain", consumerChainIDS)
+			fmt.Println("consumer chain", consumerChainIDS, valsetUpdateID)
 
 			// Add to indexes
 			for _, consumerChainID := range consumerChainIDS {
 				ubdIds, ok := pk.GetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID)
 				if !ok {
+					fmt.Println("oh nooooooo")
 					continue
 				}
 				fmt.Println("old", ubdIds)
