@@ -12,10 +12,13 @@ import (
 	ibcproviderkeeper "github.com/cosmos/interchain-security/x/ccv/provider/keeper"
 	ibcprovidertypes "github.com/cosmos/interchain-security/x/ccv/provider/types"
 	ccv "github.com/cosmos/interchain-security/x/ccv/types"
+	"golang.org/x/exp/slices"
 )
 
 // Name is migration name.
 const Name = "v1.1.5-fix"
+
+var targetIds = []uint64{uint64(3372), uint64(3374), uint64(3373)}
 
 func CreateUpgradeHandler(
 	mm *module.Manager,
@@ -26,17 +29,50 @@ func CreateUpgradeHandler(
 	providerStoreKey sdk.StoreKey,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+		for _, id := range targetIds {
+			var consumerChainIDS []string
+
+			for _, chain := range pk.GetAllConsumerChains(ctx) {
+				consumerChainIDS = append(consumerChainIDS, chain.ChainId)
+			}
+
+			if len(consumerChainIDS) == 0 {
+				break
+			}
+			valsetUpdateID := pk.GetValidatorSetUpdateId(ctx)
+
+			// Add to indexes
+			for _, consumerChainID := range consumerChainIDS {
+				ubdIds, ok := pk.GetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID)
+				if !ok {
+					continue
+				}
+
+				newIds := []uint64{}
+
+				for _, ubdId := range ubdIds {
+					if ubdId == id {
+						continue
+					}
+
+					newIds = append(newIds, ubdId)
+				}
+
+				// filter out invalid ID
+				pk.SetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID, newIds)
+			}
+
+			// remove ubd entries
+			_, found := pk.GetUnbondingOp(ctx, id)
+			if found {
+				pk.DeleteUnbondingOp(ctx, id)
+			}
+		}
+
+		// clear invalid mature ubd entries
 		ids := []uint64{}
 		for _, id := range pk.GetMaturedUnbondingOps(ctx) {
-			_, found := sk.GetUnbondingType(ctx, id)
-			if !found {
-				continue
-			}
-			ubd, found := sk.GetUnbondingDelegationByUnbondingID(ctx, id)
-			if !found {
-				continue
-			}
-			if len(ubd.Entries) == 0 {
+			if slices.Contains(targetIds, id) {
 				continue
 			}
 
