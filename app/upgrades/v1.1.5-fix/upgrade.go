@@ -39,6 +39,7 @@ func CreateFork(
 				if !ok {
 					continue
 				}
+				fmt.Println("old", ubdIds)
 
 				newIds := []uint64{}
 
@@ -50,6 +51,8 @@ func CreateFork(
 
 					newIds = append(newIds, ubdId)
 				}
+
+				fmt.Println("new", newIds)
 
 				// filter out invalid ID
 				pk.SetUnbondingOpIndex(ctx, consumerChainID, valsetUpdateID, newIds)
