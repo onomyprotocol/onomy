@@ -27,7 +27,7 @@ func CreateFork(
 		for _, chainID := range consumerChainIDS {
 			for _, ubdOpIndex := range pk.GetAllUnbondingOpIndexes(ctx, chainID) {
 				for _, id := range ubdOpIndex.UnbondingOpIds {
-					if _, found := sk.GetUnbondingType(ctx, id); found {
+					if _, found := sk.GetUnbondingType(ctx, id); !found {
 						toBeRemovedUbdIDs[id] = true
 					}
 				}
