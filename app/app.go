@@ -95,21 +95,8 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	ibcprovider "github.com/cosmos/interchain-security/x/ccv/provider"
-	ibcproviderclient "github.com/cosmos/interchain-security/x/ccv/provider/client"
-	ibcproviderkeeper "github.com/cosmos/interchain-security/x/ccv/provider/keeper"
-	providertypes "github.com/cosmos/interchain-security/x/ccv/provider/types"
-
 	"github.com/onomyprotocol/onomy/app/upgrades"
-	v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
-	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
-	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
-	v1_0_3_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.5"
-	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
-	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
-	v1_1_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.4"
-	v1_1_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.5"
-	v1_1_5_fix "github.com/onomyprotocol/onomy/app/upgrades/v1.1.5-fix"
+	v1_1_6 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.6"
 	"github.com/onomyprotocol/onomy/docs"
 	"github.com/onomyprotocol/onomy/x/dao"
 	daoclient "github.com/onomyprotocol/onomy/x/dao/client"
@@ -136,9 +123,6 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		ibcclientclient.UpgradeProposalHandler,
 		daoclient.FundTreasuryProposalHandler,
 		daoclient.ExchangeWithTreasuryProposalProposalHandler,
-		ibcproviderclient.ConsumerAdditionProposalHandler,
-		ibcproviderclient.ConsumerRemovalProposalHandler,
-		ibcproviderclient.EquivocationProposalHandler,
 	)
 
 	return govProposalHandlers
@@ -171,20 +155,18 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		dao.AppModuleBasic{},
-		ibcprovider.AppModuleBasic{},
 	)
 
 	// module account permissions.
 	maccPerms = map[string][]string{ // nolint:gochecknoglobals // cosmos-sdk application style
-		authtypes.FeeCollectorName:        nil,
-		daotypes.ModuleName:               {authtypes.Minter},
-		distrtypes.ModuleName:             nil,
-		minttypes.ModuleName:              {authtypes.Minter},
-		stakingtypes.BondedPoolName:       {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:               {authtypes.Burner},
-		ibctransfertypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
-		providertypes.ConsumerRewardsPool: nil,
+		authtypes.FeeCollectorName:     nil,
+		daotypes.ModuleName:            {authtypes.Minter},
+		distrtypes.ModuleName:          nil,
+		minttypes.ModuleName:           {authtypes.Minter},
+		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:            {authtypes.Burner},
+		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens.
@@ -252,7 +234,6 @@ type OnomyApp struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	AuthzKeeper      authzkeeper.Keeper
-	ProviderKeeper   ibcproviderkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -296,7 +277,6 @@ func New( // nolint:funlen // app new cosmos func
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, authzkeeper.StoreKey,
-		providertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -323,7 +303,6 @@ func New( // nolint:funlen // app new cosmos func
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
-	scopedIBCProviderKeeper := app.CapabilityKeeper.ScopeToModule(providertypes.ModuleName)
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -406,7 +385,6 @@ func New( // nolint:funlen // app new cosmos func
 		stakingtypes.NewMultiStakingHooks(
 			app.DistrKeeper.Hooks(),
 			app.SlashingKeeper.Hooks(),
-			app.ProviderKeeper.Hooks(),
 		),
 	)
 
@@ -417,29 +395,9 @@ func New( // nolint:funlen // app new cosmos func
 		}
 	})
 
-	app.ProviderKeeper = ibcproviderkeeper.NewKeeper(
-		appCodec,
-		keys[providertypes.StoreKey],
-		app.GetSubspace(providertypes.ModuleName),
-		scopedIBCProviderKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		app.IBCKeeper.ConnectionKeeper,
-		app.IBCKeeper.ClientKeeper,
-		app.StakingKeeper,
-		app.SlashingKeeper,
-		app.AccountKeeper,
-		app.EvidenceKeeper,
-		app.DistrKeeper,
-		app.BankKeeper,
-		authtypes.FeeCollectorName,
-	)
-	providerModule := ibcprovider.NewAppModule(&app.ProviderKeeper)
-
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
-	ibcRouter.AddRoute(providertypes.ModuleName, providerModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// register the proposal types
@@ -449,8 +407,7 @@ func New( // nolint:funlen // app new cosmos func
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(app.DaoKeeper)).
-		AddRoute(providertypes.RouterKey, ibcprovider.NewProviderProposalHandler(app.ProviderKeeper))
+		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(app.DaoKeeper))
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
@@ -489,7 +446,6 @@ func New( // nolint:funlen // app new cosmos func
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		transferModule,
 		dao.NewAppModule(appCodec, app.DaoKeeper),
-		providerModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -516,7 +472,6 @@ func New( // nolint:funlen // app new cosmos func
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
 		daotypes.ModuleName,
-		providertypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		upgradetypes.ModuleName,
@@ -538,7 +493,6 @@ func New( // nolint:funlen // app new cosmos func
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
 		daotypes.ModuleName,
-		providertypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -566,7 +520,6 @@ func New( // nolint:funlen // app new cosmos func
 		vestingtypes.ModuleName,
 		feegrant.ModuleName,
 		daotypes.ModuleName,
-		providertypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -623,7 +576,6 @@ func New( // nolint:funlen // app new cosmos func
 	app.SetEndBlocker(app.EndBlocker)
 
 	app.setupUpgradeHandlers()
-	app.SetupForkLogic(v1_1_5_fix.CreateFork(&app.StakingKeeper, &app.ProviderKeeper, keys[providertypes.StoreKey]))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -633,7 +585,6 @@ func New( // nolint:funlen // app new cosmos func
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
-	app.ScopedIBCProviderKeeper = scopedIBCProviderKeeper
 
 	return app
 }
@@ -691,9 +642,6 @@ func (app *OnomyApp) BlockedAddrs() map[string]bool {
 	for acc := range maccPerms {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
 	}
-
-	// For ICS multiden fix
-	delete(blockedAddrs, authtypes.NewModuleAddress(providertypes.ConsumerRewardsPool).String())
 
 	return blockedAddrs
 }
@@ -803,7 +751,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(daotypes.ModuleName)
-	paramsKeeper.Subspace(providertypes.ModuleName)
 
 	return paramsKeeper
 }
@@ -814,27 +761,7 @@ func (app *OnomyApp) SimulationManager() *module.SimulationManager {
 }
 
 func (app *OnomyApp) setupUpgradeHandlers() {
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_1.Name, v1_0_1.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3.Name, v1_0_3.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_4.Name, v1_0_3_4.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_5.Name, v1_0_3_5.UpgradeHandler)
-	// we need to have the reference to `app` which is why we need this `func` here
-	app.UpgradeKeeper.SetUpgradeHandler(
-		v1_1_1.Name,
-		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			for moduleName, eachModule := range app.mm.Modules {
-				fromVM[moduleName] = eachModule.ConsensusVersion()
-			}
-
-			// This is critical for the chain upgrade to work
-			app.ProviderKeeper.InitGenesis(ctx, providertypes.DefaultGenesisState())
-
-			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
-		},
-	)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_1_2.Name, v1_1_2.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_1_4.Name, v1_1_4.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_1_5.Name, v1_1_5.CreateUpgradeHandler(app.mm, app.configurator, &app.AccountKeeper, &app.BankKeeper, &app.StakingKeeper))
+	app.UpgradeKeeper.SetUpgradeHandler(v1_1_6.Name, v1_1_6.UpgradeHandler)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
@@ -849,13 +776,9 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case v1_1_1.Name:
+	case v1_1_6.Name:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{providertypes.ModuleName, providertypes.StoreKey},
-		}
-	case v1_1_4.Name:
-		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{authz.ModuleName, authzkeeper.StoreKey},
+			Deleted: []string{"provider"},
 		}
 	default:
 		// no store upgrades
