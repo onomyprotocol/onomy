@@ -87,7 +87,7 @@ format:
 	gofumpt -lang=1.6 -extra -s -w $(SCAN_FILES)
 	gogroup -order std,other,prefix=$(IMPORT_PREFIX) -rewrite $(SCAN_FILES)
 
-PACKAGE_NAME:=github.com/decentrio/onomy-protocal
+PACKAGE_NAME:=github.com/onomyprotocol/onomy
 GOLANG_CROSS_VERSION  = v1.22
 
 release:
