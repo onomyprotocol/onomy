@@ -30,6 +30,7 @@ jobs:
           release_name: ${{ github.ref }}
           draft: false
           prerelease: true
+          allowUpdates: true
 
       # build & upload onomyd
 
