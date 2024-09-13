@@ -1,65 +1,35 @@
+---
+name: Release Binary
+      
 on:
-  push:
-    tags:
-      - "v*"
-
-name: Automated release build
-
+  release:
+    types: [created]
+      
+permissions: write-all
+        
+# This workflow creates a release using goreleaser
+# via the 'make release' command.
+  
 jobs:
-  build:
-    name: Build and upload release assets
+  release:
     runs-on: ubuntu-latest
-
+    environment: release
     steps:
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.22
-        id: go
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+        check-latest: true
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: false
-          prerelease: true
-          allowUpdates: true
+    - name: Setup release environment
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |-
+        echo 'GITHUB_TOKEN=${{secrets.GITHUB_TOKEN}}' > .release-env
 
-      # build & upload onomyd
-
-      - name: Build onomyd
-        run: make build
-
-      - name: Upload onomyd
-        id: upload-onomyd-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: onomyd
-          asset_name: onomyd
-          asset_content_type: application/bin
-
-      # build & upload onomyd arm64
-
-      - name: Build onomyd arm64
-        run: GOARCH=arm64 make build
-
-      - name: Upload onomyd arm64
-        id: upload-onomyd-release-asset-arm
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: onomyd
-          asset_name: onomyd-arm
-          asset_content_type: application/bin
+    - name: Release publish
+      run: make release
