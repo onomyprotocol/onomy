@@ -2,53 +2,131 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
+	"strings"
 
+	"cosmossdk.io/client/v2/autocli"
+	"cosmossdk.io/log"
+	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/config"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server"
 
-	"github.com/cosmos/cosmos-sdk/client/flags"
+	// "github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/x/auth/tx"
+	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/spf13/cobra"
-	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
-	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+
+	// "github.com/cometbft/starport/starport/pkg/cosmoscmd"
+	//
 	"github.com/onomyprotocol/onomy/app"
 )
 
 // NewRootCmd initiates the cli for onomy chain.
-func NewRootCmd() (*cobra.Command, cosmoscmd.EncodingConfig) {
-	rootCmd, encodingConfig := cosmoscmd.NewRootCmd(
-		app.Name,
-		app.AccountAddressPrefix,
-		app.DefaultNodeHome,
-		app.Name,
-		app.ModuleBasics,
-		app.New,
+func NewRootCmd() *cobra.Command {
+	initAppOptions := viper.New()
+	tempDir := tempDir()
+	initAppOptions.Set(flags.FlagHome, tempDir)
+	tempApplication := app.NewApp(
+		log.NewNopLogger(),
+		dbm.NewMemDB(),
+		nil,
+		true,
+		map[int64]bool{},
+		tempDir,
+		initAppOptions,
 	)
+	defer func() {
+		if err := tempApplication.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
-	rootCmd.AddCommand(
-		server.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler),
-	)
+	// fmt.Println(tempApplication.GetTxConfig().NewTxBuilder() == nil)
 
-	return rootCmd, encodingConfig
-}
+	initClientCtx := client.Context{}.
+		WithCodec(tempApplication.AppCodec()).
+		WithInterfaceRegistry(tempApplication.InterfaceRegistry()).
+		WithLegacyAmino(tempApplication.LegacyAmino()).
+		WithInput(os.Stdin).
+		WithAccountRetriever(types.AccountRetriever{}).
+		WithHomeDir(app.DefaultNodeHome).
+		WithViper("")
 
-// WrapBridgeCommands registers a sub-tree of gravity commands.
-func WrapBridgeCommands(defaultNodeHome, rootCmd string, cmds []*cobra.Command) *cobra.Command {
-	//nolint: exhaustivestruct
-	cmd := &cobra.Command{
-		Use:   rootCmd,
-		Short: fmt.Sprintf("Manage %s bridge.", rootCmd),
-		Long:  fmt.Sprintf("Manage %s bridge.", rootCmd),
+	rootCmd := &cobra.Command{
+		Use:   app.AppName + "d",
+		Short: "Start reserve node",
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			cmd.SetOut(cmd.OutOrStdout())
+			cmd.SetErr(cmd.ErrOrStderr())
+
+			initClientCtx = initClientCtx.WithCmdContext(cmd.Context())
+			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			initClientCtx, err = config.ReadFromClientConfig(initClientCtx)
+			if err != nil {
+				return err
+			}
+
+			if !initClientCtx.Offline {
+				txConfigOpts := tx.ConfigOptions{
+					EnabledSignModes:           append(tx.DefaultSignModes, signing.SignMode_SIGN_MODE_TEXTUAL),
+					TextualCoinMetadataQueryFn: authtxconfig.NewGRPCCoinMetadataQueryFn(initClientCtx),
+				}
+				txConfigWithTextual, err := tx.NewTxConfigWithOptions(
+					initClientCtx.Codec,
+					txConfigOpts,
+				)
+				if err != nil {
+					return err
+				}
+				initClientCtx = initClientCtx.WithTxConfig(txConfigWithTextual)
+			}
+
+			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
+				return err
+			}
+
+			customAppTemplate, customAppConfig := initAppConfig()
+			customCMTConfig := initCometBFTConfig()
+
+			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCMTConfig)
+		},
 	}
 
-	for _, childCmd := range cmds {
-		cmd.AddCommand(childCmd)
+	// Since the IBC modules don't support dependency injection, we need to
+	// manually register the modules on the client side.
+	// This needs to be removed after IBC supports App Wiring.
+	// ibcModules := app.RegisterIBC(clientCtx.InterfaceRegistry)
+	// for name, mod := range ibcModules {
+	// 	moduleBasicManager[name] = module.CoreAppModuleBasicAdaptor(name, mod)
+	// 	autoCliOpts.Modules[name] = mod
+	// }
+	// fmt.Println(tempApplication.ModuleBasics["genutil"] == nil)
+	initRootCmd(rootCmd, tempApplication.ModuleBasics, tempApplication.GetTxConfig())
+
+	overwriteFlagDefaults(rootCmd, map[string]string{
+		flags.FlagChainID:        strings.ReplaceAll(app.AppName, "-", ""),
+		flags.FlagKeyringBackend: "test",
+	})
+
+	autoCliOpts := enrichAutoCliOpts(tempApplication.AutoCliOpts(), initClientCtx)
+	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
+		panic(err)
 	}
 
-	cmd.PersistentFlags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
-	cmd.PersistentFlags().String(flags.FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
-	cmd.PersistentFlags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
-	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
-
-	return cmd
+	return rootCmd
 }

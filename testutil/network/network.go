@@ -9,10 +9,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
+	// "github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
+
+	// "github.com/cometbft/starport/starport/pkg/cosmoscmd"
 
 	"github.com/onomyprotocol/onomy/app"
 	"github.com/onomyprotocol/onomy/testutil/simapp"

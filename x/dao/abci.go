@@ -4,7 +4,8 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/telemetry"
+	"cosmossdk.io/math"
+	// "github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/onomyprotocol/onomy/x/dao/keeper"
@@ -19,7 +20,7 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
-	if k.GetDaoDelegationSupply(ctx).GT(sdk.NewDec(0)) {
+	if k.GetDaoDelegationSupply(ctx).GT(math.NewLegacyDec(0)) {
 		if err := k.VoteAbstain(ctx); err != nil {
 			k.Logger(ctx).Error("dao EndBlocker error: %v", err)
 			debug.PrintStack()

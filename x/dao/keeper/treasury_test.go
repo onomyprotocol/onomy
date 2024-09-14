@@ -3,9 +3,9 @@ package keeper_test
 import (
 	"testing"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/onomyprotocol/onomy/testutil/simapp"
 	"github.com/onomyprotocol/onomy/x/dao/types"

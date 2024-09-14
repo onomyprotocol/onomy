@@ -17,7 +17,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	// "github.com/cosmos/cosmos-sdk/crypto/keyring"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	sdkTypes "github.com/cosmos/cosmos-sdk/types"
 

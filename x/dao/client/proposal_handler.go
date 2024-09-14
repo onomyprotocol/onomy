@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/types/rest"
+	// "github.com/cosmos/cosmos-sdk/types/rest"
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
-	govrest "github.com/cosmos/cosmos-sdk/x/gov/client/rest"
+	// govrest "github.com/cosmos/cosmos-sdk/x/gov/client/rest"
 
 	"github.com/onomyprotocol/onomy/x/dao/client/cli"
 )

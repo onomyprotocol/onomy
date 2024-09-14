@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
+	// tmcli "github.com/cometbft/tendermint/libs/cli"
+	// clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"google.golang.org/grpc/status"
 
 	"github.com/onomyprotocol/onomy/testutil/network"

@@ -4,9 +4,9 @@ package keeper
 import (
 	"fmt"
 
+	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )

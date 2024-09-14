@@ -55,7 +55,7 @@ make install
 
 ## Learn more about starport
 
-- [Starport](https://github.com/tendermint/starport)
+- [Starport](https://github.com/cometbft/starport)
 - [Starport Docs](https://docs.starport.network)
 - [Cosmos SDK documentation](https://docs.cosmos.network)
 - [Cosmos SDK Tutorials](https://tutorials.cosmos.network)
