@@ -19,7 +19,6 @@ type (
 		cdc codec.BinaryCodec
 
 		storeService store.KVStoreService
-		logger       log.Logger
 
 		authority string
 

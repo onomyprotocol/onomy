@@ -11,7 +11,10 @@ import (
 
 // WithdrawReward withdraw dao delegation reward.
 func (k Keeper) WithdrawReward(ctx context.Context) error {
-	vals := k.stakingKeeper.GetAllValidators(ctx)
+	vals, err := k.stakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return err
+	}
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	for _, val := range vals {
 		valOperator := val.GetOperator()
@@ -19,12 +22,12 @@ func (k Keeper) WithdrawReward(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		_, found := k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
-		if !found {
+		_, err = k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
+		if err != nil {
 			continue
 		}
 		// check existence of delegator starting info
-		if !k.distributionKeeper.HasDelegatorStartingInfo(ctx, valAddr, daoAddr) {
+		if has, err := k.distributionKeeper.HasDelegatorStartingInfo(ctx, valAddr, daoAddr); err != nil || !has {
 			continue
 		}
 

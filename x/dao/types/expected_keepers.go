@@ -10,7 +10,9 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	// govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	"github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	// govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 // ParamSubspace defines the expected Subspace interface.
@@ -40,28 +42,27 @@ type BankKeeper interface {
 
 // DistributionKeeper expected distribution keeper.
 type DistributionKeeper interface {
-	HasDelegatorStartingInfo(context.Context, sdk.ValAddress, sdk.AccAddress) bool
+	HasDelegatorStartingInfo(context.Context, sdk.ValAddress, sdk.AccAddress) (bool, error)
 	WithdrawDelegationRewards(context.Context, sdk.AccAddress, sdk.ValAddress) (sdk.Coins, error)
 }
 
 // GovKeeper expected gov keeper.
 type GovKeeper interface {
-	AddVote(context.Context, uint64, sdk.AccAddress, govtypes.WeightedVoteOptions) error
-	GetVote(context.Context, uint64, sdk.AccAddress) (govtypes.Vote, bool)
-	IterateProposals(context.Context, func(proposal govtypes.Proposal) bool)
+	AddVote(context.Context, uint64, sdk.AccAddress, v1.WeightedVoteOptions, string) error
+	GetVote(context.Context, uint64, sdk.AccAddress) (v1.Vote, error)
+	IterateProposals(context.Context, func(v v1.Proposal) bool) error
 }
 
 // MintKeeper expected mint keeper.
 type MintKeeper interface {
-	GetMinter(ctx context.Context) (minter minttypes.Minter)
-	GetParams(ctx context.Context) (params minttypes.Params)
+	ExportGenesis(ctx sdk.Context) *minttypes.GenesisState
 }
 
 // StakingKeeper expected staking keeper.
 type StakingKeeper interface {
-	BondDenom(context.Context) string
+	BondDenom(context.Context) (string, error)
 	Delegate(context.Context, sdk.AccAddress, math.Int, stakingtypes.BondStatus, stakingtypes.Validator, bool) (math.LegacyDec, error)
-	GetDelegation(context.Context, sdk.AccAddress, sdk.ValAddress) (stakingtypes.Delegation, bool)
-	GetAllValidators(context.Context) []stakingtypes.Validator
+	GetDelegation(context.Context, sdk.AccAddress, sdk.ValAddress) (stakingtypes.Delegation, error)
+	GetAllValidators(context.Context) ([]stakingtypes.Validator, error)
 	UnbondAndUndelegateCoins(context.Context, sdk.AccAddress, sdk.ValAddress, math.LegacyDec) (math.Int, error)
 }

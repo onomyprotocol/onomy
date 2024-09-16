@@ -12,8 +12,11 @@ import (
 func (k Keeper) InflateDao(ctx context.Context) (err error) {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	daoBalance := k.bankKeeper.GetBalance(ctx, daoAddr, "anom")
-	minter := k.mintKeeper.GetMinter(ctx)
-	params := k.mintKeeper.GetParams(ctx)
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	genesis := k.mintKeeper.ExportGenesis(sdkCtx)
+	minter := genesis.Minter
+	params := genesis.Params
 	minter.AnnualProvisions = minter.NextAnnualProvisions(params, daoBalance.Amount)
 
 	// mint coins, update supply

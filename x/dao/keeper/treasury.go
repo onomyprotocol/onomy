@@ -13,7 +13,10 @@ func (k Keeper) Treasury(ctx sdk.Context) sdk.Coins {
 }
 
 func (k Keeper) treasuryBondDenomAmount(ctx sdk.Context) math.Int {
-	denom := k.stakingKeeper.BondDenom(ctx)
+	denom, err := k.stakingKeeper.BondDenom(ctx)
+	if err != nil {
+		panic(err)
+	}
 	return k.treasury(ctx).AmountOf(denom)
 }
 

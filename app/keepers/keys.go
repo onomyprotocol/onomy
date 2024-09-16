@@ -24,6 +24,8 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	providertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
+	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 func (appKeepers *AppKeepers) GenerateKeys() {
@@ -49,6 +51,8 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		capabilitytypes.StoreKey,
 		feegrant.StoreKey,
 		authzkeeper.StoreKey,
+		providertypes.StoreKey,
+		daotypes.StoreKey,
 		consensusparamtypes.StoreKey,
 	)
 

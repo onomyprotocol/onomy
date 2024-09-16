@@ -14,7 +14,10 @@ import (
 // ReBalanceDelegation re-balances the DAO staking among validators bases on the current validators self bond.
 func (k Keeper) ReBalanceDelegation(ctx sdk.Context) error {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
-	vals := k.stakingKeeper.GetAllValidators(ctx)
+	vals, err := k.stakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return err
+	}
 	targetDaoStaking := k.getTargetDelegationState(ctx, vals)
 	delegations, undelegations := k.computeDelegationsAndUndelegation(ctx, daoAddr, vals, targetDaoStaking)
 
@@ -29,7 +32,10 @@ func (k Keeper) ReBalanceDelegation(ctx sdk.Context) error {
 		return err
 	}
 
-	vals = k.stakingKeeper.GetAllValidators(ctx)
+	vals, err = k.stakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return err
+	}
 	targetDaoStaking = k.getTargetDelegationState(ctx, vals)
 	delegations, undelegations = k.computeDelegationsAndUndelegation(ctx, daoAddr, vals, targetDaoStaking)
 
@@ -41,8 +47,12 @@ func (k Keeper) ReBalanceDelegation(ctx sdk.Context) error {
 }
 
 // GetDaoDelegationSupply returns total amount of the treasury bonded coins.
-func (k Keeper) GetDaoDelegationSupply(ctx context.Context) math.LegacyDec {
-	return k.getDaoDelegationSupply(ctx, k.stakingKeeper.GetAllValidators(ctx))
+func (k Keeper) GetDaoDelegationSupply(ctx context.Context) (math.LegacyDec, error) {
+	vals, err := k.stakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return math.LegacyZeroDec(), err
+	}
+	return k.getDaoDelegationSupply(ctx, vals), nil
 }
 
 // getTargetDelegationState builds a map of the validators and the stake amount they should have now.
@@ -64,8 +74,8 @@ func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Va
 			panic(err)
 		}
 		accVal := sdk.AccAddress(valAddr)
-		selfDelegation, found := k.stakingKeeper.GetDelegation(ctx, accVal, valAddr)
-		if !found || selfDelegation.GetShares().IsZero() {
+		selfDelegation, err := k.stakingKeeper.GetDelegation(ctx, accVal, valAddr)
+		if err != nil || selfDelegation.GetShares().IsZero() {
 			continue
 		}
 		selfDelegationAmount := val.TokensFromShares(selfDelegation.GetShares())
@@ -99,8 +109,8 @@ func (k Keeper) getDaoDelegationSupply(ctx context.Context, vals []stakingtypes.
 		if err != nil {
 			panic(err)
 		}
-		delegation, found := k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
-		if !found || delegation.GetShares().IsZero() {
+		delegation, err := k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
+		if err != nil || delegation.GetShares().IsZero() {
 			continue
 		}
 		delegationAmount := val.TokensFromShares(delegation.GetShares())
@@ -126,8 +136,8 @@ func (k Keeper) computeDelegationsAndUndelegation(
 		}
 		targetDaoDelegation, ok := targetDaoStaking[valAddr.String()]
 		delegatedByDao := math.ZeroInt()
-		delegation, found := k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
-		if found {
+		delegation, err := k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
+		if err == nil {
 			delegatedByDao = val.TokensFromShares(delegation.GetShares()).TruncateInt()
 		}
 		// for the validators not in the target list the target amount is zero
@@ -187,7 +197,10 @@ func undelegateValidators(ctx sdk.Context, vals []stakingtypes.Validator, undele
 func (k Keeper) UndelegateAllValidators(ctx context.Context) (err error) {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 
-	vals := k.stakingKeeper.GetAllValidators(ctx)
+	vals, err := k.stakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return err
+	}
 
 	for _, val := range vals {
 		valAddr, err := sdk.ValAddressFromBech32(val.GetOperator())
@@ -195,8 +208,8 @@ func (k Keeper) UndelegateAllValidators(ctx context.Context) (err error) {
 			return err
 		}
 
-		delegation, found := k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
-		if !found || delegation.GetShares().IsZero() {
+		delegation, err := k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
+		if err != nil || delegation.GetShares().IsZero() {
 			continue
 		}
 

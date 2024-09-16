@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -76,8 +77,7 @@ import (
 	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
 	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
 	v1_1_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.4"
-	// "github.com/onomyprotocol/onomy/docs"
-	// "github.com/onomyprotocol/onomy/x/dao"
+	"github.com/onomyprotocol/onomy/docs"
 	// daoclient "github.com/onomyprotocol/onomy/x/dao/client"
 	// daokeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
 	// daotypes "github.com/onomyprotocol/onomy/x/dao/types"
@@ -89,26 +89,6 @@ const (
 	// Name is the name of the onomy chain.
 	AppName = "onomy"
 )
-
-// func getGovProposalHandlers() []govclient.ProposalHandler {
-// 	var govProposalHandlers []govclient.ProposalHandler
-
-// 	govProposalHandlers = append(govProposalHandlers,
-// 		paramsclient.ProposalHandler,
-// 		distrclient.ProposalHandler,
-// 		upgradeclient.ProposalHandler,
-// 		upgradeclient.CancelProposalHandler,
-// 		ibcclientclient.UpdateClientProposalHandler,
-// 		ibcclientclient.UpgradeProposalHandler,
-// 		daoclient.FundTreasuryProposalHandler,
-// 		daoclient.ExchangeWithTreasuryProposalProposalHandler,
-// 		ibcproviderclient.ConsumerAdditionProposalHandler,
-// 		ibcproviderclient.ConsumerRemovalProposalHandler,
-// 		ibcproviderclient.EquivocationProposalHandler,
-// 	)
-
-// 	return govProposalHandlers
-// }
 
 var (
 	// DefaultNodeHome default home directories for the application daemon.
@@ -488,6 +468,8 @@ func (app *OnomyApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIC
 	if err := server.RegisterSwaggerAPI(apiSvr.ClientCtx, apiSvr.Router, apiConfig.Swagger); err != nil {
 		panic(err)
 	}
+	// register app's OpenAPI routes.
+	apiSvr.Router.Handle("/openapi/openapi.yml", http.FileServer(http.FS(docs.Docs)))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.

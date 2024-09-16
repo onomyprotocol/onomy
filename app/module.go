@@ -49,12 +49,16 @@ import (
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	providertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
+
+	"github.com/onomyprotocol/onomy/x/dao"
+	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 var (
 	// module account permissions.
 	maccPerms = map[string][]string{ // nolint:gochecknoglobals // cosmos-sdk application style
 		authtypes.FeeCollectorName:        nil,
+		daotypes.ModuleName:               {authtypes.Minter},
 		distrtypes.ModuleName:             nil,
 		minttypes.ModuleName:              {authtypes.Minter},
 		stakingtypes.BondedPoolName:       {authtypes.Burner, authtypes.Staking},
@@ -67,6 +71,7 @@ var (
 	// module accounts that are allowed to receive tokens.
 	allowedReceivingModAcc = map[string]bool{ // nolint:gochecknoglobals // cosmos-sdk application style
 		distrtypes.ModuleName: true,
+		daotypes.ModuleName:   true,
 		// provider chain note: the fee-pool is allowed to receive tokens
 		authtypes.FeeCollectorName: true,
 	}
@@ -82,6 +87,7 @@ func appModules(
 		auth.NewAppModule(appCodec, app.AccountKeeper, nil, app.GetSubspace(authtypes.ModuleName)),
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
+		dao.NewAppModule(appCodec, app.DaoKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),
@@ -97,6 +103,8 @@ func appModules(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
 		genutil.NewAppModule(app.AccountKeeper, app.StakingKeeper, app, txConfig),
+		app.ProviderModule,
+		app.TransferModule,
 		// and
 	}
 
@@ -110,6 +118,8 @@ func newBasicManagerFromManager(app *OnomyApp) module.BasicManager {
 			govtypes.ModuleName: gov.NewAppModuleBasic(
 				[]govclient.ProposalHandler{
 					paramsclient.ProposalHandler,
+					dao.FundTreasuryProposalHandler,
+					dao.ExchangeWithTreasuryProposalProposalHandler,
 				},
 			),
 		})
@@ -142,6 +152,7 @@ func orderBeginBlockers() []string {
 		consensusparamtypes.ModuleName,
 		providertypes.ModuleName,
 		// and
+		daotypes.ModuleName,
 	}
 }
 
@@ -170,6 +181,7 @@ func orderEndBlockers() []string {
 		consensusparamtypes.ModuleName,
 		providertypes.ModuleName,
 		// and
+		daotypes.ModuleName,
 	}
 }
 
@@ -197,6 +209,7 @@ func orderInitBlockers() []string {
 		consensusparamtypes.ModuleName,
 		crisistypes.ModuleName,
 		providertypes.ModuleName,
+		daotypes.ModuleName,
 	}
 }
 
@@ -208,6 +221,7 @@ func simulationModules(
 	return []module.AppModuleSimulation{
 		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
+		dao.NewAppModule(appCodec, app.DaoKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),
@@ -219,5 +233,7 @@ func simulationModules(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
+		app.ProviderModule,
+		app.TransferModule,
 	}
 }
