@@ -53,6 +53,9 @@ import (
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+
+	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
+	icsproviderkeeper "github.com/cosmos/interchain-security/v5/x/ccv/provider/keeper"
 )
 
 type AppKeepers struct {
@@ -84,6 +87,12 @@ type AppKeepers struct {
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+
+	//
+	TransferKeeper          ibctransferkeeper.Keeper
+	ProviderKeeper          icsproviderkeeper.Keeper
+	ScopedIBCProviderKeeper capabilitykeeper.ScopedKeeper
+	// DaoKeeper               daokeeper.Keeper
 }
 
 func NewAppKeeper(

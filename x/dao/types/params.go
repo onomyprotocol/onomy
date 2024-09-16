@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"cosmossdk.io/math"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	// "gopkg.in/yaml.v2"
 )
@@ -12,11 +12,11 @@ var (
 	// DefaultWithdrawRewardPeriod is default value for the DefaultWithdrawRewardPeriod param.
 	DefaultWithdrawRewardPeriod = int64(51840) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
 	// DefaultPoolRate is default value for the DefaultPoolRate param.
-	DefaultPoolRate = sdk.NewDec(1).Quo(sdk.NewDec(20)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
+	DefaultPoolRate = math.LegacyNewDec(1).Quo(math.LegacyNewDec(20)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
 	// DefaultMaxProposalRate is default value for the DefaultMaxProposalRate param.
-	DefaultMaxProposalRate = sdk.NewDec(1).Quo(sdk.NewDec(20)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
+	DefaultMaxProposalRate = math.LegacyNewDec(1).Quo(math.LegacyNewDec(20)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
 	// DefaultMaxValCommission is default value for the DefaultMaxValCommission param.
-	DefaultMaxValCommission = sdk.NewDec(1).Quo(sdk.NewDec(10)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
+	DefaultMaxValCommission = math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)) //nolint:gomnd,gochecknoglobals // cosmos-sdk style
 )
 
 // Parameter store keys.
@@ -43,7 +43,7 @@ func NewParams(
 	withdrawRewardPeriod int64,
 	poolRate,
 	maxProposalRate,
-	maxValCommission sdk.Dec,
+	maxValCommission math.LegacyDec,
 ) Params {
 	return Params{
 		WithdrawRewardPeriod: withdrawRewardPeriod,
@@ -73,6 +73,7 @@ func (m *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 
 // Validate validates the set of params.
 func (m Params) Validate() error {
+	m.Size()
 	if err := validateWithdrawRewardPeriod(m.WithdrawRewardPeriod); err != nil {
 		return err
 	}
@@ -84,12 +85,6 @@ func (m Params) Validate() error {
 	}
 
 	return validateMaxValCommission(m.MaxValCommission)
-}
-
-// String implements the Stringer interface.
-func (m Params) String() string {
-	out, _ := yaml.Marshal(m) //nolint:errcheck // error is not expected here
-	return string(out)
 }
 
 func validateWithdrawRewardPeriod(i interface{}) error {
@@ -106,7 +101,7 @@ func validateWithdrawRewardPeriod(i interface{}) error {
 }
 
 func validatePoolRate(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(math.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -114,7 +109,7 @@ func validatePoolRate(i interface{}) error {
 	if v.IsNil() || v.IsNegative() {
 		return fmt.Errorf("staking token pool rate cannot be negative or nil: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
+	if v.GT(math.LegacyOneDec()) {
 		return fmt.Errorf("staking token pool rate too large: %s", v)
 	}
 
@@ -122,7 +117,7 @@ func validatePoolRate(i interface{}) error {
 }
 
 func validateMaxProposalRate(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(math.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -130,7 +125,7 @@ func validateMaxProposalRate(i interface{}) error {
 	if v.IsNil() || v.IsNegative() {
 		return fmt.Errorf("staking token max proposal rate cannot be negative or nil: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
+	if v.GT(math.LegacyOneDec()) {
 		return fmt.Errorf("staking token max proposal rate too large: %s", v)
 	}
 
@@ -138,7 +133,7 @@ func validateMaxProposalRate(i interface{}) error {
 }
 
 func validateMaxValCommission(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(math.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -146,7 +141,7 @@ func validateMaxValCommission(i interface{}) error {
 	if v.IsNil() || v.IsNegative() {
 		return fmt.Errorf("staking max commission rate cannot be negative or nil: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
+	if v.GT(math.LegacyOneDec()) {
 		return fmt.Errorf("staking max commission rate too large: %s", v)
 	}
 

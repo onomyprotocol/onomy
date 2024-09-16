@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
@@ -11,7 +12,7 @@ func (k Keeper) Treasury(ctx sdk.Context) sdk.Coins {
 	return k.treasury(ctx)
 }
 
-func (k Keeper) treasuryBondDenomAmount(ctx sdk.Context) sdk.Int {
+func (k Keeper) treasuryBondDenomAmount(ctx sdk.Context) math.Int {
 	denom := k.stakingKeeper.BondDenom(ctx)
 	return k.treasury(ctx).AmountOf(denom)
 }

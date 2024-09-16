@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	sdkerrors "cosmossdk.io/errors"
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 const (
@@ -26,13 +27,8 @@ var (
 
 func init() { // nolint:gochecknoinits // cosmos sdk style
 	govtypes.RegisterProposalType(ProposalTypeFundTreasuryProposal)
-	govtypes.RegisterProposalTypeCodec(&FundTreasuryProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeFundTreasuryProposal))
-
 	govtypes.RegisterProposalType(ProposalTypeExchangeWithTreasuryProposal)
-	govtypes.RegisterProposalTypeCodec(&ExchangeWithTreasuryProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeExchangeWithTreasuryProposal))
-
 	govtypes.RegisterProposalType(ProposalTypeFundAccountProposal)
-	govtypes.RegisterProposalTypeCodec(&FundAccountProposal{}, fmt.Sprintf("%s/%s", ModuleName, ProposalTypeFundAccountProposal))
 }
 
 // NewFundTreasuryProposal creates a new fund treasury proposal.
@@ -63,15 +59,15 @@ func (m *FundTreasuryProposal) ValidateBasic() error {
 		return err
 	}
 	if err := sdk.VerifyAddressFormat(sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address: %s", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address: %s", err)
 	}
 
 	if !m.Amount.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
+		return errors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
 	}
 
 	if !m.Amount.IsAllPositive() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
+		return errors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
 	}
 
 	return nil
@@ -122,11 +118,11 @@ func (m *ExchangeWithTreasuryProposal) ValidateBasic() error {
 		return err
 	}
 	if err := sdk.VerifyAddressFormat(sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address: %s", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address: %s", err)
 	}
 
 	if len(m.CoinsPairs) == 0 {
-		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "coins pairs can't be empty")
+		return errors.Wrapf(ErrInvalidCoinsPair, "coins pairs can't be empty")
 	}
 
 	for i := range m.CoinsPairs {
@@ -156,15 +152,15 @@ func (m ExchangeWithTreasuryProposal) String() string {
 // ValidateBasic validates CoinsExchangePair basic options.
 func (m *CoinsExchangePair) ValidateBasic() error {
 	if m == nil {
-		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "coins pairs can't be nil")
+		return errors.Wrapf(ErrInvalidCoinsPair, "coins pairs can't be nil")
 	}
 
 	if !m.CoinAsk.IsValid() || m.CoinAsk.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "invalid coin ask")
+		return errors.Wrapf(ErrInvalidCoinsPair, "invalid coin ask")
 	}
 
 	if !m.CoinBid.IsValid() || m.CoinBid.IsZero() {
-		return sdkerrors.Wrapf(ErrInvalidCoinsPair, "invalid coin bid")
+		return errors.Wrapf(ErrInvalidCoinsPair, "invalid coin bid")
 	}
 
 	return nil
@@ -198,15 +194,15 @@ func (m *FundAccountProposal) ValidateBasic() error {
 		return err
 	}
 	if err := sdk.VerifyAddressFormat(sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address: %s", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address: %s", err)
 	}
 
 	if !m.Amount.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
+		return errors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
 	}
 
 	if !m.Amount.IsAllPositive() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
+		return errors.Wrap(sdkerrors.ErrInvalidCoins, m.Amount.String())
 	}
 
 	return nil

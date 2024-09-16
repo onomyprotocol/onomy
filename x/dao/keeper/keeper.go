@@ -2,8 +2,10 @@
 package keeper
 
 import (
+	"context"
 	"fmt"
 
+	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,10 +16,15 @@ import (
 type (
 	// Keeper is a dao keeper struct.
 	Keeper struct {
-		cdc                codec.BinaryCodec
-		storeKey           sdk.StoreKey
-		memKey             sdk.StoreKey
-		ps                 types.ParamSubspace
+		cdc codec.BinaryCodec
+
+		storeService store.KVStoreService
+		logger       log.Logger
+
+		authority string
+
+		ps types.ParamSubspace
+
 		bankKeeper         types.BankKeeper
 		accountKeeper      types.AccountKeeper
 		distributionKeeper types.DistributionKeeper
@@ -30,8 +37,8 @@ type (
 // NewKeeper creates new dao keeper.
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	storeKey,
-	memKey sdk.StoreKey,
+	storeService store.KVStoreService,
+	authority string,
 	ps types.ParamSubspace,
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
@@ -52,8 +59,8 @@ func NewKeeper(
 
 	return &Keeper{
 		cdc:                cdc,
-		storeKey:           storeKey,
-		memKey:             memKey,
+		storeService:       storeService,
+		authority:          authority,
 		ps:                 ps,
 		bankKeeper:         bankKeeper,
 		accountKeeper:      accountKeeper,
@@ -65,6 +72,7 @@ func NewKeeper(
 }
 
 // Logger returns keeper logger.
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
-	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+func (k Keeper) Logger(ctx context.Context) log.Logger {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return sdkCtx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }

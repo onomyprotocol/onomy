@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
@@ -23,19 +24,19 @@ func (k Keeper) WithdrawRewardPeriod(ctx sdk.Context) (res int64) {
 }
 
 // MaxValCommission - the max validator's commission to be staked by the dao.
-func (k Keeper) MaxValCommission(ctx sdk.Context) (res sdk.Dec) {
+func (k Keeper) MaxValCommission(ctx sdk.Context) (res math.LegacyDec) {
 	k.ps.Get(ctx, types.KeyMaxValCommission, &res)
 	return
 }
 
 // MaxProposalRate - the rate of max allowed proposal from the treasury amount.
-func (k Keeper) MaxProposalRate(ctx sdk.Context) (res sdk.Dec) {
+func (k Keeper) MaxProposalRate(ctx sdk.Context) (res math.LegacyDec) {
 	k.ps.Get(ctx, types.KeyMaxProposalRate, &res)
 	return
 }
 
 // PoolRate - the rate of total dao's staking coins to keep unstaked.
-func (k Keeper) PoolRate(ctx sdk.Context) (res sdk.Dec) {
+func (k Keeper) PoolRate(ctx sdk.Context) (res math.LegacyDec) {
 	k.ps.Get(ctx, types.KeyPoolRate, &res)
 	return
 }

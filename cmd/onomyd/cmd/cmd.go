@@ -11,8 +11,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server"
 
 	// "github.com/cosmos/cosmos-sdk/types/module"
@@ -35,9 +33,9 @@ import (
 // NewRootCmd initiates the cli for onomy chain.
 func NewRootCmd() *cobra.Command {
 	initAppOptions := viper.New()
-	tempDir := tempDir()
+	tempDir := app.DefaultNodeHome
 	initAppOptions.Set(flags.FlagHome, tempDir)
-	tempApplication := app.NewApp(
+	tempApplication := app.NewOnomyApp(
 		log.NewNopLogger(),
 		dbm.NewMemDB(),
 		nil,
@@ -129,4 +127,30 @@ func NewRootCmd() *cobra.Command {
 	}
 
 	return rootCmd
+}
+
+func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
+	set := func(s *pflag.FlagSet, key, val string) {
+		if f := s.Lookup(key); f != nil {
+			f.DefValue = val
+			_ = f.Value.Set(val)
+		}
+	}
+	for key, val := range defaults {
+		set(c.Flags(), key, val)
+		set(c.PersistentFlags(), key, val)
+	}
+	for _, c := range c.Commands() {
+		overwriteFlagDefaults(c, defaults)
+	}
+}
+
+func enrichAutoCliOpts(autoCliOpts autocli.AppOptions, clientCtx client.Context) autocli.AppOptions {
+	autoCliOpts.AddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix())
+	autoCliOpts.ValidatorAddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix())
+	autoCliOpts.ConsensusAddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix())
+
+	autoCliOpts.ClientCtx = clientCtx
+
+	return autoCliOpts
 }

@@ -1,16 +1,16 @@
 package keeper
 
 import (
+	"context"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 // VoteAbstain votes abstain on all the proposals from the DAO account.
-func (k Keeper) VoteAbstain(ctx sdk.Context) (err error) {
+func (k Keeper) VoteAbstain(ctx context.Context) (err error) {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	k.govKeeper.IterateProposals(ctx, func(proposal govtypes.Proposal) bool {
 		if proposal.Status != govtypes.StatusVotingPeriod {
