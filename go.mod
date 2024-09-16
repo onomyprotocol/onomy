@@ -210,6 +210,6 @@ require (
 // require github.com/gogo/protobuf v1.3.2
 
 replace (
-	github.com/cosmos/cosmos-sdk => /Users/donglieu/cosmos-sdk
+	github.com/cosmos/cosmos-sdk => github.com/DongLieu/cosmos-sdk v0.50.8-onomy
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 )
