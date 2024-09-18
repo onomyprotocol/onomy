@@ -121,12 +121,15 @@ screen -S onomy2 -t onomy2 -d -m onomyd start --home=$HOME/.onomyd/validator2
 screen -S onomy3 -t onomy3 -d -m onomyd start --home=$HOME/.onomyd/validator3
 # onomyd start --home=$HOME/.onomyd/validator3
 
-# sleep 7
+sleep 7
 
-# onomyd tx bank send onomy1wa3u4knw74r598quvzydvca42qsmk6jrc6uj7m onomy1w7f3xx7e75p4l7qdym5msqem9rd4dyc4y47xsd 100000stake --keyring-backend=test --chain-id=testing-1 -y --home=$HOME/.onomyd/validator1 --fees 10stake
+onomyd q bank balances onomy1w7f3xx7e75p4l7qdym5msqem9rd4dyc4y47xsd
 
-# onomyd q staking validators
-# onomyd keys list --keyring-backend=test --home=$HOME/.onomyd/validator1
-# onomyd keys list --keyring-backend=test --home=$HOME/.onomyd/validator2
-# onomyd keys list --keyring-backend=test --home=$HOME/.onomyd/validator3
+sleep 1
+
+onomyd tx bank send onomy1wa3u4knw74r598quvzydvca42qsmk6jrc6uj7m onomy1w7f3xx7e75p4l7qdym5msqem9rd4dyc4y47xsd 100000stake --keyring-backend=test --chain-id=testing-1 -y --home=$HOME/.onomyd/validator1 --fees 20stake
+
+sleep 7
+
+onomyd q bank balances onomy1w7f3xx7e75p4l7qdym5msqem9rd4dyc4y47xsd
 

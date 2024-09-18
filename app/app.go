@@ -225,24 +225,6 @@ func NewOnomyApp( // nolint:funlen // app new cosmos func
 		appOpts,
 	)
 
-	// app.ProviderKeeper = ibcproviderkeeper.NewKeeper(
-	// 	appCodec,
-	// 	keys[providertypes.StoreKey],
-	// 	app.GetSubspace(providertypes.ModuleName),
-	// 	scopedIBCProviderKeeper,
-	// 	app.IBCKeeper.ChannelKeeper,
-	// 	&app.IBCKeeper.PortKeeper,
-	// 	app.IBCKeeper.ConnectionKeeper,
-	// 	app.IBCKeeper.ClientKeeper,
-	// 	app.StakingKeeper,
-	// 	app.SlashingKeeper,
-	// 	app.AccountKeeper,
-	// 	app.EvidenceKeeper,
-	// 	app.DistrKeeper,
-	// 	app.BankKeeper,
-	// 	authtypes.FeeCollectorName,
-	// )
-
 	/****  Module Options ****/
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -320,7 +302,7 @@ func NewOnomyApp( // nolint:funlen // app new cosmos func
 
 	// and storeloader
 	app.setupUpgradeHandlers()
-	// app.setupUpgradeStoreLoaders()
+	app.setupUpgradeStoreLoaders()
 
 	app.SetAnteHandler(anteHandler)
 
@@ -429,16 +411,6 @@ func (app *OnomyApp) AppCodec() codec.Codec {
 // InterfaceRegistry returns an InterfaceRegistry.
 func (app *OnomyApp) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
-}
-
-// GetKey returns the KVStoreKey for the provided store key.
-func (app *OnomyApp) GetKey(storeKey string) *storetypes.KVStoreKey {
-	return app.AppKeepers.GetKey(storeKey)
-}
-
-// GetMemKey returns the MemoryStoreKey for the provided store key.
-func (app *OnomyApp) GetMemKey(storeKey string) *storetypes.MemoryStoreKey {
-	return app.AppKeepers.GetMemKey(storeKey)
 }
 
 // GetSubspace returns a param subspace for a given module name.
@@ -557,16 +529,16 @@ func (app *OnomyApp) BlockedModuleAccountAddrs(modAccAddrs map[string]bool) map[
 	return modAccAddrs
 }
 
-// func (app *OnomyApp) setupUpgradeStoreLoaders() {
-// 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-// 	if err != nil {
-// 		panic(fmt.Sprintf("failed to read upgrade info from disk %s", err))
-// 	}
+func (app *OnomyApp) setupUpgradeStoreLoaders() {
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(fmt.Sprintf("failed to read upgrade info from disk %s", err))
+	}
 
-// 	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-// 		return
-// 	}
-// }
+	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		return
+	}
+}
 
 func (app *OnomyApp) RegisterNodeService(clientCtx client.Context, cfg config.Config) {
 	nodeservice.RegisterNodeService(clientCtx, app.GRPCQueryRouter(), cfg)

@@ -33,7 +33,7 @@ import (
 // NewRootCmd initiates the cli for onomy chain.
 func NewRootCmd() *cobra.Command {
 	initAppOptions := viper.New()
-	tempDir := app.DefaultNodeHome
+	tempDir := tempDir()
 	initAppOptions.Set(flags.FlagHome, tempDir)
 	tempApplication := app.NewOnomyApp(
 		log.NewNopLogger(),
@@ -153,4 +153,14 @@ func enrichAutoCliOpts(autoCliOpts autocli.AppOptions, clientCtx client.Context)
 	autoCliOpts.ClientCtx = clientCtx
 
 	return autoCliOpts
+}
+
+var tempDir = func() string {
+	dir, err := os.MkdirTemp("", "."+app.AppName)
+	if err != nil {
+		dir = app.DefaultNodeHome
+	}
+	defer os.RemoveAll(dir)
+
+	return dir
 }
