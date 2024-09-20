@@ -8,23 +8,24 @@ import (
 	"os"
 	"path/filepath"
 
-	"cosmossdk.io/log"
-	"cosmossdk.io/math"
-	storetypes "cosmossdk.io/store/types"
-
-	dbm "github.com/cosmos/cosmos-db"
-	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/codec"
-
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
 	autocli "cosmossdk.io/client/v2/autocli"
 	"cosmossdk.io/core/appmodule"
+	"cosmossdk.io/log"
+	"cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/tx/signing"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	tmos "github.com/cometbft/cometbft/libs/os"
+	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
+	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -40,36 +41,25 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	sigtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
-
-	// govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	// paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/cosmos/gogoproto/proto"
-	"github.com/onomyprotocol/onomy/app/keepers"
-	"github.com/spf13/cast"
-
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-
-	"github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
-	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
-	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-
-	upgradetypes "cosmossdk.io/x/upgrade/types"
-	// authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	ibctesting "github.com/cosmos/ibc-go/v8/testing"
 	ibctestingtypes "github.com/cosmos/ibc-go/v8/testing/types"
 	providertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
+	"github.com/spf13/cast"
 
-	// psm "github.com/onomyprotocol/reserve/x/psm/module"
-
+	"github.com/onomyprotocol/onomy/app/keepers"
+	"github.com/onomyprotocol/onomy/app/upgrades"
 	v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
 	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
 	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
@@ -77,10 +67,8 @@ import (
 	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
 	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
 	v1_1_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.4"
+	v1_1_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.5"
 	"github.com/onomyprotocol/onomy/docs"
-	// daoclient "github.com/onomyprotocol/onomy/x/dao/client"
-	// daokeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
-	// daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 const (
@@ -92,7 +80,9 @@ const (
 
 var (
 	// DefaultNodeHome default home directories for the application daemon.
-	DefaultNodeHome string // nolint:gochecknoglobals // cosmos-sdk application style
+	DefaultNodeHome string //nolint:gochecknoglobals // cosmos-sdk application style
+
+	Forks = []upgrades.Fork{}
 )
 
 var (
@@ -101,7 +91,7 @@ var (
 	_ ibctesting.TestingApp   = (*OnomyApp)(nil)
 )
 
-func init() { // nolint: gochecknoinits // init funcs is are commonly used in cosmos
+func init() { //nolint: gochecknoinits // init funcs is are commonly used in cosmos
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
@@ -110,16 +100,16 @@ func init() { // nolint: gochecknoinits // init funcs is are commonly used in co
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+AppName)
 
 	// change default power reduction to 18 digits, since the onomy anom is 18 digits based.
-	sdk.DefaultPowerReduction = math.NewIntWithDecimal(1, 18) // nolint: gomnd
+	sdk.DefaultPowerReduction = math.NewIntWithDecimal(1, 18) //nolint: gomnd
 
-	// Set prefixes
+	// Set prefixes.
 	accountPubKeyPrefix := AccountAddressPrefix + "pub"
 	validatorAddressPrefix := AccountAddressPrefix + "valoper"
 	validatorPubKeyPrefix := AccountAddressPrefix + "valoperpub"
 	consNodeAddressPrefix := AccountAddressPrefix + "valcons"
 	consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
 
-	// Set and seal config
+	// Set and seal config.
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
 	config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
@@ -141,11 +131,11 @@ type OnomyApp struct {
 
 	invCheckPeriod uint
 
-	// mm is the module manager
+	// mm is the module manager.
 	mm           *module.Manager
 	ModuleBasics module.BasicManager
 	configurator module.Configurator
-	// sm is the simulation manager
+	// sm is the simulation manager.
 	sm *module.SimulationManager
 }
 
@@ -182,7 +172,7 @@ func NewOnomyApp( // nolint:funlen // app new cosmos func
 	std.RegisterLegacyAminoCodec(legacyAmino)
 	std.RegisterInterfaces(interfaceRegistry)
 
-	// App Opts
+	// App Opts.
 	skipGenesisInvariants := cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
 	invCheckPeriod := cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod))
 
@@ -210,7 +200,7 @@ func NewOnomyApp( // nolint:funlen // app new cosmos func
 
 	moduleAccountAddresses := app.ModuleAccountAddrs()
 
-	// Setup keepers
+	// Setup keepers.
 	app.AppKeepers = keepers.NewAppKeeper(
 		appCodec,
 		bApp,
@@ -225,7 +215,7 @@ func NewOnomyApp( // nolint:funlen // app new cosmos func
 		appOpts,
 	)
 
-	/****  Module Options ****/
+	/****  Module Options ***.*/
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
@@ -267,21 +257,21 @@ func NewOnomyApp( // nolint:funlen // app new cosmos func
 	}
 	reflectionv1.RegisterReflectionServiceServer(app.GRPCQueryRouter(), reflectionSvc)
 
-	// add test gRPC service for testing gRPC queries in isolation
+	// add test gRPC service for testing gRPC queries in isolation.
 	testdata.RegisterQueryServer(app.GRPCQueryRouter(), testdata.QueryImpl{})
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
 	// NOTE: this is not required apps that don't use the simulator for fuzz testing
-	// transactions
+	// transactions.
 	app.sm = module.NewSimulationManager(simulationModules(app, appCodec, skipGenesisInvariants)...)
 	app.sm.RegisterStoreDecoders()
 
-	// initialize stores
+	// initialize stores.
 	app.MountKVStores(app.GetKVStoreKey())
 	app.MountTransientStores(app.GetTransientStoreKey())
 	app.MountMemoryStores(app.GetMemoryStoreKey())
 
-	// initialize BaseApp
+	// initialize BaseApp.
 	app.SetInitChainer(app.InitChainer)
 	app.SetPreBlocker(app.PreBlocker)
 	app.SetBeginBlocker(app.BeginBlocker)
@@ -300,7 +290,7 @@ func NewOnomyApp( // nolint:funlen // app new cosmos func
 		panic(err)
 	}
 
-	// and storeloader
+	// and storeloader.
 	app.setupUpgradeHandlers()
 	app.setupUpgradeStoreLoaders()
 
@@ -333,7 +323,13 @@ func (app *OnomyApp) Name() string { return app.BaseApp.Name() }
 // GetBaseApp returns the base app of the application.
 func (app OnomyApp) GetBaseApp() *baseapp.BaseApp { return app.BaseApp }
 
+// BeginBlocker application updates every begin block.
 func (app *OnomyApp) BeginBlocker(ctx sdk.Context) (sdk.BeginBlock, error) {
+	for _, fork := range Forks {
+		if ctx.BlockHeight() == fork.UpgradeHeight {
+			fork.BeginForkLogic(ctx)
+		}
+	}
 	return app.mm.BeginBlock(ctx)
 }
 
@@ -386,7 +382,7 @@ func (app *OnomyApp) BlockedAddrs() map[string]bool {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
 	}
 
-	// For ICS multiden fix
+	// For ICS multiden fix.
 	delete(blockedAddrs, authtypes.NewModuleAddress(providertypes.ConsumerRewardsPool).String())
 
 	return blockedAddrs
@@ -421,6 +417,10 @@ func (app *OnomyApp) GetSubspace(moduleName string) paramstypes.Subspace {
 	return subspace
 }
 
+func (app *OnomyApp) SetupForkLogic(fork upgrades.Fork) {
+	Forks = append(Forks, fork)
+}
+
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.
 func (app *OnomyApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
@@ -436,7 +436,7 @@ func (app *OnomyApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIC
 	// Register nodeservice grpc-gateway routes.
 	nodeservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register swagger API from root so that other applications can override easily
+	// register swagger API from root so that other applications can override easily.
 	if err := server.RegisterSwaggerAPI(apiSvr.ClientCtx, apiSvr.Router, apiConfig.Swagger); err != nil {
 		panic(err)
 	}
@@ -474,7 +474,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3.Name, v1_0_3.UpgradeHandler)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_4.Name, v1_0_3_4.UpgradeHandler)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_5.Name, v1_0_3_5.UpgradeHandler)
-	// we need to have the reference to `app` which is why we need this `func` here
+	// we need to have the reference to `app` which is why we need this `func` here.
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v1_1_1.Name,
 		func(ctx context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
@@ -483,7 +483,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 				fromVM[moduleName] = m.ConsensusVersion()
 			}
 
-			// This is critical for the chain upgrade to work
+			// This is critical for the chain upgrade to work.
 			sdkCtx := sdk.UnwrapSDKContext(ctx)
 			app.ProviderKeeper.InitGenesis(sdkCtx, providertypes.DefaultGenesisState())
 
@@ -492,13 +492,14 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 	)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_1_2.Name, v1_1_2.UpgradeHandler)
 	app.UpgradeKeeper.SetUpgradeHandler(v1_1_4.Name, v1_1_4.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v1_1_5.Name, v1_1_5.CreateUpgradeHandler(app.mm, app.configurator, &app.AccountKeeper, &app.BankKeeper, app.StakingKeeper))
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
 		panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
 	}
 
-	// configure store loader that checks if version == upgradeHeight and applies store upgrades
+	// configure store loader that checks if version == upgradeHeight and applies store upgrades.
 	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		return
 	}
@@ -515,7 +516,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 			Added: []string{authtypes.ModuleName, authzkeeper.StoreKey},
 		}
 	default:
-		// no store upgrades
+		// no store upgrades.
 	}
 
 	if storeUpgrades != nil {
@@ -524,7 +525,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 }
 
 func (app *OnomyApp) BlockedModuleAccountAddrs(modAccAddrs map[string]bool) map[string]bool {
-	// remove module accounts that are ALLOWED to received funds
+	// remove module accounts that are ALLOWED to received funds.
 	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	return modAccAddrs
 }

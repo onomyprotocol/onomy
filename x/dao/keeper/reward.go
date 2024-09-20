@@ -26,7 +26,7 @@ func (k Keeper) WithdrawReward(ctx context.Context) error {
 		if err != nil {
 			continue
 		}
-		// check existence of delegator starting info
+		// check existence of delegator starting info.
 		if has, err := k.distributionKeeper.HasDelegatorStartingInfo(ctx, valAddr, daoAddr); err != nil || !has {
 			continue
 		}

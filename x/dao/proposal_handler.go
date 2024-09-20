@@ -15,9 +15,9 @@ import (
 
 var (
 	// FundTreasuryProposalHandler is the cli handler used for the gov cli integration.
-	FundTreasuryProposalHandler = govclient.NewProposalHandler(cli.CmdFundTreasuryProposal) // nolint:gochecknoglobals // cosmos-sdk style
+	FundTreasuryProposalHandler = govclient.NewProposalHandler(cli.CmdFundTreasuryProposal) //nolint:gochecknoglobals // cosmos-sdk style
 	// ExchangeWithTreasuryProposalProposalHandler is the cli handler used for the gov cli integration.
-	ExchangeWithTreasuryProposalProposalHandler = govclient.NewProposalHandler(cli.CmdExchangeWithTreasuryProposal) // nolint:gochecknoglobals // cosmos-sdk style
+	ExchangeWithTreasuryProposalProposalHandler = govclient.NewProposalHandler(cli.CmdExchangeWithTreasuryProposal) //nolint:gochecknoglobals // cosmos-sdk style
 )
 
 // NewProposalHandler defines the dao proposal handler.

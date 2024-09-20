@@ -11,9 +11,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/server"
-
-	// "github.com/cosmos/cosmos-sdk/types/module"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	// "github.com/cosmos/cosmos-sdk/types/module".
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -21,11 +23,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/tx/signing"
-
-	// "github.com/cometbft/starport/starport/pkg/cosmoscmd"
+	// "github.com/cometbft/starport/starport/pkg/cosmoscmd".
 	//
 	"github.com/onomyprotocol/onomy/app"
 )
@@ -50,7 +48,7 @@ func NewRootCmd() *cobra.Command {
 		}
 	}()
 
-	// fmt.Println(tempApplication.GetTxConfig().NewTxBuilder() == nil)
+	// fmt.Println(tempApplication.GetTxConfig().NewTxBuilder() == nil).
 
 	initClientCtx := client.Context{}.
 		WithCodec(tempApplication.AppCodec()).
@@ -113,7 +111,7 @@ func NewRootCmd() *cobra.Command {
 	// 	moduleBasicManager[name] = module.CoreAppModuleBasicAdaptor(name, mod)
 	// 	autoCliOpts.Modules[name] = mod
 	// }
-	// fmt.Println(tempApplication.ModuleBasics["genutil"] == nil)
+	// fmt.Println(tempApplication.ModuleBasics["genutil"] == nil).
 	initRootCmd(rootCmd, tempApplication.ModuleBasics, tempApplication.GetTxConfig())
 
 	overwriteFlagDefaults(rootCmd, map[string]string{

@@ -46,12 +46,12 @@ func NewKeeper(
 	mintKeeper types.MintKeeper,
 	stakingKeeper types.StakingKeeper,
 ) *Keeper {
-	// set KeyTable if it has not already been set
+	// set KeyTable if it has not already been set.
 	if !ps.HasKeyTable() {
 		ps = ps.WithKeyTable(types.ParamKeyTable())
 	}
 
-	// ensure dao module account is set
+	// ensure dao module account is set.
 	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
 	}

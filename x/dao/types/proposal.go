@@ -25,7 +25,7 @@ var (
 	_ govtypes.Content = &FundAccountProposal{}
 )
 
-func init() { // nolint:gochecknoinits // cosmos sdk style
+func init() { //nolint:gochecknoinits // cosmos sdk style
 	govtypes.RegisterProposalType(ProposalTypeFundTreasuryProposal)
 	govtypes.RegisterProposalType(ProposalTypeExchangeWithTreasuryProposal)
 	govtypes.RegisterProposalType(ProposalTypeFundAccountProposal)

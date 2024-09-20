@@ -16,4 +16,4 @@ func UpgradeHandler(_ context.Context, _ upgradetypes.Plan, vm module.VersionMap
 	return vm, nil
 }
 
-// func(ctx context.Context, plan Plan, fromVM module.VersionMap) (module.VersionMap, error)
+// func(ctx context.Context, plan Plan, fromVM module.VersionMap) (module.VersionMap, error).

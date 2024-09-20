@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
@@ -17,7 +17,7 @@ func (k Keeper) VoteAbstain(ctx context.Context) (err error) {
 			return false
 		}
 		_, err := k.govKeeper.GetVote(ctx, proposal.Id, daoAddr)
-		// the dao should vote now
+		// the dao should vote now.
 		if err != nil {
 			err = k.govKeeper.AddVote(ctx, proposal.Id, daoAddr, v1.NewNonSplitVoteOption(v1.OptionAbstain), "")
 			if err != nil {

@@ -59,7 +59,7 @@ func (k Keeper) GetDaoDelegationSupply(ctx context.Context) (math.LegacyDec, err
 // if the validator is not in the map, the DAO stake is zero.
 func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Validator) map[string]math.Int {
 	maxValCommission := k.MaxValCommission(ctx)
-	valsSelfBonds := make(map[string]math.LegacyDec) // the key is OperatorAddress
+	valsSelfBonds := make(map[string]math.LegacyDec) // the key is OperatorAddress.
 	valsSelfBondsSupply := math.LegacyZeroDec()
 	for _, val := range vals {
 		if !val.IsBonded() {
@@ -88,7 +88,7 @@ func (k Keeper) getTargetDelegationState(ctx sdk.Context, vals []stakingtypes.Va
 
 	daoBondDenomToDelegate := daoBondDenomSupply.Sub(daoBondDenomSupply.Mul(k.PoolRate(ctx)))
 
-	targetDelegationState := make(map[string]math.Int) // the key is OperatorAddress
+	targetDelegationState := make(map[string]math.Int) // the key is OperatorAddress.
 	for valAddr, selfDelegationAmt := range valsSelfBonds {
 		valDaoDelegationAmt := selfDelegationAmt.Mul(daoBondDenomToDelegate).Quo(valsSelfBondsSupply).TruncateInt()
 		if !valDaoDelegationAmt.IsZero() {
@@ -140,7 +140,7 @@ func (k Keeper) computeDelegationsAndUndelegation(
 		if err == nil {
 			delegatedByDao = val.TokensFromShares(delegation.GetShares()).TruncateInt()
 		}
-		// for the validators not in the target list the target amount is zero
+		// for the validators not in the target list the target amount is zero.
 		if !ok {
 			targetDaoDelegation = math.ZeroInt()
 		}

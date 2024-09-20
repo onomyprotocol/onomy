@@ -9,7 +9,7 @@ package keeper_test
 
 // 	"github.com/onomyprotocol/onomy/testutil/simapp"
 // 	"github.com/onomyprotocol/onomy/x/dao/types"
-// )
+// ).
 
 // func TestKeeper_Treasury(t *testing.T) {
 // 	const (
@@ -50,4 +50,4 @@ package keeper_test
 // 			require.Equal(t, tt.want, got)
 // 		})
 // 	}
-// }
+// }.

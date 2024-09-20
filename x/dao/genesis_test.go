@@ -9,7 +9,7 @@ package dao_test
 // 	"github.com/onomyprotocol/onomy/testutil/simapp"
 // 	"github.com/onomyprotocol/onomy/x/dao"
 // 	"github.com/onomyprotocol/onomy/x/dao/types"
-// )
+// ).
 
 // func TestInitGenesis(t *testing.T) {
 // 	const (
@@ -45,7 +45,7 @@ package dao_test
 // 			require.Equal(t, tt.args.genState.Params, simApp.OnomyApp().DaoKeeper.GetParams(ctx))
 // 		})
 // 	}
-// }
+// }.
 
 // func TestInitAndExportGenesis(t *testing.T) {
 // 	const (
@@ -80,4 +80,4 @@ package dao_test
 // 			require.Equal(t, &tt.args.genState, exportedGenesis)
 // 		})
 // 	}
-// }
+// }.

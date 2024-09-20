@@ -49,7 +49,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		consensusparamtypes.StoreKey,
 	)
 
-	// Define transient store keys
+	// Define transient store keys.
 	appKeepers.tkeys = storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
 
 	// MemKeys are for information that is stored only in RAM.

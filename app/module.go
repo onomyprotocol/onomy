@@ -53,7 +53,7 @@ import (
 
 var (
 	// module account permissions.
-	maccPerms = map[string][]string{ // nolint:gochecknoglobals // cosmos-sdk application style
+	maccPerms = map[string][]string{ //nolint:gochecknoglobals // cosmos-sdk application style
 		authtypes.FeeCollectorName:        nil,
 		daotypes.ModuleName:               {authtypes.Minter},
 		distrtypes.ModuleName:             nil,
@@ -66,10 +66,10 @@ var (
 	}
 
 	// module accounts that are allowed to receive tokens.
-	allowedReceivingModAcc = map[string]bool{ // nolint:gochecknoglobals // cosmos-sdk application style
+	allowedReceivingModAcc = map[string]bool{ //nolint:gochecknoglobals // cosmos-sdk application style
 		distrtypes.ModuleName: true,
 		daotypes.ModuleName:   true,
-		// provider chain note: the fee-pool is allowed to receive tokens
+		// provider chain note: the fee-pool is allowed to receive tokens.
 		authtypes.FeeCollectorName: true,
 	}
 )
@@ -102,9 +102,8 @@ func appModules(
 		genutil.NewAppModule(app.AccountKeeper, app.StakingKeeper, app, txConfig),
 		app.ProviderModule,
 		app.TransferModule,
-		// and
+		// and.
 	}
-
 }
 
 func newBasicManagerFromManager(app *OnomyApp) module.BasicManager {
@@ -172,7 +171,7 @@ func orderEndBlockers() []string {
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		providertypes.ModuleName,
-		// and
+		// and.
 		daotypes.ModuleName,
 	}
 }

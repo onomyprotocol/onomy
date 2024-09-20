@@ -8,7 +8,7 @@ package dao
 
 // 	// "github.com/onomyprotocol/onomy/x/dao/keeper"
 // 	"github.com/onomyprotocol/onomy/x/dao/types"
-// )
+// ).
 
 // // NewHandler ...
 // func NewHandler() sdk.Handler {
@@ -19,4 +19,4 @@ package dao
 // 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 // 		}
 // 	}
-// }
+// }.

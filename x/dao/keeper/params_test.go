@@ -7,7 +7,7 @@ package keeper_test
 
 // 	"github.com/onomyprotocol/onomy/testutil/simapp"
 // 	"github.com/onomyprotocol/onomy/x/dao/types"
-// )
+// ).
 
 // func TestKeeper_GetAndSetParams(t *testing.T) {
 // 	type args struct {
@@ -37,4 +37,4 @@ package keeper_test
 // 			require.Equal(t, tt.args.params, got)
 // 		})
 // 	}
-// }
+// }.
