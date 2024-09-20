@@ -3,6 +3,7 @@ package v1_0_3_5 //nolint:revive,stylecheck // app version
 
 import (
 	"context"
+
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 )

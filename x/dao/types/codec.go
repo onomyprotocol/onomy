@@ -27,7 +27,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 
 var (
 	// Amino holds the LegacyAmino codec.
-	Amino = codec.NewLegacyAmino() // nolint:gochecknoglobals // cosmos sdk style
+	Amino = codec.NewLegacyAmino() //nolint:gochecknoglobals // cosmos sdk style
 	// ModuleCdc holds the default proto codec.
-	ModuleCdc = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry()) // nolint:gochecknoglobals // cosmos sdk style
+	ModuleCdc = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry()) //nolint:gochecknoglobals // cosmos sdk style
 )

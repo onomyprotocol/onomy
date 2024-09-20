@@ -24,7 +24,7 @@ package integration
 // 	"github.com/onomyprotocol/onomy/app"
 // 	onomydCmd "github.com/onomyprotocol/onomy/cmd/onomyd/cmd"
 // 	"github.com/onomyprotocol/onomy/testutil/retry"
-// )
+// ).
 
 // const (
 // 	// AnomDenom is anom name .
@@ -54,13 +54,13 @@ package integration
 // 	OnomyGrpcHost = "127.0.0.1"
 // 	// OnomyGrpcPort is default port.
 // 	OnomyGrpcPort = "9090"
-// )
+// ).
 
 // // OnomyChain is test struct for the chain running.
 // type OnomyChain struct {
 // 	homeFlag  string
 // 	Validator keyring.KeyOutput
-// }
+// }.
 
 // // NewOnomyChain creates a new OnomyChain.
 // func NewOnomyChain() (*OnomyChain, error) {
@@ -123,7 +123,7 @@ package integration
 // 		homeFlag:  homeFlag,
 // 		Validator: val1KeyOutput,
 // 	}, nil
-// }
+// }.
 
 // // Start start the OnomyChain.
 // func (oc *OnomyChain) Start(timeout time.Duration) error {
@@ -131,12 +131,12 @@ package integration
 
 // 	// wait for grpc port
 // 	return retry.AwaitForPort(OnomyGrpcHost, OnomyGrpcPort, timeout)
-// }
+// }.
 
 // // Stop stops the OnomyChain.
 // func (oc *OnomyChain) Stop() {
 // 	ExecuteChainCmd("stop", oc.homeFlag)
-// }
+// }.
 
 // // GetAccountBalance return the 'address' balance.
 // func (oc *OnomyChain) GetAccountBalance(address string) ([]sdkTypes.Coin, error) {
@@ -148,7 +148,7 @@ package integration
 // 		return nil, err
 // 	}
 // 	return balances.Balances, nil
-// }
+// }.
 
 // // ExecuteChainCmd executes any cmd on the onomyd cli.
 // func ExecuteChainCmd(cmd string, args ...string) string {
@@ -171,14 +171,14 @@ package integration
 // 	os.Args = oldArgs
 
 // 	return out
-// }
+// }.
 
 // func mainTestRunner() {
 // 	rootCmd, _ := onomydCmd.NewRootCmd()
 // 	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
 // 		os.Exit(1)
 // 	}
-// }
+// }.
 
 // func captureOutput(f func()) string {
 // 	reader, writer, err := os.Pipe()
@@ -204,7 +204,7 @@ package integration
 // 	f()
 // 	writer.Close() // nolint: errcheck
 // 	return <-out
-// }
+// }.
 
 // func setField(object interface{}, fieldName string, value interface{}) {
 // 	rs := reflect.ValueOf(object).Elem()
@@ -213,7 +213,7 @@ package integration
 // 	reflect.NewAt(field.Type(), unsafe.Pointer(field.UnsafeAddr())).
 // 		Elem().
 // 		Set(reflect.ValueOf(value))
-// }
+// }.
 
 // func replaceStringInFile(filePath, from, to string) error {
 // 	input, err := ioutil.ReadFile(filePath)
@@ -222,7 +222,7 @@ package integration
 // 	}
 // 	output := bytes.ReplaceAll(input, []byte(from), []byte(to))
 // 	return ioutil.WriteFile(filePath, output, 0o666) // nolint:gomnd
-// }
+// }.
 
 // func replaceGenesysSettings(filePath, settingPath string, newValue json.RawMessage) error {
 // 	input, err := ioutil.ReadFile(filePath)
@@ -245,7 +245,7 @@ package integration
 // 	}
 
 // 	return ioutil.WriteFile(filePath, output, 0o666) // nolint:gomnd
-// }
+// }.
 
 // func replaceJSONInJSONmap(object map[string]json.RawMessage, settingPath []string, newValue json.RawMessage) error {
 // 	if len(settingPath) == 0 {
@@ -274,4 +274,4 @@ package integration
 // 		object[key] = nextRawJSONBytes
 // 	}
 // 	return nil
-// }
+// }.

@@ -19,7 +19,7 @@ func (k Keeper) InflateDao(ctx context.Context) (err error) {
 	params := genesis.Params
 	minter.AnnualProvisions = minter.NextAnnualProvisions(params, daoBalance.Amount)
 
-	// mint coins, update supply
+	// mint coins, update supply.
 	mintedCoin := minter.BlockProvision(params)
 	mintedCoins := sdk.NewCoins(mintedCoin)
 

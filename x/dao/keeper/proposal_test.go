@@ -15,7 +15,7 @@ package keeper_test
 
 // 	"github.com/onomyprotocol/onomy/testutil/simapp"
 // 	"github.com/onomyprotocol/onomy/x/dao/types"
-// )
+// ).
 
 // func TestKeeper_FundTreasuryProposal(t *testing.T) {
 // 	const (
@@ -109,7 +109,7 @@ package keeper_test
 // 			require.Equal(t, tt.wantTreasuryBalance, got)
 // 		})
 // 	}
-// }
+// }.
 
 // func TestKeeper_ExchangeWithTreasuryProposal(t *testing.T) {
 // 	const (
@@ -304,7 +304,7 @@ package keeper_test
 // 			require.Equal(t, tt.wantAccountBalance, senderBalance)
 // 		})
 // 	}
-// }
+// }.
 
 // func TestKeeper_FundAccountProposal(t *testing.T) {
 // 	const (
@@ -406,7 +406,7 @@ package keeper_test
 // 			require.Equal(t, tt.wantAccountBalance, got)
 // 		})
 // 	}
-// }
+// }.
 
 // func TestKeeper_ProposalsFullCycle(t *testing.T) {
 // 	var (
@@ -564,4 +564,4 @@ package keeper_test
 // 			require.Equal(t, tt.wantTreasuryBalance.String(), simApp.OnomyApp().DaoKeeper.Treasury(ctx).String())
 // 		})
 // 	}
-// }
+// }.

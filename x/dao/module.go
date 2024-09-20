@@ -12,7 +12,8 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	// "github.com/gorilla/mux"
+
+	// "github.com/gorilla/mux".
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -133,7 +134,7 @@ func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 // no validator updates.
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
 	var genState types.GenesisState
-	// Initialize global index to index in genesis state
+	// Initialize global index to index in genesis state.
 	cdc.MustUnmarshalJSON(gs, &genState)
 
 	InitGenesis(ctx, am.keeper, genState)
@@ -148,7 +149,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // ConsensusVersion implements ConsensusVersion.
-func (AppModule) ConsensusVersion() uint64 { return 2 } // nolint:gomnd // constant number for cosmos sdk
+func (AppModule) ConsensusVersion() uint64 { return 2 } //nolint:gomnd // constant number for cosmos sdk
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the dao module.
 func (am AppModule) BeginBlock(ctx context.Context) {

@@ -12,7 +12,6 @@ import (
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/address"
@@ -65,14 +64,14 @@ import (
 )
 
 type AppKeepers struct {
-	// keys to access the substores
+	// keys to access the substores.
 	keys    map[string]*storetypes.KVStoreKey
 	tkeys   map[string]*storetypes.TransientStoreKey
 	memKeys map[string]*storetypes.MemoryStoreKey
 
-	// keepers
+	// keepers.
 	AccountKeeper         authkeeper.AccountKeeper
-	BankKeeper            bankkeeper.Keeper
+	BankKeeper            bankkeeper.BaseKeeper
 	CapabilityKeeper      *capabilitykeeper.Keeper
 	StakingKeeper         *stakingkeeper.Keeper
 	SlashingKeeper        slashingkeeper.Keeper
@@ -90,12 +89,12 @@ type AppKeepers struct {
 	TransferKeeper        ibctransferkeeper.Keeper
 	ProviderKeeper        icsproviderkeeper.Keeper
 
-	// make scoped keepers public for test purposes
+	// make scoped keepers public for test purposes.
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
 	ScopedICSproviderkeeper capabilitykeeper.ScopedKeeper
 
-	// Modules
+	// Modules.
 	TransferModule transfer.AppModule
 	ProviderModule icsprovider.AppModule
 
@@ -117,14 +116,14 @@ func NewAppKeeper(
 ) AppKeepers {
 	appKeepers := AppKeepers{}
 
-	// Set keys KVStoreKey, TransientStoreKey, MemoryStoreKey
+	// Set keys KVStoreKey, TransientStoreKey, MemoryStoreKey.
 	appKeepers.GenerateKeys()
 
 	/*
 		configure state listening capabilities using AppOptions
 		we are doing nothing with the returned streamingServices and waitGroup in this case
 	*/
-	// load state streaming if enabled
+	// load state streaming if enabled.
 
 	if err := bApp.RegisterStreamingServices(appOpts, appKeepers.keys); err != nil {
 		logger.Error("failed to load state streaming", "err", err)
@@ -138,7 +137,7 @@ func NewAppKeeper(
 		appKeepers.tkeys[paramstypes.TStoreKey],
 	)
 
-	// set the BaseApp's parameter store
+	// set the BaseApp's parameter store.
 	appKeepers.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(appKeepers.keys[consensusparamtypes.StoreKey]),
@@ -147,7 +146,7 @@ func NewAppKeeper(
 	)
 	bApp.SetParamStore(appKeepers.ConsensusParamsKeeper.ParamsStore)
 
-	// add capability keeper and ScopeToModule for ibc module
+	// add capability keeper and ScopeToModule for ibc module.
 	appKeepers.CapabilityKeeper = capabilitykeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[capabilitytypes.StoreKey],
@@ -159,7 +158,7 @@ func NewAppKeeper(
 	appKeepers.ScopedICSproviderkeeper = appKeepers.CapabilityKeeper.ScopeToModule(providertypes.ModuleName)
 
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
-	// their scoped modules in `NewApp` with `ScopeToModule`
+	// their scoped modules in `NewApp` with `ScopeToModule`.
 	appKeepers.CapabilityKeeper.Seal()
 
 	appKeepers.CrisisKeeper = crisiskeeper.NewKeeper(
@@ -172,7 +171,7 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper.AddressCodec(),
 	)
 
-	// Add normal keepers
+	// Add normal keepers.
 	appKeepers.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
 		runtime.NewKVStoreService(appKeepers.keys[authtypes.StoreKey]),
@@ -234,7 +233,7 @@ func NewAppKeeper(
 	)
 
 	// register the staking hooks
-	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
+	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks.
 	appKeepers.StakingKeeper.SetHooks(
 		stakingtypes.NewMultiStakingHooks(
 			appKeepers.DistrKeeper.Hooks(),
@@ -243,13 +242,13 @@ func NewAppKeeper(
 		),
 	)
 
-	// protect the dao module form the slashing
+	// protect the dao module form the slashing.
 	appKeepers.StakingKeeper = appKeepers.StakingKeeper.SetSlashingProtestedModules(func() map[string]struct{} {
 		return map[string]struct{}{
 			daotypes.ModuleName: {},
 		}
 	})
-	// UpgradeKeeper must be created before IBCKeeper
+	// UpgradeKeeper must be created before IBCKeeper.
 	appKeepers.UpgradeKeeper = upgradekeeper.NewKeeper(
 		skipUpgradeHeights,
 		runtime.NewKVStoreService(appKeepers.keys[upgradetypes.StoreKey]),
@@ -259,7 +258,7 @@ func NewAppKeeper(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	// UpgradeKeeper must be created before IBCKeeper
+	// UpgradeKeeper must be created before IBCKeeper.
 	appKeepers.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[ibcexported.StoreKey],
@@ -291,9 +290,9 @@ func NewAppKeeper(
 		authtypes.FeeCollectorName,
 	)
 
-	// gov depends on provider, so needs to be set after
+	// gov depends on provider, so needs to be set after.
 	govConfig := govtypes.DefaultConfig()
-	// set the MaxMetadataLen for proposals to the same value as it was pre-sdk v0.47.x
+	// set the MaxMetadataLen for proposals to the same value as it was pre-sdk v0.47.x.
 	govConfig.MaxMetadataLen = 10200
 	appKeepers.GovKeeper = govkeeper.NewKeeper(
 		appCodec,
@@ -301,7 +300,7 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		// use the ProviderKeeper as StakingKeeper for gov
-		// because governance should be based on the consensus-active validators
+		// because governance should be based on the consensus-active validators.
 		appKeepers.StakingKeeper,
 		appKeepers.DistrKeeper,
 		bApp.MsgServiceRouter(),
@@ -309,7 +308,7 @@ func NewAppKeeper(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	// mint keeper must be created after provider keeper
+	// mint keeper must be created after provider keeper.
 	appKeepers.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(appKeepers.keys[minttypes.StoreKey]),
@@ -321,14 +320,14 @@ func NewAppKeeper(
 	)
 	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
 
-	// appKeepers.ProviderKeeper.SetGovKeeper(*appKeepers.GovKeeper)
+	// appKeepers.ProviderKeeper.SetGovKeeper(*appKeepers.GovKeeper).
 
 	appKeepers.ProviderModule = icsprovider.NewAppModule(
 		&appKeepers.ProviderKeeper,
 		appKeepers.GetSubspace(providertypes.ModuleName),
 	)
 
-	// Create static IBC router, add transfer route, then set and seal it
+	// Create static IBC router, add transfer route, then set and seal it.
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
 	ibcRouter.AddRoute(providertypes.ModuleName, appKeepers.ProviderModule)
@@ -344,7 +343,7 @@ func NewAppKeeper(
 		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(appKeepers.DaoKeeper)).
 		AddRoute(providertypes.RouterKey, icsprovider.NewProviderProposalHandler(appKeepers.ProviderKeeper))
 
-	// Set legacy router for backwards compatibility with gov v1beta1
+	// Set legacy router for backwards compatibility with gov v1beta1.
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
 
 	appKeepers.GovKeeper = appKeepers.GovKeeper.SetHooks(
@@ -361,7 +360,7 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper.AddressCodec(),
 		runtime.ProvideCometInfoService(),
 	)
-	// If evidence needs to be handled for the app, set routes in router here and seal
+	// If evidence needs to be handled for the app, set routes in router here and seal.
 	appKeepers.EvidenceKeeper = *evidenceKeeper
 
 	appKeepers.TransferKeeper = ibctransferkeeper.NewKeeper(
@@ -404,7 +403,7 @@ func (appKeepers *AppKeepers) GetSubspace(moduleName string) paramstypes.Subspac
 	return subspace
 }
 
-// initParamsKeeper init params keeper and its subspaces
+// initParamsKeeper init params keeper and its subspaces.
 func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey storetypes.StoreKey) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 

@@ -2,34 +2,20 @@
 package simapp
 
 import (
-	// "encoding/json"
-	// "testing"
-
 	// bam "github.com/cosmos/cosmos-sdk/baseapp"
 	// "github.com/cosmos/cosmos-sdk/client"
-	// "github.com/cosmos/cosmos-sdk/codec"
+	// "github.com/cosmos/cosmos-sdk/codec".
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	// "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	// cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	// "github.com/cosmos/cosmos-sdk/simapp"
+	// "github.com/cosmos/cosmos-sdk/simapp".
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	// authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	// banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	// govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	// stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	// "github.com/stretchr/testify/require"
-	// // "github.com/cometbft/starport/starport/pkg/cosmoscmd"
-	// abci "github.com/cometbft/cometbft/abci/types"
-	// tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	// // "github.com/cometbft/tendermint/libs/log"
-	// dbm "github.com/cosmos/cosmos-db"
-	// "github.com/onomyprotocol/onomy/app"
 )
 
 // // The SimApp is OnomyApp wrapper with the advance testing capabilities.
 // type SimApp struct {
 // 	onomyApp *app.OnomyApp
-// }
+// }.
 
 // // GenesisState of the blockchain is represented here as a map of raw json
 // // messages key'd by a identifier string.
@@ -38,13 +24,13 @@ import (
 // // Within this application default genesis information is retrieved from
 // // the ModuleBasicManager which populates json from each BasicModule
 // // object provided to it during init.
-// type GenesisState map[string]json.RawMessage
+// type GenesisState map[string]json.RawMessage.
 
 // // Option is an option pattern function used fot the test simapp customisations.
 // type Option struct {
 // 	before func(*SimApp, GenesisState) (*SimApp, GenesisState)
 // 	after  func(*SimApp) *SimApp
-// }
+// }.
 
 // // ValReq is simplified struct for the validator creation.
 // type ValReq struct {
@@ -52,7 +38,7 @@ import (
 // 	SelfBondCoin sdk.Coin
 // 	Commission   stakingtypes.CommissionRates
 // 	Reward       sdk.Coin
-// }
+// }.
 
 // // WithGenesisAccountsAndBalances returns genesis override Option for initial balances.
 // func WithGenesisAccountsAndBalances(balances ...banktypes.Balance) Option {
@@ -79,7 +65,7 @@ import (
 // 			return simApp, genState
 // 		},
 // 	}
-// }
+// }.
 
 // // WithGenesisOverride returns genesis override ConfigOption.
 // func WithGenesisOverride(override func(map[string]json.RawMessage) map[string]json.RawMessage) Option {
@@ -89,7 +75,7 @@ import (
 // 			return simApp, genState
 // 		},
 // 	}
-// }
+// }.
 
 // // WithAppCommit commits the app state after the initialisation.
 // func WithAppCommit() Option {
@@ -99,12 +85,12 @@ import (
 // 			return simApp
 // 		},
 // 	}
-// }
+// }.
 
 // // NewDefaultGenesisState generates the default state for the application.
 // func NewDefaultGenesisState(cdc codec.JSONCodec) GenesisState {
 // 	return app.ModuleBasics.DefaultGenesis(cdc)
-// }
+// }.
 
 // // SetupWithValidators create new simApp with the defined list of the validators.
 // func SetupWithValidators(t *testing.T, vals map[string]ValReq, opts ...Option) (*SimApp, map[string]*secp256k1.PrivKey) {
@@ -137,7 +123,7 @@ import (
 // 		simApp.CreateValidator(t, val.SelfBondCoin, description, val.Commission, sdk.OneInt(), privateKeys[moniker])
 // 	}
 // 	return simApp, privateKeys
-// }
+// }.
 
 // // Setup initializes a new SimApp. A Nop logger is set in SimApp.
 // func Setup(opts ...Option) *SimApp {
@@ -175,44 +161,44 @@ import (
 // 	}
 
 // 	return simApp
-// }
+// }.
 
 // // OnomyApp returns OnomyApp from the SimApp.
 // func (s *SimApp) OnomyApp() *app.OnomyApp {
 // 	return s.onomyApp
-// }
+// }.
 
 // // BeginNextBlock begins new SimApp block.
 // func (s *SimApp) BeginNextBlock() {
 // 	s.onomyApp.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{Height: s.onomyApp.LastBlockHeight() + 1}})
-// }
+// }.
 
 // // EndBlockAndCommit ends the current block and commit the state.
 // func (s *SimApp) EndBlockAndCommit(ctx sdk.Context) {
 // 	s.onomyApp.EndBlocker(ctx, abci.RequestEndBlock{Height: ctx.BlockHeight()})
 // 	s.onomyApp.Commit()
-// }
+// }.
 
 // // EndBlock ends the current block.
 // func (s *SimApp) EndBlock(ctx sdk.Context) {
 // 	s.onomyApp.EndBlocker(ctx, abci.RequestEndBlock{Height: ctx.BlockHeight()})
-// }
+// }.
 
 // // NewContext returns empty sdk context for the SimApp.
 // func (s *SimApp) NewContext() sdk.Context {
 // 	return s.onomyApp.BaseApp.NewContext(true, tmproto.Header{})
-// }
+// }.
 
 // // CurrentContext returns current context for the SimApp.
 // func (s *SimApp) CurrentContext() sdk.Context {
 // 	return s.onomyApp.BaseApp.NewContext(true, tmproto.Header{Height: s.onomyApp.LastBlockHeight()})
-// }
+// }.
 
 // // NewNextContext creates next block sdk context for the SimApp.
 // func (s *SimApp) NewNextContext() sdk.Context {
 // 	header := tmproto.Header{Height: s.onomyApp.LastBlockHeight() + 1}
 // 	return s.onomyApp.BaseApp.NewContext(false, header)
-// }
+// }.
 
 // // CreateValidator creates the validator.
 // func (s *SimApp) CreateValidator(
@@ -235,7 +221,7 @@ import (
 // 	messages = append(messages, createValidatorMsg)
 
 // 	s.sendTx(t, priv, messages...)
-// }
+// }.
 
 // // CreateProposal creates a new proposal with the provided contant.
 // func (s *SimApp) CreateProposal(
@@ -251,7 +237,7 @@ import (
 // 	require.NoError(t, err)
 
 // 	s.sendTx(t, priv, msg)
-// }
+// }.
 
 // // VoteProposal votes for the proposal.
 // func (s *SimApp) VoteProposal(
@@ -266,7 +252,7 @@ import (
 
 // 	msg := govtypes.NewMsgVote(address, proposalID, option)
 // 	s.sendTx(t, priv, msg)
-// }
+// }.
 
 // GenAccountAddress generates random account.
 func GenAccountAddress() sdk.AccAddress {
@@ -287,14 +273,14 @@ func GenAccountAddress() sdk.AccAddress {
 
 // 	_, _, err := signCheckDeliver(t, txGen, s.onomyApp.BaseApp, header, messages, "", []uint64{accountNum}, []uint64{accountSeq}, true, true, priv)
 // 	require.NoError(t, err)
-// }
+// }.
 
 // func setup(invCheckPeriod uint) (*app.OnomyApp, GenesisState) {
 // 	db := dbm.NewMemDB()
 // 	encCdc := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
 // 	simApp := app.New(log.NewNopLogger(), db, nil, true, map[int64]bool{}, app.DefaultNodeHome, invCheckPeriod, encCdc, simapp.EmptyAppOptions{})
 // 	return simApp.(*app.OnomyApp), NewDefaultGenesisState(encCdc.Marshaler)
-// }
+// }.
 
 // func signCheckDeliver(
 // 	t *testing.T, txCfg client.TxConfig, app *bam.BaseApp, header tmproto.Header, msgs []sdk.Msg,
@@ -303,4 +289,4 @@ func GenAccountAddress() sdk.AccAddress {
 // 	t.Helper()
 
 // 	return simapp.SignCheckDeliver(t, txCfg, app, header, msgs, chainID, accNums, accSeqs, expSimPass, expPass, priv...)
-// }
+// }.

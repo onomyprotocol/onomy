@@ -16,12 +16,12 @@ package cli_test
 // 	"github.com/onomyprotocol/onomy/testutil/simapp"
 // 	"github.com/onomyprotocol/onomy/x/dao/client/cli"
 // 	"github.com/onomyprotocol/onomy/x/dao/types"
-// )
+// ).
 
 // const (
 // 	normalToken = "node0token"
 // 	stakeToken  = "stake"
-// )
+// ).
 
 // func TestCLI_FundTreasuryProposal(t *testing.T) {
 // 	for _, tt := range []struct {
@@ -61,7 +61,7 @@ package cli_test
 // 			}
 // 		})
 // 	}
-// }
+// }.
 
 // func TestCLI_ExchangeWithTreasuryProposal(t *testing.T) {
 // 	for _, tt := range []struct {
@@ -113,7 +113,7 @@ package cli_test
 // 			}
 // 		})
 // 	}
-// }
+// }.
 
 // func TestCLI_FundAccountProposal(t *testing.T) {
 // 	accountAddress := simapp.GenAccountAddress()
@@ -166,4 +166,4 @@ package cli_test
 // 			}
 // 		})
 // 	}
-// }
+// }.

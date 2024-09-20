@@ -17,27 +17,27 @@ package network
 
 // 	"github.com/onomyprotocol/onomy/app"
 // 	"github.com/onomyprotocol/onomy/testutil/simapp"
-// )
+// ).
 
 // type (
 // 	Network = network.Network // nolint:revive // simapp test var
 // 	Config  = network.Config  // nolint:revive // simapp test var
-// )
+// ).
 
 // // TestNetwork defines the test network wrapper.
 // type TestNetwork struct {
 // 	*network.Network
-// }
+// }.
 
 // // Option is an option pattern function used fot the test network customisations.
-// type Option func(*network.Config)
+// type Option func(*network.Config).
 
 // // WithGenesisOverride returns genesis override Option.
 // func WithGenesisOverride(override func(map[string]json.RawMessage) map[string]json.RawMessage) Option {
 // 	return func(c *network.Config) {
 // 		c.GenesisState = override(c.GenesisState)
 // 	}
-// }
+// }.
 
 // // New setups the test network.
 // func New(t *testing.T, opts ...Option) *TestNetwork {
@@ -63,7 +63,7 @@ package network
 // 	require.NoError(t, err)
 
 // 	return &TestNetwork{onomyNetwork}
-// }
+// }.
 
 // // TxValidator1Args returns the tx params for the 1s network validator.
 // func (testNetwork *TestNetwork) TxValidator1Args() []string {
@@ -73,14 +73,14 @@ package network
 // 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(testNetwork.Config.BondDenom, sdk.NewInt(10))).String()), // nolint:gomnd //test constant
 // 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 // 	}
-// }
+// }.
 
 // // Validator1Ctx returns the context of the 1st validator in the network.
 // func (testNetwork *TestNetwork) Validator1Ctx() client.Context {
 // 	return testNetwork.Validators[0].ClientCtx
-// }
+// }.
 
 // // Validator1Address returns the address of the 1st validator in the network.
 // func (testNetwork *TestNetwork) Validator1Address() sdk.AccAddress {
 // 	return testNetwork.Validators[0].Address
-// }
+// }.

@@ -4,10 +4,8 @@ package app
 import (
 	"encoding/json"
 
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
 	storetypes "cosmossdk.io/store/types"
-
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -22,7 +20,7 @@ func (app *OnomyApp) ExportAppStateAndValidators(
 	jailAllowedAddrs []string,
 	modulesToExport []string,
 ) (servertypes.ExportedApp, error) {
-	// as if they could withdraw from the start of the next block
+	// as if they could withdraw from the start of the next block.
 	ctx := app.NewContextLegacy(true, tmproto.Header{Height: app.LastBlockHeight()})
 
 	// We export at last height + 1, because that's the height at which
@@ -54,11 +52,11 @@ func (app *OnomyApp) ExportAppStateAndValidators(
 
 // prepare for fresh start at zero height
 // NOTE zero height genesis is a temporary feature which will be deprecated
-// in favor of export at a block height
+// in favor of export at a block height.
 func (app *OnomyApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []string) {
 	applyAllowedAddrs := false
 
-	// check if there is a allowed address list
+	// check if there is a allowed address list.
 	if len(jailAllowedAddrs) > 0 {
 		applyAllowedAddrs = true
 	}
@@ -78,7 +76,7 @@ func (app *OnomyApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs 
 
 	/* Handle fee distribution state. */
 
-	// withdraw all validator commission
+	// withdraw all validator commission.
 	err := app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
 		valAddr, err := app.StakingKeeper.ValidatorAddressCodec().StringToBytes(val.GetOperator())
 		if err != nil {
@@ -94,7 +92,7 @@ func (app *OnomyApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs 
 		panic(err)
 	}
 
-	// withdraw all delegator rewards
+	// withdraw all delegator rewards.
 	dels, err := app.StakingKeeper.GetAllDelegations(ctx)
 	if err != nil {
 		panic(err)
@@ -116,19 +114,19 @@ func (app *OnomyApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs 
 		}
 	}
 
-	// clear validator slash events
+	// clear validator slash events.
 	app.DistrKeeper.DeleteAllValidatorSlashEvents(ctx)
 
-	// clear validator historical rewards
+	// clear validator historical rewards.
 	app.DistrKeeper.DeleteAllValidatorHistoricalRewards(ctx)
 
-	// set context height to zero
+	// set context height to zero.
 	height := ctx.BlockHeight()
 	ctx = ctx.WithBlockHeight(0)
 
-	// reinitialize all validators
+	// reinitialize all validators.
 	err = app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
-		// donate any unwithdrawn outstanding reward fraction tokens to the community pool
+		// donate any unwithdrawn outstanding reward fraction tokens to the community pool.
 		valAddr, err := app.StakingKeeper.ValidatorAddressCodec().StringToBytes(val.GetOperator())
 		if err != nil {
 			panic(err)
@@ -155,7 +153,7 @@ func (app *OnomyApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs 
 		panic(err)
 	}
 
-	// reinitialize all delegations
+	// reinitialize all delegations.
 	for _, del := range dels {
 		valAddr, err := sdk.ValAddressFromBech32(del.ValidatorAddress)
 		if err != nil {
@@ -173,12 +171,12 @@ func (app *OnomyApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs 
 		}
 	}
 
-	// reset context height
+	// reset context height.
 	ctx = ctx.WithBlockHeight(height)
 
 	/* Handle staking state. */
 
-	// iterate through redelegations, reset creation height
+	// iterate through redelegations, reset creation height.
 	err = app.StakingKeeper.IterateRedelegations(ctx, func(_ int64, red stakingtypes.Redelegation) (stop bool) {
 		for i := range red.Entries {
 			red.Entries[i].CreationHeight = 0
@@ -192,7 +190,7 @@ func (app *OnomyApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs 
 		panic(err)
 	}
 
-	// iterate through unbonding delegations, reset creation height
+	// iterate through unbonding delegations, reset creation height.
 	err = app.StakingKeeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd stakingtypes.UnbondingDelegation) (stop bool) {
 		for i := range ubd.Entries {
 			ubd.Entries[i].CreationHeight = 0
@@ -243,7 +241,7 @@ func (app *OnomyApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs 
 
 	/* Handle slashing state. */
 
-	// reset start height on signing infos
+	// reset start height on signing infos.
 	err = app.SlashingKeeper.IterateValidatorSigningInfos(
 		ctx,
 		func(addr sdk.ConsAddress, info slashingtypes.ValidatorSigningInfo) (stop bool) {

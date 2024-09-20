@@ -13,7 +13,7 @@ package cli_test
 // 	"github.com/onomyprotocol/onomy/testutil/network"
 // 	"github.com/onomyprotocol/onomy/x/dao/client/cli"
 // 	"github.com/onomyprotocol/onomy/x/dao/types"
-// )
+// ).
 
 // func TestCLI_CmdShowParams(t *testing.T) {
 // 	for _, tt := range []struct {
@@ -56,7 +56,7 @@ package cli_test
 // 			}
 // 		})
 // 	}
-// }
+// }.
 
 // func TestCLI_ShowTreasury(t *testing.T) {
 // 	for _, tt := range []struct {
@@ -99,4 +99,4 @@ package cli_test
 // 			}
 // 		})
 // 	}
-// }
+// }.

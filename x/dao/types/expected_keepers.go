@@ -5,14 +5,12 @@ import (
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	// govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	// govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	"github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	// govtypes "github.com/cosmos/cosmos-sdk/x/gov/types".
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-
-	// govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	"github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	// govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 // ParamSubspace defines the expected Subspace interface.
