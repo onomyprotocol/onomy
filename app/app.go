@@ -1,7 +1,7 @@
 package app
 
 import (
-	"context"
+	// "context"
 	"fmt"
 	"io"
 	"net/http"
@@ -46,7 +46,7 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+	// authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -60,14 +60,7 @@ import (
 
 	"github.com/onomyprotocol/onomy/app/keepers"
 	"github.com/onomyprotocol/onomy/app/upgrades"
-	v1_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.1"
-	v1_0_3 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3"
-	v1_0_3_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.4"
-	v1_0_3_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.0.3.5"
-	v1_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.1"
-	v1_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.2"
-	v1_1_4 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.4"
-	v1_1_5 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.5"
+	v1_1_6 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.6"
 	"github.com/onomyprotocol/onomy/docs"
 )
 
@@ -470,29 +463,7 @@ func (app *OnomyApp) SimulationManager() *module.SimulationManager {
 }
 
 func (app *OnomyApp) setupUpgradeHandlers() {
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_1.Name, v1_0_1.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3.Name, v1_0_3.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_4.Name, v1_0_3_4.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_0_3_5.Name, v1_0_3_5.UpgradeHandler)
-	// we need to have the reference to `app` which is why we need this `func` here.
-	app.UpgradeKeeper.SetUpgradeHandler(
-		v1_1_1.Name,
-		func(ctx context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			for moduleName, eachModule := range app.mm.Modules {
-				m := eachModule.(module.GenesisOnlyAppModule)
-				fromVM[moduleName] = m.ConsensusVersion()
-			}
-
-			// This is critical for the chain upgrade to work.
-			sdkCtx := sdk.UnwrapSDKContext(ctx)
-			app.ProviderKeeper.InitGenesis(sdkCtx, providertypes.DefaultGenesisState())
-
-			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
-		},
-	)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_1_2.Name, v1_1_2.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_1_4.Name, v1_1_4.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v1_1_5.Name, v1_1_5.CreateUpgradeHandler(app.mm, app.configurator, &app.AccountKeeper, &app.BankKeeper, app.StakingKeeper))
+	app.UpgradeKeeper.SetUpgradeHandler(v1_1_6.Name, v1_1_6.UpgradeHandler)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
@@ -507,13 +478,9 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case v1_1_1.Name:
+	case v1_1_6.Name:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{providertypes.ModuleName, providertypes.StoreKey},
-		}
-	case v1_1_4.Name:
-		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{authtypes.ModuleName, authzkeeper.StoreKey},
+			Deleted: []string{"provider"},
 		}
 	default:
 		// no store upgrades.
