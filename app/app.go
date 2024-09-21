@@ -61,6 +61,7 @@ import (
 	"github.com/onomyprotocol/onomy/app/keepers"
 	"github.com/onomyprotocol/onomy/app/upgrades"
 	v1_1_6 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.6"
+	v2_0_0 "github.com/onomyprotocol/onomy/app/upgrades/v2.0.0"
 	"github.com/onomyprotocol/onomy/docs"
 )
 
@@ -464,6 +465,7 @@ func (app *OnomyApp) SimulationManager() *module.SimulationManager {
 
 func (app *OnomyApp) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(v1_1_6.Name, v1_1_6.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v2_0_0.Name, v2_0_0.UpgradeHandler)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
@@ -482,6 +484,8 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Deleted: []string{"provider"},
 		}
+	case v2_0_0.Name:
+		// no store upgrades.
 	default:
 		// no store upgrades.
 	}
