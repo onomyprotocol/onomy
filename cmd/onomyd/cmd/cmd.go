@@ -12,6 +12,10 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/onomyprotocol/onomy/app"
+
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	ibcprovidertypes "github.com/cosmos/interchain-security/x/ccv/provider/types"
 )
 
 // NewRootCmd initiates the cli for onomy chain.
@@ -24,6 +28,8 @@ func NewRootCmd() (*cobra.Command, cosmoscmd.EncodingConfig) {
 		app.ModuleBasics,
 		app.New,
 	)
+	// pull request #171 refactor: Remove ics. So we need re-register proto can read state
+	RegisterInterfacesICSProvider(encodingConfig.InterfaceRegistry)
 
 	rootCmd.AddCommand(
 		server.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler),
@@ -51,4 +57,12 @@ func WrapBridgeCommands(defaultNodeHome, rootCmd string, cmds []*cobra.Command) 
 	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
 
 	return cmd
+}
+
+// // pull request #171 refactor: Remove ics. So we need re-register proto can read state
+func RegisterInterfacesICSProvider(registry cdctypes.InterfaceRegistry) {
+	registry.RegisterImplementations(
+		(*govtypes.Content)(nil),
+		&ibcprovidertypes.ConsumerAdditionProposal{},
+	)
 }
