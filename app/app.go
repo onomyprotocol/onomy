@@ -1,7 +1,6 @@
 package app
 
 import (
-	// "context"
 	"fmt"
 	"io"
 	"net/http"
@@ -46,7 +45,6 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	// authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -55,7 +53,6 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	ibctesting "github.com/cosmos/ibc-go/v8/testing"
 	ibctestingtypes "github.com/cosmos/ibc-go/v8/testing/types"
-	providertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
 	"github.com/spf13/cast"
 
 	"github.com/onomyprotocol/onomy/app/keepers"
@@ -376,9 +373,6 @@ func (app *OnomyApp) BlockedAddrs() map[string]bool {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
 	}
 
-	// For ICS multiden fix.
-	delete(blockedAddrs, authtypes.NewModuleAddress(providertypes.ConsumerRewardsPool).String())
-
 	return blockedAddrs
 }
 
@@ -465,7 +459,7 @@ func (app *OnomyApp) SimulationManager() *module.SimulationManager {
 
 func (app *OnomyApp) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(v1_1_6.Name, v1_1_6.UpgradeHandler)
-	app.UpgradeKeeper.SetUpgradeHandler(v2_0_0.Name, v2_0_0.UpgradeHandler)
+	app.UpgradeKeeper.SetUpgradeHandler(v2_0_0.Name, v2_0_0.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers))
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
@@ -485,7 +479,9 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 			Deleted: []string{"provider"},
 		}
 	case v2_0_0.Name:
-		// no store upgrades.
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{"consensus", "crisis", "dao"},
+		}
 	default:
 		// no store upgrades.
 	}

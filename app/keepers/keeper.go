@@ -49,14 +49,12 @@ import (
 	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
-	icsprovider "github.com/cosmos/interchain-security/v5/x/ccv/provider"
-	icsproviderkeeper "github.com/cosmos/interchain-security/v5/x/ccv/provider/keeper"
-	providertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
 
 	"github.com/onomyprotocol/onomy/x/dao"
 	daokeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
@@ -87,7 +85,6 @@ type AppKeepers struct {
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	IBCKeeper             *ibckeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
-	ProviderKeeper        icsproviderkeeper.Keeper
 
 	// make scoped keepers public for test purposes.
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -96,7 +93,6 @@ type AppKeepers struct {
 
 	// Modules.
 	TransferModule transfer.AppModule
-	ProviderModule icsprovider.AppModule
 
 	DaoKeeper daokeeper.Keeper
 }
@@ -155,7 +151,6 @@ func NewAppKeeper(
 
 	appKeepers.ScopedIBCKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	appKeepers.ScopedTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
-	appKeepers.ScopedICSproviderkeeper = appKeepers.CapabilityKeeper.ScopeToModule(providertypes.ModuleName)
 
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
 	// their scoped modules in `NewApp` with `ScopeToModule`.
@@ -238,7 +233,6 @@ func NewAppKeeper(
 		stakingtypes.NewMultiStakingHooks(
 			appKeepers.DistrKeeper.Hooks(),
 			appKeepers.SlashingKeeper.Hooks(),
-			appKeepers.ProviderKeeper.Hooks(),
 		),
 	)
 
@@ -267,27 +261,6 @@ func NewAppKeeper(
 		appKeepers.UpgradeKeeper,
 		appKeepers.ScopedIBCKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	)
-
-	appKeepers.ProviderKeeper = icsproviderkeeper.NewKeeper(
-		appCodec,
-		appKeepers.keys[providertypes.StoreKey],
-		appKeepers.GetSubspace(providertypes.ModuleName),
-		appKeepers.ScopedICSproviderkeeper,
-		appKeepers.IBCKeeper.ChannelKeeper,
-		appKeepers.IBCKeeper.PortKeeper,
-		appKeepers.IBCKeeper.ConnectionKeeper,
-		appKeepers.IBCKeeper.ClientKeeper,
-		appKeepers.StakingKeeper,
-		appKeepers.SlashingKeeper,
-		appKeepers.AccountKeeper,
-		appKeepers.DistrKeeper,
-		appKeepers.BankKeeper,
-		govkeeper.Keeper{},
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
-		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
-		authtypes.FeeCollectorName,
 	)
 
 	// gov depends on provider, so needs to be set after.
@@ -320,17 +293,9 @@ func NewAppKeeper(
 	)
 	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
 
-	// appKeepers.ProviderKeeper.SetGovKeeper(*appKeepers.GovKeeper).
-
-	appKeepers.ProviderModule = icsprovider.NewAppModule(
-		&appKeepers.ProviderKeeper,
-		appKeepers.GetSubspace(providertypes.ModuleName),
-	)
-
 	// Create static IBC router, add transfer route, then set and seal it.
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
-	ibcRouter.AddRoute(providertypes.ModuleName, appKeepers.ProviderModule)
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 	// Register the proposal types
 	// Deprecated: Avoid adding new handlers, instead use the new proposal flow
@@ -341,16 +306,10 @@ func NewAppKeeper(
 		AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
 		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(appKeepers.DaoKeeper)).
-		AddRoute(providertypes.RouterKey, icsprovider.NewProviderProposalHandler(appKeepers.ProviderKeeper))
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
 
 	// Set legacy router for backwards compatibility with gov v1beta1.
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
-
-	appKeepers.GovKeeper = appKeepers.GovKeeper.SetHooks(
-		govtypes.NewMultiGovHooks(
-			appKeepers.ProviderKeeper.Hooks(),
-		),
-	)
 
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec,
@@ -420,7 +379,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())     //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
-	paramsKeeper.Subspace(providertypes.ModuleName).WithKeyTable(providertypes.ParamKeyTable())
 	paramsKeeper.Subspace(daotypes.ModuleName)
 
 	return paramsKeeper

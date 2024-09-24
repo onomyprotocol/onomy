@@ -45,7 +45,6 @@ import (
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
-	providertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
 
 	"github.com/onomyprotocol/onomy/x/dao"
 	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
@@ -54,22 +53,20 @@ import (
 var (
 	// module account permissions.
 	maccPerms = map[string][]string{ //nolint:gochecknoglobals // cosmos-sdk application style
-		authtypes.FeeCollectorName:        nil,
-		daotypes.ModuleName:               {authtypes.Minter},
-		distrtypes.ModuleName:             nil,
-		minttypes.ModuleName:              {authtypes.Minter},
-		stakingtypes.BondedPoolName:       {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:               {authtypes.Burner},
-		ibctransfertypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
-		providertypes.ConsumerRewardsPool: nil,
+		authtypes.FeeCollectorName:     nil,
+		daotypes.ModuleName:            {authtypes.Minter},
+		distrtypes.ModuleName:          nil,
+		minttypes.ModuleName:           {authtypes.Minter},
+		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:            {authtypes.Burner},
+		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens.
 	allowedReceivingModAcc = map[string]bool{ //nolint:gochecknoglobals // cosmos-sdk application style
-		distrtypes.ModuleName: true,
-		daotypes.ModuleName:   true,
-		// provider chain note: the fee-pool is allowed to receive tokens.
+		distrtypes.ModuleName:      true,
+		daotypes.ModuleName:        true,
 		authtypes.FeeCollectorName: true,
 	}
 )
@@ -95,12 +92,12 @@ func appModules(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		ibc.NewAppModule(app.IBCKeeper),
 		ibctm.NewAppModule(),
 		sdkparams.NewAppModule(app.ParamsKeeper),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
 		genutil.NewAppModule(app.AccountKeeper, app.StakingKeeper, app, txConfig),
-		app.ProviderModule,
 		app.TransferModule,
 		// and.
 	}
@@ -144,7 +141,6 @@ func orderBeginBlockers() []string {
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		providertypes.ModuleName,
 		daotypes.ModuleName,
 	}
 }
@@ -170,8 +166,6 @@ func orderEndBlockers() []string {
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		providertypes.ModuleName,
-		// and.
 		daotypes.ModuleName,
 	}
 }
@@ -197,7 +191,6 @@ func orderInitBlockers() []string {
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		crisistypes.ModuleName,
-		providertypes.ModuleName,
 		daotypes.ModuleName,
 	}
 }
@@ -222,7 +215,6 @@ func simulationModules(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
-		app.ProviderModule,
 		app.TransferModule,
 	}
 }

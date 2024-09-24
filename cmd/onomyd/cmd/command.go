@@ -48,7 +48,7 @@ func initRootCmd(
 	rootCmd.AddCommand(
 		server.StatusCommand(),
 		genesisCommand(txConfig, basicManager),
-		queryCommand(),
+		queryCommand(basicManager),
 		txCommand(basicManager),
 		keys.Commands(),
 	)
@@ -69,7 +69,7 @@ func genesisCommand(txConfig client.TxConfig, basicManager module.BasicManager, 
 	return cmd
 }
 
-func queryCommand() *cobra.Command {
+func queryCommand(basicManager module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "query",
 		Aliases:                    []string{"q"},
@@ -89,6 +89,7 @@ func queryCommand() *cobra.Command {
 		server.QueryBlockResultsCmd(),
 	)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
+	basicManager.AddQueryCommands(cmd)
 
 	return cmd
 }
@@ -115,7 +116,6 @@ func txCommand(basicManager module.BasicManager) *cobra.Command {
 	)
 
 	basicManager.AddTxCommands(cmd)
-	basicManager.AddQueryCommands(cmd)
 
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
@@ -136,7 +136,7 @@ func newApp(
 		skipUpgradeHeights[int64(h)] = true
 	}
 
-	return app.NewOnomyApp(
+	app := app.NewOnomyApp(
 		logger,
 		db,
 		traceStore,
@@ -146,6 +146,9 @@ func newApp(
 		appOpts,
 		baseappOptions...,
 	)
+
+	RegisterInterfacesICSProvider(app.InterfaceRegistry())
+	return app
 }
 
 // appExport creates a new app (optionally at a given height) and exports state.
