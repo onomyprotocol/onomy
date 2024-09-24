@@ -26,6 +26,10 @@ import (
 	// "github.com/cometbft/starport/starport/pkg/cosmoscmd".
 	//
 	"github.com/onomyprotocol/onomy/app"
+
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	ibcprovidertypes "github.com/cosmos/interchain-security/x/ccv/provider/types"
 )
 
 // NewRootCmd initiates the cli for onomy chain.
@@ -48,7 +52,8 @@ func NewRootCmd() *cobra.Command {
 		}
 	}()
 
-	// fmt.Println(tempApplication.GetTxConfig().NewTxBuilder() == nil).
+	// pull request #171 refactor: Remove ics. So we need re-register proto can read state
+	RegisterInterfacesICSProvider(encodingConfig.InterfaceRegistry)
 
 	initClientCtx := client.Context{}.
 		WithCodec(tempApplication.AppCodec()).
@@ -160,5 +165,13 @@ var tempDir = func() string {
 	}
 	defer os.RemoveAll(dir)
 
-	return dir
+	return cmd
+}
+
+// // pull request #171 refactor: Remove ics. So we need re-register proto can read state
+func RegisterInterfacesICSProvider(registry cdctypes.InterfaceRegistry) {
+	registry.RegisterImplementations(
+		(*govtypes.Content)(nil),
+		&ibcprovidertypes.ConsumerAdditionProposal{},
+	)
 }
