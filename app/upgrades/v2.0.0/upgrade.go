@@ -99,9 +99,7 @@ func unbondNow(ctx sdk.Context, keepers *keepers.AppKeepers, ubfs []UnbondingFai
 
 		// ensure accuracy
 		if u.Delegator == ubd.DelegatorAddress && u.Validator == ubd.ValidatorAddress && ubd.Entries[u.Index].Balance.Equal(u.Balance) {
-
 			ubd.Entries[u.Index].UnbondingId = u.UnbondingId
-
 			ubd.Entries[u.Index].CompletionTime = ctx.BlockHeader().Time.Add(-1 * time.Hour)
 			ubd.Entries[u.Index].UnbondingOnHoldRefCount = 1
 
@@ -122,20 +120,8 @@ func unbondNow(ctx sdk.Context, keepers *keepers.AppKeepers, ubfs []UnbondingFai
 	return nil
 }
 
-type UnbondingFail struct {
-	Delegator string
-	Validator string
-
-	CreationHeight int64
-	Balance        math.Int
-
-	Index       int
-	UnbondingId uint64
-}
-
 // getInfoUnbondingFail Get info UnbondingFail
 func getInfoUnbondingFail(ctx sdk.Context, keepers *keepers.AppKeepers) (ubf []UnbondingFail, err error) {
-
 	// ubdID errors: 3500-3700 (3599-3678)
 	for i := 3500; i < 3700; i++ {
 		id := uint64(i)
@@ -144,20 +130,19 @@ func getInfoUnbondingFail(ctx sdk.Context, keepers *keepers.AppKeepers) (ubf []U
 			continue // not found ubd for id
 		}
 
-		for j := len(ubd.Entries) - 1; j >= 0; j-- {
-
-			if ubd.Entries[j].UnbondingOnHoldRefCount != 0 && ubd.Entries[j].UnbondingId == id {
+		for idx, entry := range ubd.Entries {
+			if entry.UnbondingOnHoldRefCount != 0 && entry.UnbondingId == id {
 				ubf = append(ubf, UnbondingFail{
 					Delegator:   ubd.DelegatorAddress,
 					Validator:   ubd.ValidatorAddress,
-					Balance:     ubd.Entries[j].Balance,
+					Balance:     entry.Balance,
 					UnbondingId: id,
-					Index:       j,
+					Index:       idx,
 				})
 				break
 			}
-		}
 
+		}
 	}
 
 	return ubf, nil
@@ -165,7 +150,6 @@ func getInfoUnbondingFail(ctx sdk.Context, keepers *keepers.AppKeepers) (ubf []U
 
 func indexUpdate(del, val string, index int, ubf []UnbondingFail) {
 	for i := 0; i < len(ubf); i++ {
-
 		if ubf[i].Delegator == del && ubf[i].Validator == val {
 			if index < ubf[i].Index {
 				ubf[i].Index = ubf[i].Index - 1
