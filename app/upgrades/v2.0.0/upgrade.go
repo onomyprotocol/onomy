@@ -1,9 +1,8 @@
 // Package v1_1_4 is contains chain upgrade of the corresponding version.
-package v1_1_4 //nolint:revive,stylecheck // app version
+package v2_0_0 //nolint:revive,stylecheck // app version
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"cosmossdk.io/math"
@@ -30,7 +29,7 @@ func CreateUpgradeHandler(
 	return func(c context.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 		ctx := sdk.UnwrapSDKContext(c)
 
-		ubf, err := getInfoUnbondingFail(ctx, keepers)
+		unbondingfails, err := getInfoUnbondingFail(ctx, keepers)
 		if err != nil {
 			ctx.Logger().Error("Error fixUnbondingICSRemove:", "message", err.Error())
 		}
@@ -40,7 +39,7 @@ func CreateUpgradeHandler(
 			return vm, err
 		}
 
-		err = preMigration2(ctx, keepers, ubf)
+		err = unbondNow(ctx, keepers, unbondingfails)
 		if err != nil {
 			ctx.Logger().Error("Error fixUnbondingICSRemove:", "message", err.Error())
 		}
@@ -90,17 +89,15 @@ func collectionsInitializeMintParam(ctx sdk.Context, mintKeeper mintkeeper.Keepe
 	return mintKeeper.Params.Set(ctx, params)
 }
 
-func preMigration2(ctx sdk.Context, keepers *keepers.AppKeepers, ubfs []UnbondingFail) error {
+func unbondNow(ctx sdk.Context, keepers *keepers.AppKeepers, ubfs []UnbondingFail) error {
 	for i := 0; i < len(ubfs); i++ {
 		u := ubfs[i]
-		// inbond now
 		ubd, err := keepers.StakingKeeper.GetUnbondingDelegationByUnbondingID(ctx, u.UnbondingId)
 		if err != nil {
 			continue
 		}
 
-		// ddamr bao la dung unbonding entry
-
+		// ensure accuracy
 		if u.Delegator == ubd.DelegatorAddress && u.Validator == ubd.ValidatorAddress && ubd.Entries[u.Index].Balance.Equal(u.Balance) {
 
 			ubd.Entries[u.Index].UnbondingId = u.UnbondingId
@@ -134,8 +131,6 @@ type UnbondingFail struct {
 
 	Index       int
 	UnbondingId uint64
-
-	readed bool
 }
 
 // getInfoUnbondingFail Get info UnbondingFail
@@ -158,7 +153,6 @@ func getInfoUnbondingFail(ctx sdk.Context, keepers *keepers.AppKeepers) (ubf []U
 					Balance:     ubd.Entries[j].Balance,
 					UnbondingId: id,
 					Index:       j,
-					readed:      false,
 				})
 				break
 			}
@@ -174,9 +168,6 @@ func indexUpdate(del, val string, index int, ubf []UnbondingFail) {
 
 		if ubf[i].Delegator == del && ubf[i].Validator == val {
 			if index < ubf[i].Index {
-				fmt.Println("update index:", index)
-				fmt.Println("update index for :", ubf[i].Index)
-
 				ubf[i].Index = ubf[i].Index - 1
 			}
 		}
