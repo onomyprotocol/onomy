@@ -10,9 +10,9 @@ import (
 // Any other change in the code should be height-gated, if the goal is to have old and new binaries
 // to be compatible prior to the upgrade height.
 type Fork struct {
-	// Upgrade version name, for the upgrade handler, e.g. `v7`
+	// Upgrade version name, for the upgrade handler, e.g. `v7`.
 	UpgradeName string
-	// height the upgrade occurs at
+	// height the upgrade occurs at.
 	UpgradeHeight int64
 
 	// Function that runs some custom state transition code at the beginning of a fork.

@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 // RegisterCodec registers the legacy amino codec.
@@ -27,7 +27,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 
 var (
 	// Amino holds the LegacyAmino codec.
-	Amino = codec.NewLegacyAmino() // nolint:gochecknoglobals // cosmos sdk style
+	Amino = codec.NewLegacyAmino() //nolint:gochecknoglobals // cosmos sdk style
 	// ModuleCdc holds the default proto codec.
-	ModuleCdc = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry()) // nolint:gochecknoglobals // cosmos sdk style
+	ModuleCdc = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry()) //nolint:gochecknoglobals // cosmos sdk style
 )

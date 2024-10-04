@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"slices"
 
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	ibcproviderkeeper "github.com/cosmos/interchain-security/x/ccv/provider/keeper"
-	ibcprovidertypes "github.com/cosmos/interchain-security/x/ccv/provider/types"
-	ccv "github.com/cosmos/interchain-security/x/ccv/types"
+	ibcproviderkeeper "github.com/cosmos/interchain-security/v5/x/ccv/provider/keeper"
+	ibcprovidertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
+
 	"github.com/onomyprotocol/onomy/app/upgrades"
 )
 
@@ -18,20 +19,18 @@ var targetIds = []uint64{uint64(3372), uint64(3374), uint64(3373)}
 func CreateFork(
 	sk *stakingkeeper.Keeper,
 	pk *ibcproviderkeeper.Keeper,
-	providerStoreKey sdk.StoreKey,
+	providerStoreKey storetypes.StoreKey,
 ) upgrades.Fork {
 	forkLogic := func(ctx sdk.Context) {
 		for _, id := range targetIds {
 			var consumerChainIDS []string
 
-			for _, chain := range pk.GetAllConsumerChains(ctx) {
-				consumerChainIDS = append(consumerChainIDS, chain.ChainId)
-			}
+			consumerChainIDS = append(consumerChainIDS, pk.GetAllRegisteredConsumerChainIDs(ctx)...)
 
 			if len(consumerChainIDS) == 0 {
 				break
 			}
-			// Add to indexes
+			// Add to indexes.
 			for _, consumerChainID := range consumerChainIDS {
 				ubdOpIds := pk.GetAllUnbondingOpIndexes(ctx, consumerChainID)
 				for _, ubdIds := range ubdOpIds {
@@ -45,19 +44,19 @@ func CreateFork(
 						newIds = append(newIds, ubdId)
 					}
 
-					// filter out invalid ID
+					// filter out invalid ID.
 					pk.SetUnbondingOpIndex(ctx, consumerChainID, ubdIds.VscId, newIds)
 				}
 			}
 
-			// remove ubd entries
+			// remove ubd entries.
 			_, found := pk.GetUnbondingOp(ctx, id)
 			if found {
 				pk.DeleteUnbondingOp(ctx, id)
 			}
 		}
 
-		// clear invalid mature ubd entries
+		// clear invalid mature ubd entries.
 		ids := []uint64{}
 		for _, id := range pk.GetMaturedUnbondingOps(ctx) {
 			if slices.Contains(targetIds, id) {
@@ -67,7 +66,7 @@ func CreateFork(
 			ids = append(ids, id)
 		}
 
-		maturedOps := ccv.MaturedUnbondingOps{
+		maturedOps := ibcprovidertypes.MaturedUnbondingOps{
 			Ids: ids,
 		}
 		bz, err := maturedOps.Marshal()
@@ -77,7 +76,7 @@ func CreateFork(
 			panic(fmt.Sprintf("failed to marshal matured unbonding operations: %s", err))
 		}
 
-		// update mature ubd ids
+		// update mature ubd ids.
 		store := ctx.KVStore(providerStoreKey)
 		store.Set(ibcprovidertypes.MaturedUnbondingOpsKey(), bz)
 	}

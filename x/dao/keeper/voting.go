@@ -1,29 +1,29 @@
 package keeper
 
 import (
+	"context"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 // VoteAbstain votes abstain on all the proposals from the DAO account.
-func (k Keeper) VoteAbstain(ctx sdk.Context) (err error) {
+func (k Keeper) VoteAbstain(ctx context.Context) (err error) {
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
-	k.govKeeper.IterateProposals(ctx, func(proposal govtypes.Proposal) bool {
-		if proposal.Status != govtypes.StatusVotingPeriod {
+	k.govKeeper.IterateProposals(ctx, func(proposal v1.Proposal) bool {
+		if proposal.Status != v1.StatusVotingPeriod {
 			return false
 		}
-		_, found := k.govKeeper.GetVote(ctx, proposal.ProposalId, daoAddr)
-		// the dao should vote now
-		if !found {
-			err = k.govKeeper.AddVote(ctx, proposal.ProposalId, daoAddr, govtypes.NewNonSplitVoteOption(govtypes.OptionAbstain))
+		_, err := k.govKeeper.GetVote(ctx, proposal.Id, daoAddr)
+		// the dao should vote now.
+		if err != nil {
+			err = k.govKeeper.AddVote(ctx, proposal.Id, daoAddr, v1.NewNonSplitVoteOption(v1.OptionAbstain), "")
 			if err != nil {
 				return true
 			}
-			k.Logger(ctx).Info(fmt.Sprintf("voted abstain on proposal[%d]: %s", proposal.ProposalId, proposal.GetTitle()))
+			k.Logger(ctx).Info(fmt.Sprintf("voted abstain on proposal[%d]: %s", proposal.Id, proposal.GetTitle()))
 		}
 		return false
 	})

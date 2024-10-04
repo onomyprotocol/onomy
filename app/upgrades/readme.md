@@ -4,6 +4,7 @@ This folder contains sub-folders for every chain upgrade.
 
 ## Version History
 
+- v2.0.0 - Upgrades sdk v0.50
 - v1.1.4 - Add missing authz module
 - v1.1.2 - Fix that the treasury is actually subtracted from the staking supply
 - v1.1.1 - Removal of Gravity module and addition of provider module

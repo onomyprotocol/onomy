@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
 )
@@ -16,7 +16,7 @@ func (k Keeper) FundTreasuryProposal(ctx sdk.Context, request *types.FundTreasur
 
 	senderBalance := k.bankKeeper.GetAllBalances(ctx, senderAddr)
 	amountToSend := request.Amount
-	if _, isNegative := senderBalance.SafeSub(amountToSend); isNegative {
+	if _, isNegative := senderBalance.SafeSub(amountToSend...); isNegative {
 		return sdkerrors.Wrapf(types.ErrInsufficientBalance, "sender balance is less than amount to send")
 	}
 
@@ -38,12 +38,12 @@ func (k Keeper) ExchangeWithTreasuryProposal(ctx sdk.Context, request *types.Exc
 	}
 
 	senderBalance := k.bankKeeper.GetAllBalances(ctx, senderAddr)
-	if _, isNegative := senderBalance.SafeSub(coinsBid); isNegative {
+	if _, isNegative := senderBalance.SafeSub(coinsBid...); isNegative {
 		return sdkerrors.Wrapf(types.ErrInsufficientBalance, "sender balance is less than bid coins amount")
 	}
 
 	treasuryBalance := k.bankKeeper.GetAllBalances(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName))
-	if _, isNegative := treasuryBalance.SafeSub(coinsAsk); isNegative {
+	if _, isNegative := treasuryBalance.SafeSub(coinsAsk...); isNegative {
 		return sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than ask coins amount")
 	}
 
@@ -67,7 +67,7 @@ func (k Keeper) FundAccountProposal(ctx sdk.Context, request *types.FundAccountP
 
 	treasuryBalance := k.bankKeeper.GetAllBalances(ctx, k.accountKeeper.GetModuleAddress(types.ModuleName))
 	amountToSend := request.Amount
-	if _, isNegative := treasuryBalance.SafeSub(amountToSend); isNegative {
+	if _, isNegative := treasuryBalance.SafeSub(amountToSend...); isNegative {
 		return sdkerrors.Wrapf(types.ErrInsufficientBalance, "treasury balance is less than amount to send")
 	}
 	if err := k.validateMaxProposalRate(ctx, treasuryBalance, amountToSend); err != nil {
@@ -81,7 +81,7 @@ func (k Keeper) validateMaxProposalRate(ctx sdk.Context, treasuryBalance, coinsA
 	maxProposalRate := k.MaxProposalRate(ctx)
 	for _, tcoin := range treasuryBalance {
 		askAmount := coinsAsk.AmountOf(tcoin.Denom)
-		allowedAmount := tcoin.Amount.ToDec().Mul(maxProposalRate).TruncateInt()
+		allowedAmount := tcoin.Amount.ToLegacyDec().Mul(maxProposalRate).TruncateInt()
 		if allowedAmount.LT(askAmount) {
 			return sdkerrors.Wrapf(types.ErrProhibitedCoinsAmount, "requested %s:%s amount is more than max allowed %s:%s ",
 				tcoin.Denom, askAmount, tcoin.Denom, allowedAmount.String())

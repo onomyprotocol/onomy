@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"cosmossdk.io/math"
 	"github.com/stretchr/testify/require"
 
 	"github.com/onomyprotocol/onomy/x/dao/types"
@@ -25,9 +25,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				Params: types.Params{
 					WithdrawRewardPeriod: 1,
-					PoolRate:             sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxProposalRate:      sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxValCommission:     sdk.NewDec(1).Quo(sdk.NewDec(10)),
+					PoolRate:             math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxProposalRate:      math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxValCommission:     math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
 				},
 			},
 			valid: true,
@@ -42,9 +42,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				Params: types.Params{
 					WithdrawRewardPeriod: -1,
-					PoolRate:             sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxProposalRate:      sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxValCommission:     sdk.NewDec(1).Quo(sdk.NewDec(10)),
+					PoolRate:             math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxProposalRate:      math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxValCommission:     math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
 				},
 			},
 			valid: false,
@@ -54,9 +54,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				Params: types.Params{
 					WithdrawRewardPeriod: 1,
-					PoolRate:             sdk.NewDec(-1).Quo(sdk.NewDec(10)),
-					MaxProposalRate:      sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxValCommission:     sdk.NewDec(1).Quo(sdk.NewDec(10)),
+					PoolRate:             math.LegacyNewDec(-1).Quo(math.LegacyNewDec(10)),
+					MaxProposalRate:      math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxValCommission:     math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
 				},
 			},
 			valid: false,
@@ -66,9 +66,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				Params: types.Params{
 					WithdrawRewardPeriod: 1,
-					PoolRate:             sdk.NewDec(11).Quo(sdk.NewDec(10)),
-					MaxProposalRate:      sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxValCommission:     sdk.NewDec(1).Quo(sdk.NewDec(10)),
+					PoolRate:             math.LegacyNewDec(11).Quo(math.LegacyNewDec(10)),
+					MaxProposalRate:      math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxValCommission:     math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
 				},
 			},
 			valid: false,
@@ -78,9 +78,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				Params: types.Params{
 					WithdrawRewardPeriod: 1,
-					PoolRate:             sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxProposalRate:      sdk.NewDec(-1).Quo(sdk.NewDec(10)),
-					MaxValCommission:     sdk.NewDec(1).Quo(sdk.NewDec(10)),
+					PoolRate:             math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxProposalRate:      math.LegacyNewDec(-1).Quo(math.LegacyNewDec(10)),
+					MaxValCommission:     math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
 				},
 			},
 			valid: false,
@@ -90,9 +90,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				Params: types.Params{
 					WithdrawRewardPeriod: 1,
-					PoolRate:             sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxProposalRate:      sdk.NewDec(11).Quo(sdk.NewDec(10)),
-					MaxValCommission:     sdk.NewDec(1).Quo(sdk.NewDec(10)),
+					PoolRate:             math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxProposalRate:      math.LegacyNewDec(11).Quo(math.LegacyNewDec(10)),
+					MaxValCommission:     math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
 				},
 			},
 			valid: false,
@@ -102,9 +102,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				Params: types.Params{
 					WithdrawRewardPeriod: 1,
-					PoolRate:             sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxProposalRate:      sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxValCommission:     sdk.NewDec(-1).Quo(sdk.NewDec(10)),
+					PoolRate:             math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxProposalRate:      math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxValCommission:     math.LegacyNewDec(-1).Quo(math.LegacyNewDec(10)),
 				},
 			},
 			valid: false,
@@ -114,9 +114,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				Params: types.Params{
 					WithdrawRewardPeriod: 1,
-					PoolRate:             sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxProposalRate:      sdk.NewDec(1).Quo(sdk.NewDec(10)),
-					MaxValCommission:     sdk.NewDec(11).Quo(sdk.NewDec(10)),
+					PoolRate:             math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxProposalRate:      math.LegacyNewDec(1).Quo(math.LegacyNewDec(10)),
+					MaxValCommission:     math.LegacyNewDec(11).Quo(math.LegacyNewDec(10)),
 				},
 			},
 			valid: false,
