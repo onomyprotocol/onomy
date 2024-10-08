@@ -48,6 +48,16 @@ import (
 
 	"github.com/onomyprotocol/onomy/x/dao"
 	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
+
+	auctiontypes "github.com/onomyprotocol/reserve/x/auction/types"
+	oracletypes "github.com/onomyprotocol/reserve/x/oracle/types"
+	psmtypes "github.com/onomyprotocol/reserve/x/psm/types"
+	vaultstypes "github.com/onomyprotocol/reserve/x/vaults/types"
+
+	auction "github.com/onomyprotocol/reserve/x/auction/module"
+	oracle "github.com/onomyprotocol/reserve/x/oracle/module"
+	psm "github.com/onomyprotocol/reserve/x/psm/module"
+	vaults "github.com/onomyprotocol/reserve/x/vaults/module"
 )
 
 var (
@@ -55,6 +65,11 @@ var (
 	maccPerms = map[string][]string{ //nolint:gochecknoglobals // cosmos-sdk application style
 		authtypes.FeeCollectorName:     nil,
 		daotypes.ModuleName:            {authtypes.Minter},
+		auctiontypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
+		vaultstypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
+		vaultstypes.ReserveModuleName:  {authtypes.Burner},
+		psmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
+		oracletypes.ModuleName:         nil,
 		distrtypes.ModuleName:          nil,
 		minttypes.ModuleName:           {authtypes.Minter},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
@@ -82,6 +97,10 @@ func appModules(
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
 		dao.NewAppModule(appCodec, app.DaoKeeper),
+		auction.NewAppModule(appCodec, app.AuctionKeeper, app.AccountKeeper, app.BankKeeper),
+		vaults.NewAppModule(appCodec, app.VaultsKeeper, app.AccountKeeper, app.BankKeeper),
+		oracle.NewAppModule(appCodec, app.OracleMockKeeper, app.AccountKeeper, app.BankKeeper),
+		psm.NewAppModule(appCodec, app.PSMKeeper, app.AccountKeeper, app.BankKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),
@@ -142,6 +161,10 @@ func orderBeginBlockers() []string {
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		daotypes.ModuleName,
+		oracletypes.ModuleName,
+		vaultstypes.ModuleName,
+		auctiontypes.ModuleName,
+		psmtypes.ModuleName,
 	}
 }
 
@@ -167,6 +190,10 @@ func orderEndBlockers() []string {
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		daotypes.ModuleName,
+		oracletypes.ModuleName,
+		vaultstypes.ModuleName,
+		auctiontypes.ModuleName,
+		psmtypes.ModuleName,
 	}
 }
 
@@ -192,6 +219,10 @@ func orderInitBlockers() []string {
 		consensusparamtypes.ModuleName,
 		crisistypes.ModuleName,
 		daotypes.ModuleName,
+		oracletypes.ModuleName,
+		vaultstypes.ModuleName,
+		auctiontypes.ModuleName,
+		psmtypes.ModuleName,
 	}
 }
 
@@ -204,6 +235,10 @@ func simulationModules(
 		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
 		dao.NewAppModule(appCodec, app.DaoKeeper),
+		// auction.NewAppModule(appCodec, app.AuctionKeeper, app.AccountKeeper, app.BankKeeper),
+		// vaults.NewAppModule(appCodec, app.VaultsKeeper, app.AccountKeeper, app.BankKeeper),
+		// oracle.NewAppModule(appCodec, app.OracleMockKeeper, app.AccountKeeper, app.BankKeeper),
+		psm.NewAppModule(appCodec, app.PSMKeeper, app.AccountKeeper, app.BankKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),

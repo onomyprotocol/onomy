@@ -236,6 +236,10 @@ func NewOnomyApp( // nolint:funlen // app new cosmos func
 	//
 	app.mm.RegisterInvariants(app.CrisisKeeper)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
+	// for a, _ := range app.mm.Modules {
+	// 	fmt.Println(a)
+	// }
+
 	err = app.mm.RegisterServices(app.configurator)
 	if err != nil {
 		panic(err)

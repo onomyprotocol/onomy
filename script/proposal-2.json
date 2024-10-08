@@ -1,0 +1,15 @@
+{
+    "messages": [{
+      "@type": "/reserve.psm.v1.MsgAddStableCoin",
+      "authority":"onomy10d07y265gmmuvt4z0w9aw880jnsr700jqr8n8k",
+      "denom": "usdt",
+      "limit_total": "100000000000000000000000000000",
+      "price": "1.000000000000000000",
+      "fee_in": "0.001000000000000000",
+      "fee_out": "0.001000000000000000"
+
+    }],
+    "deposit": "100000000stake",
+    "title": "My proposal",
+    "summary": "A short summary of my proposal"
+  }
