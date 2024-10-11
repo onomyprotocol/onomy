@@ -478,10 +478,6 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Deleted: []string{"provider"},
 		}
-	case v2_0_0.Name:
-		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{"consensus", "crisis", "dao"},
-		}
 	default:
 		// no store upgrades.
 	}
