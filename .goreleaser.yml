@@ -93,7 +93,7 @@ archives:
       - onomyd-linux-arm64
   - id: binaries
     builds:
-      - onomyd-linux-amd64
+      - onomyd-linux
       - onomyd-linux-arm64
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{- title .Os }}_{{ .Arch }}'
     format: binary
