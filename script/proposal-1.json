@@ -4,7 +4,7 @@
       "denom": "atom",
       "authority":"onomy10d07y265gmmuvt4z0w9aw880jnsr700jqr8n8k",
       "min_collateral_ratio": "1.5",
-      "liquidation_ratio":"0.8",
+      "liquidation_ratio":"1.1",
       "max_debt":"100000000000000000"
     }],
     "deposit": "100000000stake",
