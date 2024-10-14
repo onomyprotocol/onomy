@@ -1,25 +1,29 @@
 package dao
 
 import (
+	"context"
 	"runtime/debug"
-	"time"
 
-	"github.com/cosmos/cosmos-sdk/telemetry"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"cosmossdk.io/math"
 
 	"github.com/onomyprotocol/onomy/x/dao/keeper"
-	"github.com/onomyprotocol/onomy/x/dao/types"
 )
 
-// BeginBlocker does any custom logic for the DAO upon `BeginBlocker`
-func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
+// BeginBlocker does any custom logic for the DAO upon `BeginBlocker`.
+func BeginBlocker(ctx context.Context, k keeper.Keeper) {
 }
 
 // EndBlocker calls the dao re-balancing every block.
-func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
+func EndBlocker(ctx context.Context, k keeper.Keeper) {
+	// defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker).
+	totalStakingSupply, err := k.GetDaoDelegationSupply(ctx)
+	if err != nil {
+		k.Logger(ctx).Error("dao EndBlocker error: %v", err)
+		debug.PrintStack()
+	}
 
-	if k.GetDaoDelegationSupply(ctx).GT(sdk.NewDec(0)) {
+	if totalStakingSupply.GT(math.LegacyZeroDec()) {
 		if err := k.VoteAbstain(ctx); err != nil {
 			k.Logger(ctx).Error("dao EndBlocker error: %v", err)
 			debug.PrintStack()

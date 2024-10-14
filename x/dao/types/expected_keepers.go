@@ -1,8 +1,13 @@
 package types
 
 import (
+	"context"
+
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	// govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	"github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	// govtypes "github.com/cosmos/cosmos-sdk/x/gov/types".
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -24,39 +29,38 @@ type AccountKeeper interface {
 
 // BankKeeper defines the contract needed to be fulfilled for banking and supply dependencies.
 type BankKeeper interface {
-	GetAllBalances(sdk.Context, sdk.AccAddress) sdk.Coins
-	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
-	SendCoins(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) error
-	SendCoinsFromAccountToModule(sdk.Context, sdk.AccAddress, string, sdk.Coins) error
-	SendCoinsFromModuleToAccount(sdk.Context, string, sdk.AccAddress, sdk.Coins) error
-	SendCoinsFromModuleToModule(ctx sdk.Context, senderPool, recipientPool string, amt sdk.Coins) error
-	MintCoins(sdk.Context, string, sdk.Coins) error
+	GetAllBalances(context.Context, sdk.AccAddress) sdk.Coins
+	GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin
+	SendCoins(ctx context.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) error
+	SendCoinsFromAccountToModule(context.Context, sdk.AccAddress, string, sdk.Coins) error
+	SendCoinsFromModuleToAccount(context.Context, string, sdk.AccAddress, sdk.Coins) error
+	SendCoinsFromModuleToModule(ctx context.Context, senderPool, recipientPool string, amt sdk.Coins) error
+	MintCoins(context.Context, string, sdk.Coins) error
 }
 
 // DistributionKeeper expected distribution keeper.
 type DistributionKeeper interface {
-	HasDelegatorStartingInfo(sdk.Context, sdk.ValAddress, sdk.AccAddress) bool
-	WithdrawDelegationRewards(sdk.Context, sdk.AccAddress, sdk.ValAddress) (sdk.Coins, error)
+	HasDelegatorStartingInfo(context.Context, sdk.ValAddress, sdk.AccAddress) (bool, error)
+	WithdrawDelegationRewards(context.Context, sdk.AccAddress, sdk.ValAddress) (sdk.Coins, error)
 }
 
 // GovKeeper expected gov keeper.
 type GovKeeper interface {
-	AddVote(sdk.Context, uint64, sdk.AccAddress, govtypes.WeightedVoteOptions) error
-	GetVote(sdk.Context, uint64, sdk.AccAddress) (govtypes.Vote, bool)
-	IterateProposals(sdk.Context, func(proposal govtypes.Proposal) bool)
+	AddVote(context.Context, uint64, sdk.AccAddress, v1.WeightedVoteOptions, string) error
+	GetVote(context.Context, uint64, sdk.AccAddress) (v1.Vote, error)
+	IterateProposals(context.Context, func(v v1.Proposal) bool) error
 }
 
 // MintKeeper expected mint keeper.
 type MintKeeper interface {
-	GetMinter(ctx sdk.Context) (minter minttypes.Minter)
-	GetParams(ctx sdk.Context) (params minttypes.Params)
+	ExportGenesis(ctx sdk.Context) *minttypes.GenesisState
 }
 
 // StakingKeeper expected staking keeper.
 type StakingKeeper interface {
-	BondDenom(sdk.Context) string
-	Delegate(sdk.Context, sdk.AccAddress, sdk.Int, stakingtypes.BondStatus, stakingtypes.Validator, bool) (sdk.Dec, error)
-	GetDelegation(sdk.Context, sdk.AccAddress, sdk.ValAddress) (stakingtypes.Delegation, bool)
-	GetAllValidators(sdk.Context) []stakingtypes.Validator
-	UnbondAndUndelegateCoins(sdk.Context, sdk.AccAddress, sdk.ValAddress, sdk.Dec) (sdk.Int, error)
+	BondDenom(context.Context) (string, error)
+	Delegate(context.Context, sdk.AccAddress, math.Int, stakingtypes.BondStatus, stakingtypes.Validator, bool) (math.LegacyDec, error)
+	GetDelegation(context.Context, sdk.AccAddress, sdk.ValAddress) (stakingtypes.Delegation, error)
+	GetAllValidators(context.Context) ([]stakingtypes.Validator, error)
+	UnbondAndUndelegateCoins(context.Context, sdk.AccAddress, sdk.ValAddress, math.LegacyDec) (math.Int, error)
 }

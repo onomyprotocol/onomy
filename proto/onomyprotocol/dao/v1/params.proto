@@ -7,7 +7,7 @@ option go_package = "github.com/onomyprotocol/onomy/x/dao/types";
 
 // Params defines the parameters for the module.
 message Params {
-  option (gogoproto.goproto_stringer) = false;
+  // option (gogoproto.goproto_stringer) = false;
 
   // the period of blocks to withdraw the dao staking reward
   int64 withdraw_reward_period = 1 [(gogoproto.moretags) = "yaml:\"withdraw_reward_period\""];

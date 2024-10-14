@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"context"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -9,21 +10,28 @@ import (
 )
 
 // WithdrawReward withdraw dao delegation reward.
-func (k Keeper) WithdrawReward(ctx sdk.Context) error {
-	vals := k.stakingKeeper.GetAllValidators(ctx)
+func (k Keeper) WithdrawReward(ctx context.Context) error {
+	vals, err := k.stakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return err
+	}
 	daoAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	for _, val := range vals {
 		valOperator := val.GetOperator()
-		_, found := k.stakingKeeper.GetDelegation(ctx, daoAddr, valOperator)
-		if !found {
+		valAddr, err := sdk.ValAddressFromBech32(valOperator)
+		if err != nil {
+			return err
+		}
+		_, err = k.stakingKeeper.GetDelegation(ctx, daoAddr, valAddr)
+		if err != nil {
 			continue
 		}
-		// check existence of delegator starting info
-		if !k.distributionKeeper.HasDelegatorStartingInfo(ctx, valOperator, daoAddr) {
+		// check existence of delegator starting info.
+		if has, err := k.distributionKeeper.HasDelegatorStartingInfo(ctx, valAddr, daoAddr); err != nil || !has {
 			continue
 		}
 
-		reward, err := k.distributionKeeper.WithdrawDelegationRewards(ctx, daoAddr, valOperator)
+		reward, err := k.distributionKeeper.WithdrawDelegationRewards(ctx, daoAddr, valAddr)
 		if err != nil {
 			return err
 		}

@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -29,7 +29,7 @@ func GetTxCmd() *cobra.Command {
 		Use:                        types.ModuleName,
 		Short:                      fmt.Sprintf("%s dao subcommands", types.ModuleName),
 		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2, // nolint:gomnd
+		SuggestionsMinimumDistance: 2, //nolint:gomnd
 		RunE:                       client.ValidateCmd,
 	}
 
@@ -92,7 +92,7 @@ $ %s tx gov submit-proposal fund-treasury 5000000000000000000anom --title="Test 
 }
 
 // CmdExchangeWithTreasuryProposal implements the command to submit еру exchange-with-treasury proposal.
-func CmdExchangeWithTreasuryProposal() *cobra.Command { // nolint:gocognit,gocyclo,cyclop // the command is long but not complicated
+func CmdExchangeWithTreasuryProposal() *cobra.Command { //nolint:gocognit,gocyclo,cyclop // the command is long but not complicated
 	cmd := &cobra.Command{
 		Use:   "exchange-with-treasury coins-pairs",
 		Args:  cobra.ExactArgs(1),
@@ -114,7 +114,7 @@ $ %s tx gov submit-proposal exchange-with-treasury "5000000000000000000anom/5000
 			pairsStrings := strings.Split(args[0], ",")
 			for i := range pairsStrings {
 				coinsString := strings.Split(pairsStrings[i], "/")
-				if len(coinsString) != 2 { // nolint:gomnd // pair number
+				if len(coinsString) != 2 { //nolint:gomnd // pair number
 					return fmt.Errorf("coins pair %s is invalid", pairsStrings[i])
 				}
 
@@ -170,7 +170,7 @@ $ %s tx gov submit-proposal exchange-with-treasury "5000000000000000000anom/5000
 func CmdFundAccountProposal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "fund-account recipient amount",
-		Args:  cobra.ExactArgs(2), // nolint:gomnd // the args count
+		Args:  cobra.ExactArgs(2), //nolint:gomnd // the args count
 		Short: "Submit a fund account proposal",
 		Long: strings.TrimSpace(
 			fmt.Sprintf(`Submit a fund account proposal along with an initial deposit.

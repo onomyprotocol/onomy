@@ -10,7 +10,7 @@ import (
 func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) error {
 	k.SetParams(ctx, genState.Params)
 
-	// if the height is 1 or 0 the chain is in the initial state
+	// if the height is 1 or 0 the chain is in the initial state.
 	if ctx.BlockHeight() <= 1 {
 		balance := genState.TreasuryBalance
 		if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, balance); err != nil {

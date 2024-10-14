@@ -1,85 +1,86 @@
 // Package network contains utils to setup the chain network.
 package network
 
-import (
-	"encoding/json"
-	"fmt"
-	"testing"
+// import (
+// 	"encoding/json"
+// 	"fmt"
+// 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
-	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
+// 	"github.com/cosmos/cosmos-sdk/client"
+// 	"github.com/cosmos/cosmos-sdk/client/flags"
+// 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+// 	// "github.com/cosmos/cosmos-sdk/testutil/network"
+// 	sdk "github.com/cosmos/cosmos-sdk/types"
+// 	"github.com/stretchr/testify/require"
 
-	"github.com/onomyprotocol/onomy/app"
-	"github.com/onomyprotocol/onomy/testutil/simapp"
-)
+// 	// "github.com/cometbft/starport/starport/pkg/cosmoscmd"
 
-type (
-	Network = network.Network // nolint:revive // simapp test var
-	Config  = network.Config  // nolint:revive // simapp test var
-)
+// 	"github.com/onomyprotocol/onomy/app"
+// 	"github.com/onomyprotocol/onomy/testutil/simapp"
+// ).
 
-// TestNetwork defines the test network wrapper.
-type TestNetwork struct {
-	*network.Network
-}
+// type (
+// 	Network = network.Network // nolint:revive // simapp test var
+// 	Config  = network.Config  // nolint:revive // simapp test var
+// ).
 
-// Option is an option pattern function used fot the test network customisations.
-type Option func(*network.Config)
+// // TestNetwork defines the test network wrapper.
+// type TestNetwork struct {
+// 	*network.Network
+// }.
 
-// WithGenesisOverride returns genesis override Option.
-func WithGenesisOverride(override func(map[string]json.RawMessage) map[string]json.RawMessage) Option {
-	return func(c *network.Config) {
-		c.GenesisState = override(c.GenesisState)
-	}
-}
+// // Option is an option pattern function used fot the test network customisations.
+// type Option func(*network.Config).
 
-// New setups the test network.
-func New(t *testing.T, opts ...Option) *TestNetwork {
-	t.Helper()
+// // WithGenesisOverride returns genesis override Option.
+// func WithGenesisOverride(override func(map[string]json.RawMessage) map[string]json.RawMessage) Option {
+// 	return func(c *network.Config) {
+// 		c.GenesisState = override(c.GenesisState)
+// 	}
+// }.
 
-	cfg := network.DefaultConfig()
+// // New setups the test network.
+// func New(t *testing.T, opts ...Option) *TestNetwork {
+// 	t.Helper()
 
-	cfg.NumValidators = 1
-	encCfg := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
-	cfg.GenesisState = app.ModuleBasics.DefaultGenesis(encCfg.Marshaler)
-	cfg.AppConstructor = func(val network.Validator) servertypes.Application {
-		onomyApp := simapp.Setup().OnomyApp()
-		return onomyApp
-	}
+// 	cfg := network.DefaultConfig()
 
-	for _, opt := range opts {
-		opt(&cfg)
-	}
+// 	cfg.NumValidators = 1
+// 	encCfg := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
+// 	cfg.GenesisState = app.ModuleBasics.DefaultGenesis(encCfg.Marshaler)
+// 	cfg.AppConstructor = func(val network.Validator) servertypes.Application {
+// 		onomyApp := simapp.Setup().OnomyApp()
+// 		return onomyApp
+// 	}
 
-	onomyNetwork := network.New(t, cfg)
+// 	for _, opt := range opts {
+// 		opt(&cfg)
+// 	}
 
-	_, err := onomyNetwork.WaitForHeight(1)
-	require.NoError(t, err)
+// 	onomyNetwork := network.New(t, cfg)
 
-	return &TestNetwork{onomyNetwork}
-}
+// 	_, err := onomyNetwork.WaitForHeight(1)
+// 	require.NoError(t, err)
 
-// TxValidator1Args returns the tx params for the 1s network validator.
-func (testNetwork *TestNetwork) TxValidator1Args() []string {
-	return []string{
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, testNetwork.Validators[0].Address.String()),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(testNetwork.Config.BondDenom, sdk.NewInt(10))).String()), // nolint:gomnd //test constant
-		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-	}
-}
+// 	return &TestNetwork{onomyNetwork}
+// }.
 
-// Validator1Ctx returns the context of the 1st validator in the network.
-func (testNetwork *TestNetwork) Validator1Ctx() client.Context {
-	return testNetwork.Validators[0].ClientCtx
-}
+// // TxValidator1Args returns the tx params for the 1s network validator.
+// func (testNetwork *TestNetwork) TxValidator1Args() []string {
+// 	return []string{
+// 		fmt.Sprintf("--%s=%s", flags.FlagFrom, testNetwork.Validators[0].Address.String()),
+// 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+// 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(testNetwork.Config.BondDenom, sdk.NewInt(10))).String()), // nolint:gomnd //test constant
+// 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+// 	}
+// }.
 
-// Validator1Address returns the address of the 1st validator in the network.
-func (testNetwork *TestNetwork) Validator1Address() sdk.AccAddress {
-	return testNetwork.Validators[0].Address
-}
+// // Validator1Ctx returns the context of the 1st validator in the network.
+// func (testNetwork *TestNetwork) Validator1Ctx() client.Context {
+// 	return testNetwork.Validators[0].ClientCtx
+// }.
+
+// // Validator1Address returns the address of the 1st validator in the network.
+// func (testNetwork *TestNetwork) Validator1Address() sdk.AccAddress {
+// 	return testNetwork.Validators[0].Address
+// }.

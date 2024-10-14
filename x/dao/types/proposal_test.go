@@ -141,7 +141,7 @@ func TestExchangeWithTreasuryProposal_ValidateBasic(t *testing.T) {
 	}
 }
 
-func TestFundAccountProposal_ValidateBasic(t *testing.T) { // nolint:dupl // test template
+func TestFundAccountProposal_ValidateBasic(t *testing.T) { //nolint:dupl // test template
 	const denom1 = "denom1"
 
 	type fields struct {
