@@ -491,7 +491,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 
 	case v2_1_0.Name:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{"vaults", "oracel", "auction", "psm"},
+			Added: []string{"vaults", "oracle", "auction", "psm"},
 		}
 	default:
 		// no store upgrades.
