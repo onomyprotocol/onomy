@@ -51,6 +51,8 @@ onomyd tx bank send $( onomyd keys show validator1 --home=$HOME/.onomyd/validato
 
 sleep 7
 
+onomyd tx oracle set-price eth 4000 --home=$HOME/.onomyd/validator1  --from validator1 --keyring-backend test --fees 20stake --chain-id testing-1 -y
+onomyd tx oracle set-price btc 80000 --home=$HOME/.onomyd/validator2  --from validator2 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 onomyd tx oracle set-price usdt 1.1 --home=$HOME/.onomyd/validator3  --from validator3 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 # onomyd q gov proposals
 # onomyd tx gov submit-legacy-proposal active-collateral "title" "description" "atom" "10" "0.1" "10000" 10000000000000000000stake --keyring-backend=test  --home=$HOME/.onomyd/validator1 --from validator1 -y --chain-id testing-1 --fees 20stake
