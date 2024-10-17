@@ -21,6 +21,11 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 
 	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
+
+	auctiontypes "github.com/onomyprotocol/reserve/x/auction/types"
+	oracletypes "github.com/onomyprotocol/reserve/x/oracle/types"
+	psmtypes "github.com/onomyprotocol/reserve/x/psm/types"
+	vaultstypes "github.com/onomyprotocol/reserve/x/vaults/types"
 )
 
 func (appKeepers *AppKeepers) GenerateKeys() {
@@ -45,6 +50,10 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		authzkeeper.StoreKey,
 		daotypes.StoreKey,
 		consensusparamtypes.StoreKey,
+		auctiontypes.StoreKey,
+		oracletypes.StoreKey,
+		psmtypes.StoreKey,
+		vaultstypes.StoreKey,
 	)
 
 	// Define transient store keys.
