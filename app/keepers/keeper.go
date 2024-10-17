@@ -64,6 +64,7 @@ import (
 	oracleKeeper "github.com/onomyprotocol/reserve/x/oracle/keeper"
 	psmKeeper "github.com/onomyprotocol/reserve/x/psm/keeper"
 	vaultsKeeper "github.com/onomyprotocol/reserve/x/vaults/keeper"
+	vaults "github.com/onomyprotocol/reserve/x/vaults/module"
 
 	auctiontypes "github.com/onomyprotocol/reserve/x/auction/types"
 	oracletypes "github.com/onomyprotocol/reserve/x/oracle/types"
@@ -325,7 +326,8 @@ func NewAppKeeper(
 		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(appKeepers.DaoKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)).
 		AddRoute(psmtypes.RouterKey, psm.NewPSMProposalHandler(&appKeepers.PSMKeeper)).
-		AddRoute(oracletypes.RouterKey, oracle.NewOracleProposalHandler(appKeepers.OracleMockKeeper))
+		AddRoute(oracletypes.RouterKey, oracle.NewOracleProposalHandler(appKeepers.OracleMockKeeper)).
+		AddRoute(vaultstypes.RouterKey, vaults.NewVaultsProposalHandler(&appKeepers.VaultsKeeper))
 
 	// Set legacy router for backwards compatibility with gov v1beta1.
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
