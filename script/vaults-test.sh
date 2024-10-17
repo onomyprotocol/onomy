@@ -186,7 +186,7 @@ onomyd tx auction bid 0 10000000nomUSD 2.2 --from test1 --home=$HOME/.onomyd/val
 
 sleep 7
 
-echo"I will buy all the remaining"
+echo "I will buy all the remaining"
 onomyd tx auction bid 0 20000000nomUSD 2 --from test3 --home=$HOME/.onomyd/validator1 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 
 echo "wating long time, query auction ratecurrent = 1.1...liquidate"
