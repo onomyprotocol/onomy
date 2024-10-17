@@ -827,8 +827,8 @@ github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQ
 github.com/oklog/run v1.1.0 h1:GEenZ1cK0+q0+wsJew9qUg/DyD8k3JzYsZAi5gYi2mA=
 github.com/oklog/run v1.1.0/go.mod h1:sVPdnTZT1zYwAJeCMu2Th4T21pA3FPOQRfWjQlk7DVU=
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
-github.com/onomyprotocol/reserve v0.0.0-demo.10 h1:NcYo5W5YcqRbKnU+JbHMuI54+myyfcE8Z4+dbFfQAvc=
-github.com/onomyprotocol/reserve v0.0.0-demo.10/go.mod h1:xSaz6quV4tiuM/n+j+Ad1usfWZZHZXBMPQbFQw1UlIs=
+github.com/onomyprotocol/reserve v0.0.0-demo.11 h1:Qm2xtVS8sr4elA8PAGDiYVPod1+PhxbAKppoLA3VwZ0=
+github.com/onomyprotocol/reserve v0.0.0-demo.11/go.mod h1:xSaz6quV4tiuM/n+j+Ad1usfWZZHZXBMPQbFQw1UlIs=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.12.1/go.mod h1:zj2OWP4+oCPe1qIXoGWkgMRwljMUYCdkwsT2108oapk=
