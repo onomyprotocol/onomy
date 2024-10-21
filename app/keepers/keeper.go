@@ -309,12 +309,7 @@ func NewAppKeeper(
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
 
-	// Create static IBC router, add transfer route, then set and seal it.
-	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
-	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 	// Register the proposal types
 	// Deprecated: Avoid adding new handlers, instead use the new proposal flow
 	// by granting the governance module the right to execute the message.
@@ -409,6 +404,14 @@ func NewAppKeeper(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
+	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
+
+	// Create static IBC router, add transfer route, then set and seal it.
+	ibcRouter := porttypes.NewRouter().
+		AddRoute(ibctransfertypes.ModuleName, ibcmodule)
+
+	appKeepers.IBCKeeper.SetRouter(ibcRouter)
+
 	return appKeepers
 }
 
@@ -441,7 +444,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(daotypes.ModuleName)
 	paramsKeeper.Subspace(psmtypes.ModuleName)
 	paramsKeeper.Subspace(auctiontypes.ModuleName)
-	paramsKeeper.Subspace(oracletypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
+	paramsKeeper.Subspace(oracletypes.ModuleName)
 	paramsKeeper.Subspace(vaultstypes.ModuleName)
 
 	return paramsKeeper
