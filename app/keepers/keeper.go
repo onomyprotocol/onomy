@@ -378,7 +378,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())              //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())     //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
-	paramsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
+	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(daotypes.ModuleName)
 
 	return paramsKeeper
