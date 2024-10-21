@@ -291,12 +291,6 @@ func NewAppKeeper(
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
-
-	// Create static IBC router, add transfer route, then set and seal it.
-	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
-	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 	// Register the proposal types
 	// Deprecated: Avoid adding new handlers, instead use the new proposal flow
 	// by granting the governance module the right to execute the message.
@@ -349,6 +343,13 @@ func NewAppKeeper(
 		appKeepers.MintKeeper,
 		appKeepers.StakingKeeper,
 	)
+
+	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
+
+	// Create static IBC router, add transfer route, then set and seal it.
+	ibcRouter := porttypes.NewRouter()
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
+	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
 	return appKeepers
 }
