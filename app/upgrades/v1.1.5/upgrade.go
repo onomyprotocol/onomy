@@ -12,8 +12,6 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-
-	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 // Name is migration name.
@@ -80,12 +78,6 @@ func CreateUpgradeHandler(
 			// send to dao module account
 			// vesting account should be able to send coins normally after
 			// we converted it back to a base account.
-			bal := bk.GetAllBalances(ctx, sdk.MustAccAddressFromBech32(addr))
-			err = bk.SendCoinsFromAccountToModule(ctx, sdk.MustAccAddressFromBech32(addr), daotypes.ModuleName, bal)
-			if err != nil {
-				sdkCtx.Logger().Error("Error reallocating funds")
-				return nil, err
-			}
 		}
 		sdkCtx.Logger().Info("Finished reallocating funds")
 
