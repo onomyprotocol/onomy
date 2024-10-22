@@ -59,6 +59,20 @@ import (
 	"github.com/onomyprotocol/onomy/x/dao"
 	daokeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
 	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
+
+	auctionKeeper "github.com/onomyprotocol/reserve/x/auction/keeper"
+	oracleKeeper "github.com/onomyprotocol/reserve/x/oracle/keeper"
+	psmKeeper "github.com/onomyprotocol/reserve/x/psm/keeper"
+	vaultsKeeper "github.com/onomyprotocol/reserve/x/vaults/keeper"
+	vaults "github.com/onomyprotocol/reserve/x/vaults/module"
+
+	auctiontypes "github.com/onomyprotocol/reserve/x/auction/types"
+	oracletypes "github.com/onomyprotocol/reserve/x/oracle/types"
+	psmtypes "github.com/onomyprotocol/reserve/x/psm/types"
+	vaultstypes "github.com/onomyprotocol/reserve/x/vaults/types"
+
+	oracle "github.com/onomyprotocol/reserve/x/oracle"
+	psm "github.com/onomyprotocol/reserve/x/psm/module"
 )
 
 type AppKeepers struct {
@@ -87,14 +101,18 @@ type AppKeepers struct {
 	TransferKeeper        ibctransferkeeper.Keeper
 
 	// make scoped keepers public for test purposes.
-	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
-	ScopedICSproviderkeeper capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	// Modules.
 	TransferModule transfer.AppModule
 
 	DaoKeeper daokeeper.Keeper
+
+	PSMKeeper        psmKeeper.Keeper
+	AuctionKeeper    auctionKeeper.Keeper
+	VaultsKeeper     vaultsKeeper.Keeper
+	OracleMockKeeper oracleKeeper.Keeper
 }
 
 func NewAppKeeper(
@@ -291,12 +309,7 @@ func NewAppKeeper(
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
 
-	// Create static IBC router, add transfer route, then set and seal it.
-	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
-	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 	// Register the proposal types
 	// Deprecated: Avoid adding new handlers, instead use the new proposal flow
 	// by granting the governance module the right to execute the message.
@@ -306,7 +319,10 @@ func NewAppKeeper(
 		AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
 		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(appKeepers.DaoKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)).
+		AddRoute(psmtypes.RouterKey, psm.NewPSMProposalHandler(&appKeepers.PSMKeeper)).
+		AddRoute(oracletypes.RouterKey, oracle.NewOracleProposalHandler(appKeepers.OracleMockKeeper)).
+		AddRoute(vaultstypes.RouterKey, vaults.NewVaultsProposalHandler(&appKeepers.VaultsKeeper))
 
 	// Set legacy router for backwards compatibility with gov v1beta1.
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)
@@ -350,6 +366,52 @@ func NewAppKeeper(
 		appKeepers.StakingKeeper,
 	)
 
+	appKeepers.OracleMockKeeper = oracleKeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(appKeepers.keys[oracletypes.ModuleName]),
+		logger,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		// appKeepers.GetIBCKeeper,
+		// appKeepers.GetScopedIBCKeeper,
+	)
+
+	appKeepers.PSMKeeper = psmKeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(appKeepers.keys[psmtypes.ModuleName]),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		appKeepers.BankKeeper,
+		appKeepers.AccountKeeper,
+		appKeepers.OracleMockKeeper,
+	)
+
+	appKeepers.VaultsKeeper = *vaultsKeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(appKeepers.keys[vaultstypes.ModuleName]),
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+		appKeepers.OracleMockKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	appKeepers.AuctionKeeper = auctionKeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(appKeepers.keys[auctiontypes.ModuleName]),
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+		&appKeepers.VaultsKeeper,
+		appKeepers.OracleMockKeeper,
+		logger,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
+
+	// Create static IBC router, add transfer route, then set and seal it.
+	ibcRouter := porttypes.NewRouter().
+		AddRoute(ibctransfertypes.ModuleName, ibcmodule)
+
+	appKeepers.IBCKeeper.SetRouter(ibcRouter)
+
 	return appKeepers
 }
 
@@ -380,6 +442,10 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
 	paramsKeeper.Subspace(daotypes.ModuleName)
+	paramsKeeper.Subspace(psmtypes.ModuleName)
+	paramsKeeper.Subspace(auctiontypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName)
+	paramsKeeper.Subspace(vaultstypes.ModuleName)
 
 	return paramsKeeper
 }
@@ -396,4 +462,12 @@ func (r *DefaultFeemarketDenomResolver) ConvertToDenom(_ sdk.Context, coin sdk.D
 
 func (r *DefaultFeemarketDenomResolver) ExtraDenoms(_ sdk.Context) ([]string, error) {
 	return []string{}, nil
+}
+
+func (a AppKeepers) GetIBCKeeper() *ibckeeper.Keeper {
+	return a.IBCKeeper
+}
+
+func (a AppKeepers) GetScopedIBCKeeper(string) capabilitykeeper.ScopedKeeper {
+	return a.ScopedIBCKeeper
 }
