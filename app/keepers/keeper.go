@@ -56,10 +56,6 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
-	"github.com/onomyprotocol/onomy/x/dao"
-	daokeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
-	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
-
 	auctionKeeper "github.com/onomyprotocol/reserve/x/auction/keeper"
 	oracleKeeper "github.com/onomyprotocol/reserve/x/oracle/keeper"
 	psmKeeper "github.com/onomyprotocol/reserve/x/psm/keeper"
@@ -106,8 +102,6 @@ type AppKeepers struct {
 
 	// Modules.
 	TransferModule transfer.AppModule
-
-	DaoKeeper daokeeper.Keeper
 
 	PSMKeeper        psmKeeper.Keeper
 	AuctionKeeper    auctionKeeper.Keeper
@@ -255,11 +249,6 @@ func NewAppKeeper(
 	)
 
 	// protect the dao module form the slashing.
-	appKeepers.StakingKeeper = appKeepers.StakingKeeper.SetSlashingProtestedModules(func() map[string]struct{} {
-		return map[string]struct{}{
-			daotypes.ModuleName: {},
-		}
-	})
 	// UpgradeKeeper must be created before IBCKeeper.
 	appKeepers.UpgradeKeeper = upgradekeeper.NewKeeper(
 		skipUpgradeHeights,
@@ -309,7 +298,6 @@ func NewAppKeeper(
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-
 	// Register the proposal types
 	// Deprecated: Avoid adding new handlers, instead use the new proposal flow
 	// by granting the governance module the right to execute the message.
@@ -318,7 +306,6 @@ func NewAppKeeper(
 	govRouter.
 		AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
-		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(appKeepers.DaoKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)).
 		AddRoute(psmtypes.RouterKey, psm.NewPSMProposalHandler(&appKeepers.PSMKeeper)).
 		AddRoute(oracletypes.RouterKey, oracle.NewOracleProposalHandler(appKeepers.OracleMockKeeper)).
@@ -352,19 +339,6 @@ func NewAppKeeper(
 	)
 
 	appKeepers.TransferModule = transfer.NewAppModule(appKeepers.TransferKeeper)
-
-	appKeepers.DaoKeeper = *daokeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(appKeepers.keys[daotypes.StoreKey]),
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		appKeepers.GetSubspace(daotypes.ModuleName),
-		appKeepers.BankKeeper,
-		appKeepers.AccountKeeper,
-		appKeepers.DistrKeeper,
-		appKeepers.GovKeeper,
-		appKeepers.MintKeeper,
-		appKeepers.StakingKeeper,
-	)
 
 	appKeepers.OracleMockKeeper = oracleKeeper.NewKeeper(
 		appCodec,
@@ -441,7 +415,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())     //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
-	paramsKeeper.Subspace(daotypes.ModuleName)
 	paramsKeeper.Subspace(psmtypes.ModuleName)
 	paramsKeeper.Subspace(auctiontypes.ModuleName)
 	paramsKeeper.Subspace(oracletypes.ModuleName)
