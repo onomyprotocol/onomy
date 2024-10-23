@@ -28,7 +28,7 @@ onomyd tx oracle set-price atom 5 --home=$HOME/.onomyd/validator1  --from valida
 sleep 31
 onomyd q bank balances $(onomyd keys show test1 --home=$HOME/.onomyd/validator1  --keyring-backend test -a)
 
-onomyd tx auction bid 2 60000000nomUSD 5.0 --from test1 --home=$HOME/.onomyd/validator1 --keyring-backend test --fees 20stake --chain-id testing-1 -y
+onomyd tx auction bid 0 60000000nomUSD 5.0 --from test1 --home=$HOME/.onomyd/validator1 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 
 echo "wating long time, query auction ratecurrent = 1.1...liquidate"
 # onomyd tx aution 
