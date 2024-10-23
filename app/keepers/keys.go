@@ -19,8 +19,6 @@ import (
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
-
-	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 func (appKeepers *AppKeepers) GenerateKeys() {
@@ -43,7 +41,6 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		capabilitytypes.StoreKey,
 		feegrant.StoreKey,
 		authzkeeper.StoreKey,
-		daotypes.StoreKey,
 		consensusparamtypes.StoreKey,
 	)
 

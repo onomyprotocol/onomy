@@ -55,10 +55,6 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
-
-	"github.com/onomyprotocol/onomy/x/dao"
-	daokeeper "github.com/onomyprotocol/onomy/x/dao/keeper"
-	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 type AppKeepers struct {
@@ -93,8 +89,6 @@ type AppKeepers struct {
 
 	// Modules.
 	TransferModule transfer.AppModule
-
-	DaoKeeper daokeeper.Keeper
 }
 
 func NewAppKeeper(
@@ -237,11 +231,6 @@ func NewAppKeeper(
 	)
 
 	// protect the dao module form the slashing.
-	appKeepers.StakingKeeper = appKeepers.StakingKeeper.SetSlashingProtestedModules(func() map[string]struct{} {
-		return map[string]struct{}{
-			daotypes.ModuleName: {},
-		}
-	})
 	// UpgradeKeeper must be created before IBCKeeper.
 	appKeepers.UpgradeKeeper = upgradekeeper.NewKeeper(
 		skipUpgradeHeights,
@@ -291,12 +280,6 @@ func NewAppKeeper(
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
-
-	// Create static IBC router, add transfer route, then set and seal it.
-	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
-	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 	// Register the proposal types
 	// Deprecated: Avoid adding new handlers, instead use the new proposal flow
 	// by granting the governance module the right to execute the message.
@@ -305,7 +288,6 @@ func NewAppKeeper(
 	govRouter.
 		AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
-		AddRoute(daotypes.RouterKey, dao.NewProposalHandler(appKeepers.DaoKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
 
 	// Set legacy router for backwards compatibility with gov v1beta1.
@@ -337,18 +319,12 @@ func NewAppKeeper(
 
 	appKeepers.TransferModule = transfer.NewAppModule(appKeepers.TransferKeeper)
 
-	appKeepers.DaoKeeper = *daokeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(appKeepers.keys[daotypes.StoreKey]),
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		appKeepers.GetSubspace(daotypes.ModuleName),
-		appKeepers.BankKeeper,
-		appKeepers.AccountKeeper,
-		appKeepers.DistrKeeper,
-		appKeepers.GovKeeper,
-		appKeepers.MintKeeper,
-		appKeepers.StakingKeeper,
-	)
+	ibcmodule := transfer.NewIBCModule(appKeepers.TransferKeeper)
+
+	// Create static IBC router, add transfer route, then set and seal it.
+	ibcRouter := porttypes.NewRouter()
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcmodule)
+	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
 	return appKeepers
 }
@@ -379,7 +355,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())     //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
-	paramsKeeper.Subspace(daotypes.ModuleName)
 
 	return paramsKeeper
 }
