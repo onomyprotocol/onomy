@@ -210,6 +210,7 @@ require (
 // require github.com/gogo/protobuf v1.3.2
 
 replace (
+	github.com/cosmos/cosmos-sdk => github.com/DongLieu/cosmos-sdk v0.50.8-onomy
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )
