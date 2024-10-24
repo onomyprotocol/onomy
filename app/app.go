@@ -59,8 +59,8 @@ import (
 	"github.com/onomyprotocol/onomy/app/upgrades"
 	v1_1_6 "github.com/onomyprotocol/onomy/app/upgrades/v1.1.6"
 	v2_0_0 "github.com/onomyprotocol/onomy/app/upgrades/v2.0.0"
-	v2_0_1 "github.com/onomyprotocol/onomy/app/upgrades/v2.0.1"
 	v2_1_0 "github.com/onomyprotocol/onomy/app/upgrades/v2.1.0"
+	v2_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v2.1.1"
 	"github.com/onomyprotocol/onomy/docs"
 )
 
@@ -462,8 +462,8 @@ func (app *OnomyApp) SimulationManager() *module.SimulationManager {
 func (app *OnomyApp) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(v1_1_6.Name, v1_1_6.UpgradeHandler)
 	app.UpgradeKeeper.SetUpgradeHandler(v2_0_0.Name, v2_0_0.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers))
-	app.UpgradeKeeper.SetUpgradeHandler(v2_0_1.Name, v2_0_1.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers))
 	app.UpgradeKeeper.SetUpgradeHandler(v2_1_0.Name, v2_1_0.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers))
+	app.UpgradeKeeper.SetUpgradeHandler(v2_1_1.Name, v2_1_1.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers))
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
@@ -482,16 +482,15 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Deleted: []string{"provider"},
 		}
-	case v2_0_1.Name:
-		storeUpgrades = &storetypes.StoreUpgrades{
-			Deleted: []string{"dao"},
-		}
 	case v2_0_0.Name:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{"consensus", "crisis", "dao"},
 		}
-
 	case v2_1_0.Name:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Deleted: []string{"dao"},
+		}
+	case v2_1_1.Name:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{"vaults", "oracle", "auction", "psm"},
 		}
