@@ -4,6 +4,7 @@ package v2_1_1 //nolint:revive,stylecheck // app version
 import (
 	"context"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
 	"github.com/onomyprotocol/onomy/app/keepers"
@@ -20,6 +21,12 @@ func CreateUpgradeHandler(
 ) upgradetypes.UpgradeHandler {
 
 	return func(c context.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+		ctx := sdk.UnwrapSDKContext(c)
+		vm, err := mm.RunMigrations(ctx, configurator, vm)
+		if err != nil {
+			return vm, err
+		}
+
 		return vm, nil
 	}
 }
