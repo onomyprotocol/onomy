@@ -67,7 +67,7 @@ import (
 	psmtypes "github.com/onomyprotocol/reserve/x/psm/types"
 	vaultstypes "github.com/onomyprotocol/reserve/x/vaults/types"
 
-	oracle "github.com/onomyprotocol/reserve/x/oracle"
+	// oracle "github.com/onomyprotocol/reserve/x/oracle"
 	psm "github.com/onomyprotocol/reserve/x/psm/module"
 )
 
@@ -308,7 +308,7 @@ func NewAppKeeper(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)).
 		AddRoute(psmtypes.RouterKey, psm.NewPSMProposalHandler(&appKeepers.PSMKeeper)).
-		AddRoute(oracletypes.RouterKey, oracle.NewOracleProposalHandler(appKeepers.OracleMockKeeper)).
+		// AddRoute(oracletypes.RouterKey, oracle.NewOracleProposalHandler(appKeepers.OracleMockKeeper)).
 		AddRoute(vaultstypes.RouterKey, vaults.NewVaultsProposalHandler(&appKeepers.VaultsKeeper))
 
 	// Set legacy router for backwards compatibility with gov v1beta1.
@@ -344,9 +344,11 @@ func NewAppKeeper(
 		appCodec,
 		runtime.NewKVStoreService(appKeepers.keys[oracletypes.ModuleName]),
 		logger,
+		appKeepers.AccountKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		// appKeepers.GetIBCKeeper,
-		// appKeepers.GetScopedIBCKeeper,
+		appKeepers.IBCKeeper.ChannelKeeper,
+		appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.ScopedIBCKeeper,
 	)
 
 	appKeepers.PSMKeeper = psmKeeper.NewKeeper(

@@ -10,7 +10,7 @@ require (
 	github.com/cometbft/cometbft v0.38.12
 	github.com/cosmos/cosmos-db v1.0.2
 	github.com/cosmos/cosmos-sdk v0.50.8
-	github.com/cosmos/ibc-go/v8 v8.3.2
+	github.com/cosmos/ibc-go/v8 v8.4.0
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
@@ -215,6 +215,6 @@ require (
 replace (
 	github.com/cosmos/cosmos-sdk => github.com/DongLieu/cosmos-sdk v0.50.8-onomy
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
-	// github.com/onomyprotocol/reserve => /Users/donglieu/102024/reserve
+	github.com/onomyprotocol/reserve => /Users/donglieu/112024/reserve
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )
