@@ -68,6 +68,7 @@ import (
 	vaultstypes "github.com/onomyprotocol/reserve/x/vaults/types"
 
 	// oracle "github.com/onomyprotocol/reserve/x/oracle"
+	oraclemodule "github.com/onomyprotocol/reserve/x/oracle/module"
 	psm "github.com/onomyprotocol/reserve/x/psm/module"
 )
 
@@ -343,7 +344,7 @@ func NewAppKeeper(
 
 	appKeepers.OracleKeeper = oracleKeeper.NewKeeper(
 		appCodec,
-		runtime.NewKVStoreService(appKeepers.keys[oracletypes.ModuleName]),
+		runtime.NewKVStoreService(appKeepers.keys[oracletypes.StoreKey]),
 		logger,
 		appKeepers.AccountKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -385,7 +386,8 @@ func NewAppKeeper(
 
 	// Create static IBC router, add transfer route, then set and seal it.
 	ibcRouter := porttypes.NewRouter().
-		AddRoute(ibctransfertypes.ModuleName, ibcmodule)
+		AddRoute(ibctransfertypes.ModuleName, ibcmodule).
+		AddRoute(oracletypes.ModuleName, oraclemodule.NewIBCModule(appKeepers.OracleKeeper))
 
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
 
@@ -420,7 +422,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
 	paramsKeeper.Subspace(psmtypes.ModuleName)
 	paramsKeeper.Subspace(auctiontypes.ModuleName)
-	paramsKeeper.Subspace(oracletypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName).WithKeyTable(oracletypes.ParamKeyTable())
 	paramsKeeper.Subspace(vaultstypes.ModuleName)
 
 	return paramsKeeper
