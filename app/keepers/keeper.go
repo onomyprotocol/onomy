@@ -99,6 +99,7 @@ type AppKeepers struct {
 	// make scoped keepers public for test purposes.
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	ScopedOracleKeeper   capabilitykeeper.ScopedKeeper
 
 	// Modules.
 	TransferModule transfer.AppModule
@@ -163,6 +164,7 @@ func NewAppKeeper(
 
 	appKeepers.ScopedIBCKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	appKeepers.ScopedTransferKeeper = appKeepers.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	appKeepers.ScopedOracleKeeper = appKeepers.CapabilityKeeper.ScopeToModule(oracletypes.ModuleName)
 
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
 	// their scoped modules in `NewApp` with `ScopeToModule`.
@@ -347,7 +349,7 @@ func NewAppKeeper(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		appKeepers.IBCKeeper.ChannelKeeper,
 		appKeepers.IBCKeeper.PortKeeper,
-		appKeepers.ScopedIBCKeeper,
+		appKeepers.ScopedOracleKeeper,
 	)
 
 	appKeepers.PSMKeeper = psmKeeper.NewKeeper(
