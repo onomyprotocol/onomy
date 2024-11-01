@@ -103,10 +103,10 @@ type AppKeepers struct {
 	// Modules.
 	TransferModule transfer.AppModule
 
-	PSMKeeper        psmKeeper.Keeper
-	AuctionKeeper    auctionKeeper.Keeper
-	VaultsKeeper     vaultsKeeper.Keeper
-	OracleMockKeeper oracleKeeper.Keeper
+	PSMKeeper     psmKeeper.Keeper
+	AuctionKeeper auctionKeeper.Keeper
+	VaultsKeeper  vaultsKeeper.Keeper
+	OracleKeeper  oracleKeeper.Keeper
 }
 
 func NewAppKeeper(
@@ -308,7 +308,6 @@ func NewAppKeeper(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)).
 		AddRoute(psmtypes.RouterKey, psm.NewPSMProposalHandler(&appKeepers.PSMKeeper)).
-		// AddRoute(oracletypes.RouterKey, oracle.NewOracleProposalHandler(appKeepers.OracleMockKeeper)).
 		AddRoute(vaultstypes.RouterKey, vaults.NewVaultsProposalHandler(&appKeepers.VaultsKeeper))
 
 	// Set legacy router for backwards compatibility with gov v1beta1.
@@ -340,7 +339,7 @@ func NewAppKeeper(
 
 	appKeepers.TransferModule = transfer.NewAppModule(appKeepers.TransferKeeper)
 
-	appKeepers.OracleMockKeeper = oracleKeeper.NewKeeper(
+	appKeepers.OracleKeeper = oracleKeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(appKeepers.keys[oracletypes.ModuleName]),
 		logger,
@@ -357,7 +356,7 @@ func NewAppKeeper(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		appKeepers.BankKeeper,
 		appKeepers.AccountKeeper,
-		appKeepers.OracleMockKeeper,
+		appKeepers.OracleKeeper,
 	)
 
 	appKeepers.VaultsKeeper = *vaultsKeeper.NewKeeper(
@@ -365,7 +364,7 @@ func NewAppKeeper(
 		runtime.NewKVStoreService(appKeepers.keys[vaultstypes.ModuleName]),
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
-		appKeepers.OracleMockKeeper,
+		appKeepers.OracleKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -375,7 +374,7 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		&appKeepers.VaultsKeeper,
-		appKeepers.OracleMockKeeper,
+		appKeepers.OracleKeeper,
 		logger,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
