@@ -23,10 +23,3 @@ jobs:
         run: |
           mkdir -p coverage
           go test -v -coverpkg=./... -coverprofile=coverage/coverage.out -covermode=atomic ./...
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/coverage.out
-          flags: cosmos
-          fail_ci_if_error: true
