@@ -33,5 +33,6 @@ sleep 7
 echo "I will buy all the remaining"
 onomyd tx auction bid 0 60000000nomEUR 5.0 --from test3 --home=$HOME/.onomyd/validator1 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 
-echo "wating long time, query auction ratecurrent = 1.1...liquidate"
+echo "wating long t
+ime, query auction ratecurrent = 1.1...liquidate"
 # onomyd tx aution 
