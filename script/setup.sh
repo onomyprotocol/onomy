@@ -6,7 +6,7 @@ onomyd tx oracle set-price nomUSD 1 --home=$HOME/.onomyd/validator1  --from vali
 onomyd tx oracle set-price fet 1.3 --home=$HOME/.onomyd/validator2  --from validator2 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 onomyd tx oracle set-price atom 8.0 --home=$HOME/.onomyd/validator3  --from validator3 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 sleep 7
-onomyd q oracle  get-price fet
+onomyd q oracle  price fet nomUSD
 onomyd tx gov submit-proposal ./script/proposal-1.json --home=$HOME/.onomyd/validator1  --from validator1 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 # vote∑
 sleep 7

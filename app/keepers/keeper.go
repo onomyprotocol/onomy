@@ -56,19 +56,19 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
-	oracleKeeper "github.com/likesToEatFish/research-cosmos/x/oracle/keeper"
 	auctionKeeper "github.com/onomyprotocol/reserve/x/auction/keeper"
+	oracleKeeper "github.com/onomyprotocol/reserve/x/oracle/keeper"
 	psmKeeper "github.com/onomyprotocol/reserve/x/psm/keeper"
 	vaultsKeeper "github.com/onomyprotocol/reserve/x/vaults/keeper"
 	vaults "github.com/onomyprotocol/reserve/x/vaults/module"
 
-	oracletypes "github.com/likesToEatFish/research-cosmos/x/oracle/types"
 	auctiontypes "github.com/onomyprotocol/reserve/x/auction/types"
+	oracletypes "github.com/onomyprotocol/reserve/x/oracle/types"
 	psmtypes "github.com/onomyprotocol/reserve/x/psm/types"
 	vaultstypes "github.com/onomyprotocol/reserve/x/vaults/types"
 
-	// oracle "github.com/likesToEatFish/research-cosmos/x/oracle"
-	oraclemodule "github.com/likesToEatFish/research-cosmos/x/oracle/module"
+	// oracle "github.com/onomyprotocol/reserve/x/oracle"
+	oraclemodule "github.com/onomyprotocol/reserve/x/oracle/module"
 	psm "github.com/onomyprotocol/reserve/x/psm/module"
 )
 
