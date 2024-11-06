@@ -121,6 +121,6 @@ sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$node1@localhost:26656
 
 # # start all three validators/
 # onomyd start --home=$HOME/.onomyd/validator1
-onomyd start --home=$HOME/.onomyd/validator1 &
-onomyd start --home=$HOME/.onomyd/validator2 &
-onomyd start --home=$HOME/.onomyd/validator3
+screen -S onomy1 -t onomy1 -d -m onomyd start --home=$HOME/.onomyd/validator1 
+screen -S onomy2 -t onomy2 -d -m onomyd start --home=$HOME/.onomyd/validator2 
+screen -S onomy3 -t onomy3 -d -m onomyd start --home=$HOME/.onomyd/validator3
