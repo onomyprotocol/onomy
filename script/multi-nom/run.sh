@@ -5,5 +5,5 @@ sleep 7
 ./script/multi-nom/vaults-test1-eur.sh
 sleep 7
 ./script/multi-nom/vaults-test1-jpy.sh
-sleep7
+sleep 7
 ./script/multi-nom/vaults-test1-usd.sh
