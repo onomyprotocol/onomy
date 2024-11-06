@@ -53,7 +53,7 @@ func NewRootCmd() *cobra.Command {
 	}()
 
 	// pull request #171 refactor: Remove ics. So we need re-register proto can read state
-	RegisterInterfacesICSProvider(tempApplication.InterfaceRegistry())
+	RegisterInterfacesUsed(tempApplication.InterfaceRegistry())
 
 	initClientCtx := client.Context{}.
 		WithCodec(tempApplication.AppCodec()).
@@ -169,7 +169,7 @@ var tempDir = func() string {
 }
 
 // // pull request #171 refactor: Remove ics. So we need re-register proto can read state
-func RegisterInterfacesICSProvider(registry cdctypes.InterfaceRegistry) {
+func RegisterInterfacesUsed(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*govtypes.Content)(nil),
 		&ibcprovidertypes.ConsumerAdditionProposal{},
