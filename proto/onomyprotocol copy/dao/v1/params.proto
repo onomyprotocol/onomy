@@ -1,0 +1,30 @@
+syntax = "proto3";
+package onomyprotocol.dao.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/onomyprotocol/onomy/x/dao/types";
+
+// Params defines the parameters for the module.
+message Params {
+  // option (gogoproto.goproto_stringer) = false;
+
+  // the period of blocks to withdraw the dao staking reward
+  int64 withdraw_reward_period = 1 [(gogoproto.moretags) = "yaml:\"withdraw_reward_period\""];
+  // the rate of total dao's staking coins to keep unstaked
+  bytes pool_rate = 2 [
+       (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  // the max rage of total dao's staking coins to be allowed in proposals
+  bytes max_proposal_rate = 3 [
+        (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  // the max validator's commission to be staked by the dao
+  bytes max_val_commission = 4 [
+        (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+}
