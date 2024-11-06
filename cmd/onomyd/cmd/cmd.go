@@ -28,6 +28,8 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	ibcprovidertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
+
+	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
 // NewRootCmd initiates the cli for onomy chain.
@@ -172,4 +174,5 @@ func RegisterInterfacesICSProvider(registry cdctypes.InterfaceRegistry) {
 		(*govtypes.Content)(nil),
 		&ibcprovidertypes.ConsumerAdditionProposal{},
 	)
+	daotypes.RegisterInterfaces(registry)
 }
