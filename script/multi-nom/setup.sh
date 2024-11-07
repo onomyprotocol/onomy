@@ -7,7 +7,7 @@
 # onomyd tx oracle set-price nomEUR 1 --home=$HOME/.onomyd/validator1  --from validator1 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 sleep 7
 # onomyd q oracle  price atom nomEUR
-onomyd tx gov submit-proposal ./script/multi-nom/proposal-vault-1.json --home=$HOME/.onomyd/validator1  --from validator1 --keyring-backend test --fees 20stake --chain-id testing-1 -y
+onomyd tx gov submit-proposal ./script/multi-nom/proposal-vault-1.json --home=$HOME/.onomyd/validator1  --from validator1 --keyring-backend test --fees 30stake --chain-id testing-1 -y  --gas 255331
 # onomyd tx gov submit-proposal ./script/multi-nom/proposal-vault-2.json --home=$HOME/.onomyd/validator2  --from validator2 --keyring-backend test --fees 20stake --chain-id testing-1 -y
 # vote∑
 sleep 7
