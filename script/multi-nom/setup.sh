@@ -31,6 +31,6 @@ echo $test2 | onomyd keys add test2 --recover --keyring-backend=test --home=$HOM
 test3="famous aware lens hair relax cancel glove gloom enforce shoulder spread valley any uncover slush gain dawn slim pipe kidney come exit bench bomb"
 echo $test3 | onomyd keys add test3 --recover --keyring-backend=test --home=$HOME/.onomyd/validator1
 
-onomyd tx bank multi-send $( onomyd keys show validator1 --home=$HOME/.onomyd/validator1  --keyring-backend test -a) $( onomyd keys show test1 --home=$HOME/.onomyd/validator1  --keyring-backend test -a) $( onomyd keys show test2 --home=$HOME/.onomyd/validator1  --keyring-backend test -a) $( onomyd keys show test3 --home=$HOME/.onomyd/validator1  --keyring-backend test -a) 1000000000nomUSD,10000stake,100000000atom,1000000000nomEUR,10000000000000000000nomJPY --home=$HOME/.onomyd/validator1 --keyring-backend test --fees 250stake --chain-id testing-1 -y --gas 2036038
+onomyd tx bank multi-send $( onomyd keys show validator1 --home=$HOME/.onomyd/validator1  --keyring-backend test -a) $( onomyd keys show test1 --home=$HOME/.onomyd/validator1  --keyring-backend test -a) $( onomyd keys show test2 --home=$HOME/.onomyd/validator1  --keyring-backend test -a) $( onomyd keys show test3 --home=$HOME/.onomyd/validator1  --keyring-backend test -a) 1000000000nomUSD,10000stake,100000000atom,1000000000nomEUR,10000000000000000000nomJPY,150000000000000000anom --home=$HOME/.onomyd/validator1 --keyring-backend test --fees 250stake --chain-id testing-1 -y --gas 2036038
 sleep 8
 onomyd q gov proposals
