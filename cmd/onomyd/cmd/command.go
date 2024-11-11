@@ -147,7 +147,7 @@ func newApp(
 		baseappOptions...,
 	)
 
-	RegisterInterfacesICSProvider(app.InterfaceRegistry())
+	RegisterInterfacesUsed(app.InterfaceRegistry())
 	return app
 }
 
