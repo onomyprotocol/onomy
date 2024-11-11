@@ -377,7 +377,6 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 		&appKeepers.VaultsKeeper,
-		appKeepers.OracleKeeper,
 		logger,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
