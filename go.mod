@@ -14,7 +14,7 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/onomyprotocol/reserve v0.1.3-testnet3.0.20241112054113-4770d125467b
+	github.com/onomyprotocol/reserve v0.1.3-testnet3.0.20241112075933-e1415a855fa2
 	github.com/spf13/cast v1.6.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
