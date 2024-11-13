@@ -213,7 +213,7 @@ require (
 // require github.com/gogo/protobuf v1.3.2
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.50.8-onomy
+	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.50.8-onomy-sdk
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	// github.com/onomyprotocol/reserve => /Users/donglieu/102024/reserve
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
