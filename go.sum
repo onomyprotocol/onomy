@@ -227,8 +227,6 @@ github.com/DataDog/datadog-go v3.2.0+incompatible h1:qSG2N4FghB1He/r2mFrWKCaL7dX
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/DataDog/zstd v1.5.5 h1:oWf5W7GtOLgp6bciQYDmhHHjdhYkALu6S/5Ni9ZgSvQ=
 github.com/DataDog/zstd v1.5.5/go.mod h1:g4AWEaM3yOg3HYfnJ3YIawPnVdXJh9QME85blwSAmyw=
-github.com/DongLieu/cosmos-sdk v0.50.8-onomy h1:+VnpHmxjUzTBc6eGM5B8quC2tEPU2VXBqzI1Cl1xFDc=
-github.com/DongLieu/cosmos-sdk v0.50.8-onomy/go.mod h1:Zb+DgHtiByNwgj71IlJBXwOq6dLhtyAq3AgqpXm/jHo=
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Microsoft/go-winio v0.6.1 h1:9/kr64B9VUZrLm5YYwbGtUJnMgqWVOdUAXu6Migciow=
 github.com/Microsoft/go-winio v0.6.1/go.mod h1:LRdKpFKfdobln8UmuiYcKPot9D2v6svN5+sAH+4kjUM=
@@ -825,8 +823,10 @@ github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQ
 github.com/oklog/run v1.1.0 h1:GEenZ1cK0+q0+wsJew9qUg/DyD8k3JzYsZAi5gYi2mA=
 github.com/oklog/run v1.1.0/go.mod h1:sVPdnTZT1zYwAJeCMu2Th4T21pA3FPOQRfWjQlk7DVU=
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
-github.com/onomyprotocol/reserve v0.1.4-testnet4 h1:c3V+4TAsG25of8cnU99O4GGyW/mSK0sHaL6EZzABrtc=
-github.com/onomyprotocol/reserve v0.1.4-testnet4/go.mod h1:Yf1czGGCaFEjsDZ2CX9VYCawzAIEEjBAdK6kjD1ocXE=
+github.com/onomyprotocol/onomy-sdk v0.50.8-onomy-sdk h1:NA3OLSooUvsULODvnmtXik+lLzOVlM/oL3bP8j0bx/w=
+github.com/onomyprotocol/onomy-sdk v0.50.8-onomy-sdk/go.mod h1:Zb+DgHtiByNwgj71IlJBXwOq6dLhtyAq3AgqpXm/jHo=
+github.com/onomyprotocol/reserve v0.1.4-testnet4.0.20241113052136-5e221832fcf9 h1:H6ckmWqR9S3tzuPpeqI998BgVB9ZoNXZKyYotVAOX0M=
+github.com/onomyprotocol/reserve v0.1.4-testnet4.0.20241113052136-5e221832fcf9/go.mod h1:Yf1czGGCaFEjsDZ2CX9VYCawzAIEEjBAdK6kjD1ocXE=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.12.1/go.mod h1:zj2OWP4+oCPe1qIXoGWkgMRwljMUYCdkwsT2108oapk=
