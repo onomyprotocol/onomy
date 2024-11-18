@@ -25,7 +25,6 @@ func CreateUpgradeHandler(
 	configurator module.Configurator,
 	keepers *keepers.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-
 	return func(c context.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 		ctx := sdk.UnwrapSDKContext(c)
 
@@ -46,7 +45,7 @@ func CreateUpgradeHandler(
 
 		err = initializeConsensusParamVersion(ctx, keepers.ConsensusParamsKeeper)
 		if err != nil {
-			// don't hard fail here, as this is not critical for the upgrade to succeed
+			// don't hard fail here, as this is not critical for the upgrade to succeed.
 			ctx.Logger().Error("Error initializing ConsensusParam Version:", "message", err.Error())
 		}
 
@@ -74,7 +73,7 @@ func initializeConsensusParamVersion(ctx sdk.Context, consensusKeeper consensusp
 // # inflation_max: "0.200000000000000000"
 // # inflation_min: "0.070000000000000000"
 // # inflation_rate_change: "0.130000000000000000"
-// # mint_denom: anom
+// # mint_denom: anom.
 func collectionsInitializeMintParam(ctx sdk.Context, mintKeeper mintkeeper.Keeper) error {
 	params, err := mintKeeper.Params.Get(ctx)
 	if err != nil {
@@ -97,7 +96,7 @@ func unbondNow(ctx sdk.Context, keepers *keepers.AppKeepers, ubfs []UnbondingFai
 			continue
 		}
 
-		// ensure accuracy
+		// ensure accuracy.
 		if u.Delegator == ubd.DelegatorAddress && u.Validator == ubd.ValidatorAddress && ubd.Entries[u.Index].Balance.Equal(u.Balance) {
 			ubd.Entries[u.Index].UnbondingId = u.UnbondingId
 			ubd.Entries[u.Index].CompletionTime = ctx.BlockHeader().Time.Add(-1 * time.Hour)
@@ -106,13 +105,12 @@ func unbondNow(ctx sdk.Context, keepers *keepers.AppKeepers, ubfs []UnbondingFai
 			err := keepers.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
 			if err != nil {
 				return err
-
 			}
 			err = keepers.StakingKeeper.UnbondingCanComplete(ctx, u.UnbondingId)
 			if err != nil {
 				return err
 			}
-			// index ubd update
+			// index ubd update.
 			indexUpdate(u.Delegator, u.Validator, u.Index, ubfs)
 		}
 	}
@@ -120,14 +118,14 @@ func unbondNow(ctx sdk.Context, keepers *keepers.AppKeepers, ubfs []UnbondingFai
 	return nil
 }
 
-// getInfoUnbondingFail Get info UnbondingFail
+// getInfoUnbondingFail Get info UnbondingFail.
 func getInfoUnbondingFail(ctx sdk.Context, keepers *keepers.AppKeepers) (ubf []UnbondingFail, err error) {
-	// ubdID errors: 3500-3700 (3599-3678)
+	// ubdID errors: 3500-3700 (3599-3678).
 	for i := 3500; i < 3700; i++ {
 		id := uint64(i)
 		ubd, err := keepers.StakingKeeper.GetUnbondingDelegationByUnbondingID(ctx, id)
 		if err != nil {
-			continue // not found ubd for id
+			continue // not found ubd for id.
 		}
 
 		for idx, entry := range ubd.Entries {
@@ -141,7 +139,6 @@ func getInfoUnbondingFail(ctx sdk.Context, keepers *keepers.AppKeepers) (ubf []U
 				})
 				break
 			}
-
 		}
 	}
 

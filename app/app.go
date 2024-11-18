@@ -61,7 +61,6 @@ import (
 	v2_0_0 "github.com/onomyprotocol/onomy/app/upgrades/v2.0.0"
 	v2_1_0 "github.com/onomyprotocol/onomy/app/upgrades/v2.1.0"
 	v2_2_0 "github.com/onomyprotocol/onomy/app/upgrades/v2.2.0"
-
 	"github.com/onomyprotocol/onomy/docs"
 )
 

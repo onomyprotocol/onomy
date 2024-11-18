@@ -12,7 +12,7 @@ func initCometBFTConfig() *cmtcfg.Config {
 
 	// these values put a higher strain on node memory
 	// cfg.P2P.MaxNumInboundPeers = 100
-	// cfg.P2P.MaxNumOutboundPeers = 40
+	// cfg.P2P.MaxNumOutboundPeers = 40.
 
 	return cfg
 }
@@ -41,7 +41,7 @@ func initAppConfig() (string, interface{}) {
 	//
 	// In tests, we set the min gas prices to 0.
 	// srvCfg.MinGasPrices = "0stake"
-	// srvCfg.BaseConfig.IAVLDisableFastNode = true // disable fastnode by default
+	// srvCfg.BaseConfig.IAVLDisableFastNode = true // disable fastnode by default.
 
 	customAppConfig := CustomAppConfig{
 		Config: *srvCfg,
@@ -56,7 +56,7 @@ func initAppConfig() (string, interface{}) {
 	// query_gas_limit = 300000
 	// # This is the number of wasm vm instances we keep cached in memory for speed-up
 	// # Warning: this is currently unstable and may lead to crashes, best to keep for 0 unless testing locally
-	// lru_size = 0`
+	// lru_size = 0`.
 
 	return customAppTemplate, customAppConfig
 }

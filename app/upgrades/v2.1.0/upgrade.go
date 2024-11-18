@@ -22,14 +22,13 @@ func CreateUpgradeHandler(
 	configurator module.Configurator,
 	keepers *keepers.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-
 	return func(c context.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 		ctx := sdk.UnwrapSDKContext(c)
 		baseAppLegacySS := keepers.ParamsKeeper.Subspace(baseapp.Paramspace).
 			WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 		baseapp.MigrateParams(ctx, baseAppLegacySS, &keepers.ConsensusParamsKeeper.ParamsStore)
 
-		// onomy1vwr8z00ty7mqnk4dtchr9mn9j96nuh6wrlww93
+		// onomy1vwr8z00ty7mqnk4dtchr9mn9j96nuh6wrlww93.
 		addrTreasury := sdk.MustAccAddressFromBech32("onomy1vwr8z00ty7mqnk4dtchr9mn9j96nuh6wrlww93")
 		treasuryTokens := keepers.BankKeeper.GetAllBalances(ctx, addrTreasury)
 		err := keepers.DistrKeeper.FundCommunityPool(ctx, treasuryTokens, addrTreasury)

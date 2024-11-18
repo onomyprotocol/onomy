@@ -14,7 +14,7 @@ import (
 	"github.com/onomyprotocol/onomy/app/keepers"
 )
 
-// Name is migration name. Migrate denom "anom" to "ono"
+// Name is migration name. Migrate denom "anom" to "ono".
 const Name = "v2.2.0"
 
 // UpgradeHandler is an x/upgrade handler.
@@ -23,10 +23,9 @@ func CreateUpgradeHandler(
 	configurator module.Configurator,
 	keepers *keepers.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-
 	return func(c context.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 		ctx := sdk.UnwrapSDKContext(c)
-		// staking
+		// staking.
 		paramStaking, err := keepers.StakingKeeper.GetParams(ctx)
 		if err != nil {
 			return vm, err
@@ -37,9 +36,9 @@ func CreateUpgradeHandler(
 			return vm, err
 		}
 
-		// distribution
+		// distribution.
 
-		// bank
+		// bank.
 		keepers.BankKeeper.SetDenomMetaData(ctx, banktypes.Metadata{
 			Base: "ono",
 			DenomUnits: []*banktypes.DenomUnit{
@@ -72,7 +71,19 @@ func CreateUpgradeHandler(
 			return vm, err
 		}
 
-		// gov
+		err = keepers.BankKeeper.Supply.Walk(ctx, nil, func(key string, value math.Int) (stop bool, err error) {
+			if key == "anom" {
+				err = keepers.BankKeeper.Supply.Set(ctx, "ono", value)
+				err = keepers.BankKeeper.Supply.Remove(ctx, "anom")
+			}
+			return false, err
+		})
+		if err != nil {
+			return vm, err
+		}
+
+		// gov min_deposit, expedited_min_deposit.
+
 		govParams, err := keepers.GovKeeper.Params.Get(ctx)
 		if err != nil {
 			return vm, err
@@ -82,6 +93,12 @@ func CreateUpgradeHandler(
 				govParams.MinDeposit[i] = sdk.NewCoin("ono", coin.Amount)
 			}
 		}
+		for i, coin := range govParams.ExpeditedMinDeposit {
+			if coin.Denom == "anom" {
+				govParams.ExpeditedMinDeposit[i] = sdk.NewCoin("ono", coin.Amount)
+			}
+		}
+
 		err = keepers.GovKeeper.Params.Set(ctx, govParams)
 		if err != nil {
 			return vm, err
