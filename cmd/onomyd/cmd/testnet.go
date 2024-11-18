@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
@@ -30,7 +31,7 @@ import (
 )
 
 const (
-	valVotingPower int64 = 900000000000000
+	valVotingPower string = "9000000000000000000"
 )
 
 var (
@@ -93,6 +94,10 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 
 	// STAKING
 	//
+	amount, ok := math.NewIntFromString(valVotingPower)
+	if !ok {
+		tmos.Exit(fmt.Sprintf("can not convert string %s to int", valVotingPower))
+	}
 
 	// Create Validator struct for our new validator.
 	newVal := stakingtypes.Validator{
@@ -100,7 +105,7 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		ConsensusPubkey: pubkeyAny,
 		Jailed:          false,
 		Status:          stakingtypes.Bonded,
-		Tokens:          math.NewInt(valVotingPower),
+		Tokens:          amount,
 		DelegatorShares: math.LegacyMustNewDecFromStr("10000000"),
 		Description: stakingtypes.Description{
 			Moniker: "Testnet Validator",
@@ -210,6 +215,16 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		}
 	}
 
+	// GOV
+	//
+	govParams, _ := app.GovKeeper.Params.Get(ctx)
+	timeVoting := time.Second * 15
+	govParams.VotingPeriod = &timeVoting
+
+	err = app.GovKeeper.Params.Set(ctx, govParams)
+	if err != nil {
+		tmos.Exit(err.Error())
+	}
 	return app
 }
 
