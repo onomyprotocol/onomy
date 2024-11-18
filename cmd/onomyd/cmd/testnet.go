@@ -171,6 +171,12 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		tmos.Exit(err.Error())
 	}
 
+	pramStaking, err := app.StakingKeeper.GetParams(ctx)
+	if err != nil {
+		tmos.Exit(err.Error())
+	}
+	pramStaking.UnbondingTime = time.Second * 30
+	app.StakingKeeper.SetParams(ctx, pramStaking)
 	// DISTRIBUTION.
 	//
 
