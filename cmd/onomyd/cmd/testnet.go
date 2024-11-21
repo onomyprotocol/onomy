@@ -205,7 +205,7 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		tmos.Exit(err.Error())
 	}
 
-	amountMint, _ := math.NewIntFromString("500000000000000000000000000000")
+	amountMint, _ := math.NewIntFromString("6000172359524523127229047209154")
 	defaultCoins := sdk.NewCoins(sdk.NewCoin(bondDenom, amountMint), sdk.NewCoin("stake", amountMint))
 
 	// Fund local accounts.
@@ -223,7 +223,7 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 	// GOV.
 	//
 	govParams, _ := app.GovKeeper.Params.Get(ctx)
-	timeVoting := time.Second * 15
+	timeVoting := time.Second * 30
 	govParams.VotingPeriod = &timeVoting
 
 	err = app.GovKeeper.Params.Set(ctx, govParams)
