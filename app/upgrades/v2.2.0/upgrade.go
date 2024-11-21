@@ -3,6 +3,7 @@ package v2_1_0 //nolint:revive,stylecheck // app version
 
 import (
 	"context"
+	"slices"
 
 	"cosmossdk.io/collections"
 	"cosmossdk.io/math"
@@ -10,6 +11,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibctypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 
 	"github.com/onomyprotocol/onomy/app/keepers"
 )
@@ -36,7 +39,13 @@ func CreateUpgradeHandler(
 			return vm, err
 		}
 
-		// distribution.
+		// ibc
+		var escrowAddress []string
+		balancesIBCTranfer := keepers.TransferKeeper.GetAllTotalEscrowed(ctx)
+		keepers.IBCKeeper.ChannelKeeper.IterateChannels(ctx, func(ic ibctypes.IdentifiedChannel) bool {
+			escrowAddress = append(escrowAddress, transfertypes.GetEscrowAddress(ic.PortId, ic.ChannelId).String())
+			return false
+		})
 
 		// bank.
 		keepers.BankKeeper.SetDenomMetaData(ctx, banktypes.Metadata{
@@ -54,8 +63,12 @@ func CreateUpgradeHandler(
 		})
 
 		err = keepers.BankKeeper.Balances.Walk(ctx, nil, func(key collections.Pair[sdk.AccAddress, string], value math.Int) (stop bool, err error) {
+			addr := sdk.AccAddress(key.K1())
+			if slices.Contains(escrowAddress, addr.String()) {
+				return false, nil
+			}
 			if key.K2() == "anom" {
-				err = keepers.BankKeeper.Balances.Set(ctx, collections.Join(sdk.AccAddress(key.K1()), "ono"), value)
+				err = keepers.BankKeeper.Balances.Set(ctx, collections.Join(addr, "ono"), value)
 				if err != nil {
 					return true, err
 				}
@@ -73,8 +86,11 @@ func CreateUpgradeHandler(
 
 		err = keepers.BankKeeper.Supply.Walk(ctx, nil, func(key string, value math.Int) (stop bool, err error) {
 			if key == "anom" {
-				err = keepers.BankKeeper.Supply.Set(ctx, "ono", value)
-				err = keepers.BankKeeper.Supply.Remove(ctx, "anom")
+				err = keepers.BankKeeper.Supply.Set(ctx, "ono", value.Sub(balancesIBCTranfer.AmountOf("anom")))
+				if err != nil {
+					return true, err
+				}
+				err = keepers.BankKeeper.Supply.Set(ctx, "anom", balancesIBCTranfer.AmountOf("anom"))
 			}
 			return false, err
 		})
