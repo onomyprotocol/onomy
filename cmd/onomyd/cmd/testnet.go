@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
@@ -30,12 +31,10 @@ import (
 )
 
 const (
-	valVotingPower int64 = 900000000000000
+	valVotingPower string = "9000000000000000000"
 )
 
-var (
-	flagAccountsToFund = "accounts-to-fund"
-)
+var flagAccountsToFund = "accounts-to-fund"
 
 type valArgs struct {
 	newValAddr         bytes.HexBytes
@@ -64,14 +63,14 @@ it enables developers to configure their local environments to reflect mainnet c
 // newTestnetApp starts by running the normal newApp method. From there, the app interface returned is modified in order
 // for a testnet to be created from the provided app.
 func newTestnetApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
-	// Create an app and type cast to an App
+	// Create an app and type cast to an App.
 	newApp := newApp(logger, db, traceStore, appOpts)
 	testApp, ok := newApp.(*app.OnomyApp)
 	if !ok {
 		panic("app created from newApp is not of type App")
 	}
 
-	// Get command args
+	// Get command args.
 	args, err := getCommandArgs(appOpts)
 	if err != nil {
 		panic(err)
@@ -81,7 +80,7 @@ func newTestnetApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts s
 }
 
 func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
-	// Required Changes:
+	// Required Changes:.
 	//
 	ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
 
@@ -91,8 +90,12 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		tmos.Exit(err.Error())
 	}
 
-	// STAKING
+	// STAKING.
 	//
+	amount, ok := math.NewIntFromString(valVotingPower)
+	if !ok {
+		tmos.Exit(fmt.Sprintf("can not convert string %s to int", valVotingPower))
+	}
 
 	// Create Validator struct for our new validator.
 	newVal := stakingtypes.Validator{
@@ -100,7 +103,7 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		ConsensusPubkey: pubkeyAny,
 		Jailed:          false,
 		Status:          stakingtypes.Bonded,
-		Tokens:          math.NewInt(valVotingPower),
+		Tokens:          amount,
 		DelegatorShares: math.LegacyMustNewDecFromStr("10000000"),
 		Description: stakingtypes.Description{
 			Moniker: "Testnet Validator",
@@ -120,7 +123,7 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		tmos.Exit(err.Error())
 	}
 
-	// Remove all validators from power store
+	// Remove all validators from power store.
 	stakingKey := app.GetKey(stakingtypes.ModuleName)
 	stakingStore := ctx.KVStore(stakingKey)
 	iterator, err := app.StakingKeeper.ValidatorsPowerStoreIterator(ctx)
@@ -132,7 +135,7 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 	}
 	iterator.Close()
 
-	// Remove all valdiators from last validators store
+	// Remove all valdiators from last validators store.
 	iterator, err = app.StakingKeeper.LastValidatorsIterator(ctx)
 	if err != nil {
 		tmos.Exit(err.Error())
@@ -142,21 +145,21 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 	}
 	iterator.Close()
 
-	// Remove all validators from validators store
+	// Remove all validators from validators store.
 	iterator = stakingStore.Iterator(stakingtypes.ValidatorsKey, storetypes.PrefixEndBytes(stakingtypes.ValidatorsKey))
 	for ; iterator.Valid(); iterator.Next() {
 		stakingStore.Delete(iterator.Key())
 	}
 	iterator.Close()
 
-	// Remove all validators from unbonding queue
+	// Remove all validators from unbonding queue.
 	iterator = stakingStore.Iterator(stakingtypes.ValidatorQueueKey, storetypes.PrefixEndBytes(stakingtypes.ValidatorQueueKey))
 	for ; iterator.Valid(); iterator.Next() {
 		stakingStore.Delete(iterator.Key())
 	}
 	iterator.Close()
 
-	// Add our validator to power and last validators store
+	// Add our validator to power and last validators store.
 	app.StakingKeeper.SetValidator(ctx, newVal)
 	err = app.StakingKeeper.SetValidatorByConsAddr(ctx, newVal)
 	if err != nil {
@@ -168,16 +171,22 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		tmos.Exit(err.Error())
 	}
 
-	// DISTRIBUTION
+	pramStaking, err := app.StakingKeeper.GetParams(ctx)
+	if err != nil {
+		tmos.Exit(err.Error())
+	}
+	pramStaking.UnbondingTime = time.Second * 30
+	app.StakingKeeper.SetParams(ctx, pramStaking)
+	// DISTRIBUTION.
 	//
 
-	// Initialize records for this validator across all distribution stores
+	// Initialize records for this validator across all distribution stores.
 	app.DistrKeeper.SetValidatorHistoricalRewards(ctx, validator, 0, distrtypes.NewValidatorHistoricalRewards(sdk.DecCoins{}, 1))
 	app.DistrKeeper.SetValidatorCurrentRewards(ctx, validator, distrtypes.NewValidatorCurrentRewards(sdk.DecCoins{}, 1))
 	app.DistrKeeper.SetValidatorAccumulatedCommission(ctx, validator, distrtypes.InitialValidatorAccumulatedCommission())
 	app.DistrKeeper.SetValidatorOutstandingRewards(ctx, validator, distrtypes.ValidatorOutstandingRewards{Rewards: sdk.DecCoins{}})
 
-	// SLASHING
+	// SLASHING.
 	//
 
 	// Set validator signing info for our new validator.
@@ -189,16 +198,17 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 	}
 	app.SlashingKeeper.SetValidatorSigningInfo(ctx, newConsAddr, newValidatorSigningInfo)
 
-	// BANK
+	// BANK.
 	//
 	bondDenom, err := app.StakingKeeper.BondDenom(ctx)
 	if err != nil {
 		tmos.Exit(err.Error())
 	}
 
-	defaultCoins := sdk.NewCoins(sdk.NewInt64Coin(bondDenom, 1000000000))
+	amountMint, _ := math.NewIntFromString("6000172359524523127229047209154")
+	defaultCoins := sdk.NewCoins(sdk.NewCoin(bondDenom, amountMint), sdk.NewCoin("stake", amountMint))
 
-	// Fund local accounts
+	// Fund local accounts.
 	for _, account := range args.accountsToFund {
 		err := app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, defaultCoins)
 		if err != nil {
@@ -210,10 +220,20 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		}
 	}
 
+	// GOV.
+	//
+	govParams, _ := app.GovKeeper.Params.Get(ctx)
+	timeVoting := time.Second * 30
+	govParams.VotingPeriod = &timeVoting
+
+	err = app.GovKeeper.Params.Set(ctx, govParams)
+	if err != nil {
+		tmos.Exit(err.Error())
+	}
 	return app
 }
 
-// parse the input flags and returns valArgs
+// parse the input flags and returns valArgs.
 func getCommandArgs(appOpts servertypes.AppOptions) (valArgs, error) {
 	args := valArgs{}
 
@@ -238,7 +258,7 @@ func getCommandArgs(appOpts servertypes.AppOptions) (valArgs, error) {
 	}
 	args.upgradeToTrigger = upgradeToTrigger
 
-	// validate  and set accounts to fund
+	// validate  and set accounts to fund.
 	accountsString := cast.ToString(appOpts.Get(flagAccountsToFund))
 
 	for _, account := range strings.Split(accountsString, ",") {
@@ -251,7 +271,7 @@ func getCommandArgs(appOpts servertypes.AppOptions) (valArgs, error) {
 		}
 	}
 
-	// home dir
+	// home dir.
 	homeDir := cast.ToString(appOpts.Get(flags.FlagHome))
 	if homeDir == "" {
 		return args, fmt.Errorf("invalid home dir")

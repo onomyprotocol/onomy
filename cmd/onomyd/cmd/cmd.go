@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
@@ -19,16 +20,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	ibcprovidertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
 	"github.com/onomyprotocol/onomy/app"
-
-	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	ibcprovidertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
-
 	daotypes "github.com/onomyprotocol/onomy/x/dao/types"
 )
 
@@ -52,7 +50,7 @@ func NewRootCmd() *cobra.Command {
 		}
 	}()
 
-	// pull request #171 refactor: Remove ics. So we need re-register proto can read state
+	// pull request #171 refactor: Remove ics. So we need re-register proto can read state.
 	RegisterInterfacesUsed(tempApplication.InterfaceRegistry())
 
 	initClientCtx := client.Context{}.
@@ -168,7 +166,7 @@ var tempDir = func() string {
 	return dir
 }
 
-// // pull request #171 refactor: Remove ics. So we need re-register proto can read state
+// // pull request #171 refactor: Remove ics. So we need re-register proto can read state.
 func RegisterInterfacesUsed(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*govtypes.Content)(nil),

@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"errors"
-	// "fmt"
+	// "fmt".
 	"io"
 
 	"cosmossdk.io/log"
@@ -44,7 +44,7 @@ func initRootCmd(
 
 	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
 
-	// add keybase, auxiliary RPC, query, genesis, and tx child commands
+	// add keybase, auxiliary RPC, query, genesis, and tx child commands.
 	rootCmd.AddCommand(
 		server.StatusCommand(),
 		genesisCommand(txConfig, basicManager),
@@ -58,9 +58,9 @@ func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
 }
 
-// genesisCommand builds genesis-related `reserved genesis` command. Users may provide application specific commands as a parameter
+// genesisCommand builds genesis-related `reserved genesis` command. Users may provide application specific commands as a parameter.
 func genesisCommand(txConfig client.TxConfig, basicManager module.BasicManager, cmds ...*cobra.Command) *cobra.Command {
-	// fmt.Println(basicManager["genutil"] == nil)
+	// fmt.Println(basicManager["genutil"] == nil).
 	cmd := genutilcli.Commands(txConfig, basicManager, app.DefaultNodeHome)
 
 	for _, subCmd := range cmds {
@@ -122,7 +122,7 @@ func txCommand(basicManager module.BasicManager) *cobra.Command {
 	return cmd
 }
 
-// newApp creates the application
+// newApp creates the application.
 func newApp(
 	logger log.Logger,
 	db dbm.DB,
@@ -162,9 +162,7 @@ func appExport(
 	appOpts servertypes.AppOptions,
 	modulesToExport []string,
 ) (servertypes.ExportedApp, error) {
-	var (
-		bApp *app.OnomyApp
-	)
+	var bApp *app.OnomyApp
 
 	// this check is necessary as we use the flag in x/upgrade.
 	// we can exit more gracefully by checking the flag here.
@@ -178,7 +176,7 @@ func appExport(
 		return servertypes.ExportedApp{}, errors.New("appOpts is not viper.Viper")
 	}
 
-	// overwrite the FlagInvCheckPeriod
+	// overwrite the FlagInvCheckPeriod.
 	viperAppOpts.Set(server.FlagInvCheckPeriod, 1)
 	appOpts = viperAppOpts
 
