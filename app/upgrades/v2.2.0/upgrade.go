@@ -20,6 +20,8 @@ import (
 // Name is migration name. Migrate denom "anom" to "ono".
 const Name = "v2.2.0"
 
+var newDenom = "ono"
+
 // UpgradeHandler is an x/upgrade handler.
 func CreateUpgradeHandler(
 	mm *module.Manager,
@@ -33,7 +35,7 @@ func CreateUpgradeHandler(
 		if err != nil {
 			return vm, err
 		}
-		paramStaking.BondDenom = "ono"
+		paramStaking.BondDenom = newDenom
 		err = keepers.StakingKeeper.SetParams(ctx, paramStaking)
 		if err != nil {
 			return vm, err
@@ -49,14 +51,14 @@ func CreateUpgradeHandler(
 
 		// bank.
 		keepers.BankKeeper.SetDenomMetaData(ctx, banktypes.Metadata{
-			Base: "ono",
+			Base: newDenom,
 			DenomUnits: []*banktypes.DenomUnit{
 				{
-					Denom:    "ono",
+					Denom:    newDenom,
 					Exponent: 18,
 				},
 			},
-			Display:     "ono",
+			Display:     newDenom,
 			Name:        "ONO",
 			Symbol:      "ONO",
 			Description: `Migrate denom "anom" to "ono"`,
@@ -68,7 +70,7 @@ func CreateUpgradeHandler(
 				return false, nil
 			}
 			if key.K2() == "anom" {
-				err = keepers.BankKeeper.Balances.Set(ctx, collections.Join(addr, "ono"), value)
+				err = keepers.BankKeeper.Balances.Set(ctx, collections.Join(addr, newDenom), value)
 				if err != nil {
 					return true, err
 				}
@@ -86,7 +88,7 @@ func CreateUpgradeHandler(
 
 		err = keepers.BankKeeper.Supply.Walk(ctx, nil, func(key string, value math.Int) (stop bool, err error) {
 			if key == "anom" {
-				err = keepers.BankKeeper.Supply.Set(ctx, "ono", value.Sub(balancesIBCTranfer.AmountOf("anom")))
+				err = keepers.BankKeeper.Supply.Set(ctx, newDenom, value.Sub(balancesIBCTranfer.AmountOf("anom")))
 				if err != nil {
 					return true, err
 				}
@@ -106,16 +108,26 @@ func CreateUpgradeHandler(
 		}
 		for i, coin := range govParams.MinDeposit {
 			if coin.Denom == "anom" {
-				govParams.MinDeposit[i] = sdk.NewCoin("ono", coin.Amount)
+				govParams.MinDeposit[i] = sdk.NewCoin(newDenom, coin.Amount)
 			}
 		}
 		for i, coin := range govParams.ExpeditedMinDeposit {
 			if coin.Denom == "anom" {
-				govParams.ExpeditedMinDeposit[i] = sdk.NewCoin("ono", coin.Amount)
+				govParams.ExpeditedMinDeposit[i] = sdk.NewCoin(newDenom, coin.Amount)
 			}
 		}
 
 		err = keepers.GovKeeper.Params.Set(ctx, govParams)
+		if err != nil {
+			return vm, err
+		}
+		// mint
+		mintParams, err := keepers.MintKeeper.Params.Get(ctx)
+		if err != nil {
+			return vm, err
+		}
+		mintParams.MintDenom = newDenom
+		err = keepers.MintKeeper.Params.Set(ctx, mintParams)
 		if err != nil {
 			return vm, err
 		}
