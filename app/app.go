@@ -61,6 +61,7 @@ import (
 	v2_0_0 "github.com/onomyprotocol/onomy/app/upgrades/v2.0.0"
 	v2_1_0 "github.com/onomyprotocol/onomy/app/upgrades/v2.1.0"
 	v2_1_1 "github.com/onomyprotocol/onomy/app/upgrades/v2.1.1"
+	v2_1_2 "github.com/onomyprotocol/onomy/app/upgrades/v2.1.2"
 	"github.com/onomyprotocol/onomy/docs"
 )
 
@@ -464,6 +465,7 @@ func (app *OnomyApp) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(v2_0_0.Name, v2_0_0.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers))
 	app.UpgradeKeeper.SetUpgradeHandler(v2_1_0.Name, v2_1_0.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers))
 	app.UpgradeKeeper.SetUpgradeHandler(v2_1_1.Name, v2_1_1.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers))
+	app.UpgradeKeeper.SetUpgradeHandler(v2_1_2.Name, v2_1_2.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers))
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
