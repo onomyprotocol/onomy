@@ -14,7 +14,7 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/onomyprotocol/reserve v0.1.7-testnet
+	github.com/onomyprotocol/reserve v0.1.8-testnet
 	github.com/spf13/cast v1.6.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
@@ -215,6 +215,5 @@ require (
 replace (
 	github.com/cosmos/cosmos-sdk => github.com/onomyprotocol/onomy-sdk v0.50.8-onomy-sdk
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
-	// github.com/onomyprotocol/reserve => /Users/donglieu/102024/reserve
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )
