@@ -1,5 +1,5 @@
 // Package v1_1_4 is contains chain upgrade of the corresponding version.
-package v2_1_1 //nolint:revive,stylecheck // app version
+package v2_1_2 //nolint:revive,stylecheck // app version
 
 import (
 	"context"
