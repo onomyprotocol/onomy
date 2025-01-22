@@ -45,6 +45,16 @@ import (
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
+
+	auctiontypes "github.com/onomyprotocol/reserve/x/auction/types"
+	oracletypes "github.com/onomyprotocol/reserve/x/oracle/types"
+	psmtypes "github.com/onomyprotocol/reserve/x/psm/types"
+	vaultstypes "github.com/onomyprotocol/reserve/x/vaults/types"
+
+	auction "github.com/onomyprotocol/reserve/x/auction/module"
+	oracle "github.com/onomyprotocol/reserve/x/oracle/module"
+	psm "github.com/onomyprotocol/reserve/x/psm/module"
+	vaults "github.com/onomyprotocol/reserve/x/vaults/module"
 )
 
 var (
@@ -57,6 +67,11 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		auctiontypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
+		vaultstypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
+		vaultstypes.ReserveModuleName:  {authtypes.Burner},
+		psmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
+		oracletypes.ModuleName:         nil,
 	}
 
 	// module accounts that are allowed to receive tokens.
@@ -93,6 +108,10 @@ func appModules(
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
 		genutil.NewAppModule(app.AccountKeeper, app.StakingKeeper, app, txConfig),
 		app.TransferModule,
+		auction.NewAppModule(appCodec, app.AuctionKeeper, app.AccountKeeper, app.BankKeeper),
+		vaults.NewAppModule(appCodec, app.VaultsKeeper, app.AccountKeeper, app.BankKeeper),
+		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
+		psm.NewAppModule(appCodec, app.PSMKeeper, app.AccountKeeper, app.BankKeeper),
 		// and.
 	}
 }
@@ -133,6 +152,10 @@ func orderBeginBlockers() []string {
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		oracletypes.ModuleName,
+		vaultstypes.ModuleName,
+		auctiontypes.ModuleName,
+		psmtypes.ModuleName,
 	}
 }
 
@@ -157,6 +180,10 @@ func orderEndBlockers() []string {
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		oracletypes.ModuleName,
+		vaultstypes.ModuleName,
+		auctiontypes.ModuleName,
+		psmtypes.ModuleName,
 	}
 }
 
@@ -181,6 +208,10 @@ func orderInitBlockers() []string {
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		crisistypes.ModuleName,
+		oracletypes.ModuleName,
+		vaultstypes.ModuleName,
+		auctiontypes.ModuleName,
+		psmtypes.ModuleName,
 	}
 }
 
