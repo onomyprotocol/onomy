@@ -8,7 +8,7 @@ import (
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
-	storetypes "cosmossdk.io/store/types"
+	// storetypes "cosmossdk.io/store/types"
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/libs/bytes"
 	tmos "github.com/cometbft/cometbft/libs/os"
@@ -90,8 +90,7 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		tmos.Exit(err.Error())
 	}
 
-	// STAKING.
-	//
+	// STAKING
 	amount, ok := math.NewIntFromString(valVotingPower)
 	if !ok {
 		tmos.Exit(fmt.Sprintf("can not convert string %s to int", valVotingPower))
@@ -123,41 +122,41 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		tmos.Exit(err.Error())
 	}
 
-	// Remove all validators from power store.
-	stakingKey := app.GetKey(stakingtypes.ModuleName)
-	stakingStore := ctx.KVStore(stakingKey)
-	iterator, err := app.StakingKeeper.ValidatorsPowerStoreIterator(ctx)
-	if err != nil {
-		tmos.Exit(err.Error())
-	}
-	for ; iterator.Valid(); iterator.Next() {
-		stakingStore.Delete(iterator.Key())
-	}
-	iterator.Close()
+	// // Remove all validators from power store.
+	// stakingKey := app.GetKey(stakingtypes.ModuleName)
+	// stakingStore := ctx.KVStore(stakingKey)
+	// iterator, err := app.StakingKeeper.ValidatorsPowerStoreIterator(ctx)
+	// if err != nil {
+	// 	tmos.Exit(err.Error())
+	// }
+	// for ; iterator.Valid(); iterator.Next() {
+	// 	stakingStore.Delete(iterator.Key())
+	// }
+	// iterator.Close()
 
-	// Remove all valdiators from last validators store.
-	iterator, err = app.StakingKeeper.LastValidatorsIterator(ctx)
-	if err != nil {
-		tmos.Exit(err.Error())
-	}
-	for ; iterator.Valid(); iterator.Next() {
-		stakingStore.Delete(iterator.Key())
-	}
-	iterator.Close()
+	// // Remove all valdiators from last validators store.
+	// iterator, err = app.StakingKeeper.LastValidatorsIterator(ctx)
+	// if err != nil {
+	// 	tmos.Exit(err.Error())
+	// }
+	// for ; iterator.Valid(); iterator.Next() {
+	// 	stakingStore.Delete(iterator.Key())
+	// }
+	// iterator.Close()
 
-	// Remove all validators from validators store.
-	iterator = stakingStore.Iterator(stakingtypes.ValidatorsKey, storetypes.PrefixEndBytes(stakingtypes.ValidatorsKey))
-	for ; iterator.Valid(); iterator.Next() {
-		stakingStore.Delete(iterator.Key())
-	}
-	iterator.Close()
+	// // Remove all validators from validators store.
+	// iterator = stakingStore.Iterator(stakingtypes.ValidatorsKey, storetypes.PrefixEndBytes(stakingtypes.ValidatorsKey))
+	// for ; iterator.Valid(); iterator.Next() {
+	// 	stakingStore.Delete(iterator.Key())
+	// }
+	// iterator.Close()
 
-	// Remove all validators from unbonding queue.
-	iterator = stakingStore.Iterator(stakingtypes.ValidatorQueueKey, storetypes.PrefixEndBytes(stakingtypes.ValidatorQueueKey))
-	for ; iterator.Valid(); iterator.Next() {
-		stakingStore.Delete(iterator.Key())
-	}
-	iterator.Close()
+	// // Remove all validators from unbonding queue.
+	// iterator = stakingStore.Iterator(stakingtypes.ValidatorQueueKey, storetypes.PrefixEndBytes(stakingtypes.ValidatorQueueKey))
+	// for ; iterator.Valid(); iterator.Next() {
+	// 	stakingStore.Delete(iterator.Key())
+	// }
+	// iterator.Close()
 
 	// Add our validator to power and last validators store.
 	app.StakingKeeper.SetValidator(ctx, newVal)
@@ -166,7 +165,7 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 		tmos.Exit(err.Error())
 	}
 	app.StakingKeeper.SetValidatorByPowerIndex(ctx, newVal)
-	app.StakingKeeper.SetLastValidatorPower(ctx, validator, 0)
+	app.StakingKeeper.SetLastValidatorPower(ctx, validator, 1000)
 	if err := app.StakingKeeper.Hooks().AfterValidatorCreated(ctx, validator); err != nil {
 		tmos.Exit(err.Error())
 	}
@@ -206,7 +205,12 @@ func initAppForTestnet(app *app.OnomyApp, args valArgs) *app.OnomyApp {
 	}
 
 	amountMint, _ := math.NewIntFromString("6000172359524523127229047209154")
-	defaultCoins := sdk.NewCoins(sdk.NewCoin(bondDenom, amountMint), sdk.NewCoin("stake", amountMint))
+	var defaultCoins sdk.Coins
+	if bondDenom != "stake" {
+		defaultCoins = sdk.NewCoins(sdk.NewCoin(bondDenom, amountMint), sdk.NewCoin("stake", amountMint))
+	} else {
+		defaultCoins = sdk.NewCoins(sdk.NewCoin("stake", amountMint))
+	}
 
 	// Fund local accounts.
 	for _, account := range args.accountsToFund {
